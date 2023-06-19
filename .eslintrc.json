@@ -1,0 +1,14 @@
+{
+  "extends": ["next/core-web-vitals", "../quality/eslint/config.json"],
+  "plugins": ["unused-imports"],
+  "rules": {
+    "unused-imports/no-unused-imports": "error",
+    "@typescript-eslint/no-namespace": "off",
+    "no-console": [
+      "error",
+      {
+        "allow": ["warn", "error"]
+      }
+    ]
+  }
+}

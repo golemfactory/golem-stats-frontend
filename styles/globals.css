@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  @apply dark:bg-slate-900;
+  @apply bg-gray-100;
+  min-height: 100vh;
+}
+
+.rowspacing {
+  border-spacing: 0 15px;
+}
+select {
+  border-right: 16px solid transparent;
+}
+
+.form-select {
+  @apply shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md;
+}
+
+thead {
+  @apply bg-golemblue;
+  @apply dark:bg-gray-800;
+  @apply py-24;
+  @apply sticky;
+  @apply top-0;
+  @apply z-10;
+}
+
+tbody {
+  @apply bg-white;
+  @apply dark:bg-gray-800;
+}
+
+.apexcharts-xaxis-annotations {
+  visibility: hidden;
+}
+
+.apexcharts-text,
+.apexcharts-pie-label {
+  @apply font-sans !important;
+}
+
+.dark #apexchartsareaxdatetime,
+.dark .apexcharts-text tspan,
+.dark .apexcharts-yaxis-title-text,
+.dark .apexcharts-legend-text,
+.dark .apexcharts-legend-series .apexcharts-legend-text,
+.dark .apexcharts-xaxistooltip,
+.dark .apexcharts-yaxistooltip,
+.dark .apexcharts-tooltip,
+.dark .apexcharts-point-annotations,
+.dark .apexcharts-legend-text span,
+.dark .apexcharts-yaxis-title {
+  fill: theme("colors.gray.400");
+  @apply text-gray-400 !important;
+  @apply font-sans !important;
+}
+
+.dark .apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title,
+.dark .apexcharts-tooltip.apexcharts-theme-light,
+.dark .apexcharts-xaxistooltip {
+  @apply font-sans !important;
+  @apply rounded-lg !important;
+  @apply p-1 !important;
+  @apply bg-gray-200;
+  background: theme("colors.gray.700/80") !important;
+  border: none !important;
+}
+
+.dark .apexcharts-gridline {
+  @apply stroke-gray-700 !important;
+}
+
+.dark .apexcharts-area-series,
+.dark .apexcharts-area,
+.dark .apexcharts-bar-area,
+.dark .apexcharts-pie-area {
+  @apply stroke-blue-700 !important;
+}
+.dark .apexcharts-bar-area {
+  @apply fill-blue-700 !important;
+}
+
+.dark .apexcharts-legend-text,
+.dark .apexcharts-legend-series .apexcharts-legend-text,
+.dark .apexcharts-datalabels {
+  @apply text-gray-300 !important;
+}
+
+.dark .apexcharts-text,
+.dark .apexcharts-pie-label {
+  @apply fill-white font-sans !important;
+}
+
+.apexcharts-toolbar {
+  @apply z-10 !important;
+}
+
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
