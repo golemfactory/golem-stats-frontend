@@ -12,6 +12,7 @@ export default function Document() {
                     content="Golem, Golem Network, blockchain, decentralized cloud, cryptocurrency, crypto, glm, GLM"
                     key={"keyword"}
                 />
+                <meta name="google-site-verification" content="5fpjcvtgYaJbTGz1kA5h6gRiVz0vpw3UiiBtRBvm7nc" />
                 <meta
                     name="description"
                     content="Golem Network Stats is a stats page and network explorer for the Golem Network. View live network data, historical data and more."
