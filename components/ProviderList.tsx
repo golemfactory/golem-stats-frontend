@@ -66,7 +66,7 @@ const FilterRow = ({ allKeys, onApply, data }) => {
 
     return (
         <>
-            <h2 className="text-2xl font-semibold dark:text-gray-300">Advanced filtering</h2>
+            <h2 className="text-2xl font-semibold dark:text-gray-300">Filtering</h2>
             <div className="grid grid-cols-4 gap-2">
                 <select className="form-select" value={key} onChange={(e) => setKey(e.target.value)}>
                     <option value="">Select a key</option>
