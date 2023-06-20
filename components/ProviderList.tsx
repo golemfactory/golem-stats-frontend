@@ -16,7 +16,7 @@ const FilterRow = ({ allKeys, onApply, data }) => {
     const [operator, setOperator] = useState("")
     const [value, setValue] = useState("")
 
-    const canApply = key && operator && value !== ""
+    const canApply = key && operator && (value !== "" || operator === "any")
 
     const handleApply = () => {
         if (canApply) {
