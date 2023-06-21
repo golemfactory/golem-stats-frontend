@@ -15,13 +15,13 @@ const NodeLookup = () => {
         setError("")
         await new Promise((r) => setTimeout(r, 800))
         try {
-            const response = await fetcher(`provider/wallet/${wallet}`)
+            const response = await fetcher(`v1/provider/node/${wallet.toLowerCase()}`)
             if (response.length === 0) {
                 setError("Node not found")
                 setLoading(false)
                 return
             } else {
-                router.push(`/network/provider/${wallet}`)
+                router.push(`/network/provider/${wallet.toLowerCase()}`)
                 setLoading(false)
             }
         } catch (error) {

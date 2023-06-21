@@ -14,14 +14,14 @@ const OperatorLookup = () => {
         setError("")
         await new Promise((r) => setTimeout(r, 800))
         try {
-            const response = await fetcher(`provider/wallet/${wallet}`)
+            const response = await fetcher(`v1/provider/wallet/${wallet.toLowerCase()}`)
 
             if (response.length === 0) {
                 setError("Operator not found")
                 setLoading(false)
                 return
             } else {
-                router.push(`/network/providers/operator/${wallet}`)
+                router.push(`/network/providers/operator/${wallet.toLowerCase()}`)
                 setLoading(false)
             }
         } catch (error) {
