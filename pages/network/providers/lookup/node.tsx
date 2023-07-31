@@ -25,7 +25,7 @@ const NodeLookup = () => {
                 setLoading(false)
             }
         } catch (error) {
-            setError("Operator not found")
+            setError("Node not found")
             setLoading(false)
             return
         }
