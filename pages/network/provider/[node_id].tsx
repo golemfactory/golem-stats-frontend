@@ -9,7 +9,7 @@ import useSWR from "swr"
 import { SEO } from "@/components/SEO"
 
 const useIncome = (node_id: string | undefined, initialIncome: object) => {
-    const { data, error } = useSWR(node_id ? `v1/provider/node/${node_id}/earnings` : null, fetcher, {
+    const { data, error } = useSWR(node_id ? `v1/provider/node/${node_id.toLowerCase()}/earnings` : null, fetcher, {
         initialData: initialIncome,
         refreshInterval: 10000,
     })
@@ -48,13 +48,17 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 
     // if node_id is an array, use the first value
     if (Array.isArray(node_id)) {
-        node_id = node_id[0]
+        node_id = node_id[0].toLowerCase()
     }
 
-    const { data: nodeData = initialData, error: nodeError } = useSWR(node_id ? `v1/provider/node/${node_id}` : null, fetcher, {
-        initialData: initialData,
-        refreshInterval: 10000,
-    })
+    const { data: nodeData = initialData, error: nodeError } = useSWR(
+        node_id ? `v1/provider/node/${node_id.toLowerCase()}` : null,
+        fetcher,
+        {
+            initialData: initialData,
+            refreshInterval: 10000,
+        }
+    )
 
     const { income: updatedIncome, error: incomeError } = useIncome(node_id, initialIncome)
 
@@ -139,12 +143,12 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 aria-label="Show Polygon Wallet"
                                 onClick={() => {
                                     if (nodeData[0].data["golem.com.payment.platform.erc20-mainnet-glm.address"]) {
+                                        window.open(`https://polygonscan.com/address/${nodeData[0].data["wallet"]}#tokentxns`, "_blank")
+                                    } else {
                                         window.open(
                                             `https://mumbai.polygonscan.com/address/${nodeData[0].data["wallet"]}#tokentxns`,
                                             "_blank"
                                         )
-                                    } else {
-                                        window.open(`https://polygonscan.com/address/${nodeData[0].data["wallet"]}#tokentxns`, "_blank")
                                     }
                                 }}
                                 type="button"
@@ -157,9 +161,9 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 aria-label="Show Etherscan Wallet"
                                 onClick={() => {
                                     if (nodeData[0].data["golem.com.payment.platform.erc20-mainnet-glm.address"]) {
-                                        window.open(`https://goerli.etherscan.io/address/${nodeData[0].data["wallet"]}`, "_blank")
-                                    } else {
                                         window.open(`https://etherscan.io/address/${nodeData[0].data["wallet"]}`, "_blank")
+                                    } else {
+                                        window.open(`https://goerli.etherscan.io/address/${nodeData[0].data["wallet"]}`, "_blank")
                                     }
                                 }}
                                 type="button"
@@ -274,7 +278,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                     </section>
 
                     <div className="lg:col-start-1 lg:col-span-12 col-span-12">
-                        <NodeActivityChart nodeId={nodeData[0].node_id} />
+                        <NodeActivityChart nodeId={nodeData[0].node_id.toLowerCase()} />
                     </div>
                 </div>
             </main>
@@ -284,9 +288,9 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 
 export async function getStaticProps({ params }: { params: { node_id: string } }) {
     try {
-        const initialData = await fetcher(`v1/provider/node/${params.node_id}`)
+        const initialData = await fetcher(`v1/provider/node/${params.node_id.toLowerCase()}`)
 
-        const income = await fetcher(`v1/provider/node/${params.node_id}/earnings`)
+        const income = await fetcher(`v1/provider/node/${params.node_id.toLowerCase()}/earnings`)
 
         return { props: { initialData, income }, revalidate: 2880 }
     } catch (error) {
@@ -423,7 +427,7 @@ export async function getStaticProps({ params }: { params: { node_id: string } }
 export async function getStaticPaths() {
     const nodes: any = await fetcher("v1/network/online") // endpoint to get all node_ids
     const paths = nodes.map((node: any) => ({
-        params: { node_id: node.node_id.toString() },
+        params: { node_id: node.node_id.toString().toLowerCase() },
     }))
 
     return { paths, fallback: "blocking" }
