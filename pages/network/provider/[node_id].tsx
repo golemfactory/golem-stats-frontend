@@ -429,8 +429,7 @@ export async function getStaticPaths() {
     const paths = nodes.map((node: any) => ({
         params: { node_id: node.node_id.toString().toLowerCase() },
     }))
-
-    return { paths, fallback: "blocking" }
+    return { paths, fallback: false }
 }
 
 export default ProviderDetailed

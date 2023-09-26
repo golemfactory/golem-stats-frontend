@@ -19,12 +19,12 @@ export default function Home() {
                     <h1 className="text-2xl font-medium dark:text-gray-300">Live Network Data</h1>
                 </div>
 
-                <div className="lg:col-span-6">
+                <div className="lg:col-span-12">
                     <NetworkVersionAdoption />
                 </div>
-                <div className="lg:col-span-6">
+                {/* <div className="lg:col-span-6">
                     <MarketAgreementOutcome />
-                </div>
+                </div> */}
                 <div className="lg:col-span-6">
                     <NetworkCPUArchitecture />
                 </div>
