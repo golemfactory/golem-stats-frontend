@@ -429,7 +429,7 @@ export async function getStaticPaths() {
     const paths = nodes.map((node: any) => ({
         params: { node_id: node.node_id.toString().toLowerCase() },
     }))
-    return { paths, fallback: false }
+    return { paths, fallback: true }
 }
 
 export default ProviderDetailed

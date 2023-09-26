@@ -26,7 +26,7 @@ export async function getStaticPaths() {
             params: { wallet_id: node.data["wallet"].toString() },
         }))
 
-    return { paths, fallback: false }
+    return { paths, fallback: true }
 }
 
 const NodeOperator: NextPage<NodeOperatorProps> = ({ wallet_id, initialData }) => {
