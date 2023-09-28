@@ -23,7 +23,7 @@ const NodeActivityChart = ({ nodeId }: { nodeId: string }) => {
         if (data && !error) {
             try {
                 const values = data.data.result[0].values
-                const computing = values.map(([time, value]: [number, string]) => [time * 1000, parseInt(value, 10)])
+                const computing = values.map(([time, value]: [number, string]) => [time * 1000, value > 0 ? 1 : 0])
                 setSeries([{ data: computing, name: "Status" }])
             } catch (error) {
                 console.error(error, data)
@@ -82,7 +82,7 @@ const NodeActivityChart = ({ nodeId }: { nodeId: string }) => {
             max: 1,
             tickAmount: 1,
             labels: {
-                formatter: (value: number) => (value === 1 ? "Computing" : "Idle"),
+                formatter: (value: number) => (value > 0 ? "Computing" : "Idle"),
             },
         },
 
