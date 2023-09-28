@@ -7,7 +7,7 @@ import { CircleStackIcon, CpuChipIcon, Square3Stack3DIcon } from "@heroicons/rea
 import { useRouter } from "next/router"
 import useSWR from "swr"
 import { SEO } from "@/components/SEO"
-import { useState, useEffect } from "react"
+
 const useIncome = (node_id: string | undefined, initialIncome: object) => {
     const { data, error } = useSWR(node_id ? `v1/provider/node/${node_id.toLowerCase()}/earnings` : null, fetcher, {
         initialData: initialIncome,
@@ -18,6 +18,8 @@ const useIncome = (node_id: string | undefined, initialIncome: object) => {
 
     if (data) {
         const keys = Object.keys(data)
+
+        console.log(keys)
 
         keys.forEach((key) => {
             formattedIncome[key] = RoundingFunction(parseFloat(data[key]), 2)
@@ -43,34 +45,11 @@ const EarningSection = ({ icon, title, value, unit }: { icon: React.ReactNode; t
 export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: object; initialIncome: object }) => {
     const router = useRouter()
     let { node_id } = router.query
-    const { data: activity, error } = useSWR(`v1/provider/node/${node_id}/activity`, fetcher, {
-        refreshInterval: 10000,
-    })
-    const [isComputing, setIsComputing] = useState(false)
 
     // if node_id is an array, use the first value
     if (Array.isArray(node_id)) {
         node_id = node_id[0].toLowerCase()
     }
-
-    useEffect(() => {
-        try {
-            if (activity && activity.data && Array.isArray(activity.data.result)) {
-                console.log("here")
-                const resultValues = activity.data.result[0]?.values
-                if (resultValues && resultValues.length > 0) {
-                    console.log("here2")
-                    const lastElementValue = resultValues[resultValues.length - 1]
-                    if (lastElementValue[1] === "1") {
-                        console.log("here3")
-                        setIsComputing(true)
-                    }
-                }
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }, [activity])
 
     const { data: nodeData = initialData, error: nodeError } = useSWR(
         node_id ? `v1/provider/node/${node_id.toLowerCase()}` : null,
@@ -130,7 +109,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                         </span>
                                     </div>
                                     <div>
-                                        {isComputing ? (
+                                        {nodeData[0].computing_now ? (
                                             <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-500 text-white">
                                                 Computing
                                             </span>
