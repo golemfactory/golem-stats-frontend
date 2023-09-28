@@ -22,7 +22,7 @@ const useIncome = (node_id: string | undefined, initialIncome: object) => {
         console.log(keys)
 
         keys.forEach((key) => {
-            formattedIncome[key] = RoundingFunction(parseFloat(data[key]), 2)
+            formattedIncome[key] = RoundingFunction(parseFloat(data[key]), 10)
         })
     }
 
