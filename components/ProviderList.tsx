@@ -124,7 +124,18 @@ const FilterRow = ({ allKeys, onApply, data }) => {
 
 function useProviderPagination(data) {
     const [page, setPage] = useState(1)
-    const sortedData = data.sort((a, b) => b.earnings_total - a.earnings_total)
+    const sortedData = data.sort((a, b) => {
+        // First, sort by online status (offline ones first)
+        if (b.online && !a.online) {
+            return 1
+        } else if (!b.online && a.online) {
+            return -1
+        }
+
+        // If both have the same online status, then sort by earnings_total
+        return b.earnings_total - a.earnings_total
+    })
+
     const paginatedData = sortedData.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
     const lastPage = Math.ceil(sortedData.length / ITEMS_PER_PAGE)
 
@@ -221,7 +232,7 @@ const Filters = ({ allKeys, onFilter, data }) => {
     )
 }
 
-export const ProviderList = ({ endpoint, initialData }) => {
+export const ProviderList = ({ endpoint, initialData, showOffline = false }) => {
     const { data, error } = useSWR(endpoint, fetcher, {
         refreshInterval: 10000,
         initialData: initialData,
@@ -232,15 +243,16 @@ export const ProviderList = ({ endpoint, initialData }) => {
     const filteredData = useMemo(() => {
         if (!data) return []
         return data.filter((provider) => {
-            if (provider.online === false) return false
-            const dataKeys = Object.keys(provider)
+            // If showOffline is false, exclude offline providers
+            if (!showOffline && provider.online === false) return false
 
+            const dataKeys = Object.keys(provider)
             return filters.every(({ key, filterFunc }) => {
                 if (!dataKeys.includes(key)) return false
                 return filterFunc(provider[key])
             })
         })
-    }, [data, filters])
+    }, [data, filters, showOffline])
 
     const { page, data: paginatedData, lastPage, setPage } = useProviderPagination(filteredData)
     const router = useRouter()
@@ -308,10 +320,14 @@ export const ProviderList = ({ endpoint, initialData }) => {
                             <td className="px-6 py-4 rounded-l-lg">
                                 <div className="flex items-center">
                                     <div className="flex-shrink-0 h-12 w-12 bg-golemblue rounded-md p-3 relative">
-                                        {provider.computing_now ? (
+                                        {provider.computing_now && provider.online ? (
                                             <div>
                                                 <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500 animate-ping"></div>
                                                 <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500"></div>
+                                            </div>
+                                        ) : !provider.online ? (
+                                            <div>
+                                                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-gray-500"></div>
                                             </div>
                                         ) : (
                                             <div>
@@ -319,20 +335,33 @@ export const ProviderList = ({ endpoint, initialData }) => {
                                                 <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300 golemping"></div>
                                             </div>
                                         )}
-                                        <GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                                        <GolemIcon
+                                            className={`h-6 w-6 text-white
+                                        ${provider.online ? "opacity-100" : "opacity-50"}
+                                        `}
+                                            aria-hidden="true"
+                                        />
                                     </div>
+
                                     <div className="ml-4">
                                         <div className="text-sm font-medium text-gray-900 golemtext dark:text-gray-300">
                                             {provider["golem.node.id.name"]}
                                         </div>
+
                                         <div className="text-sm text-gray-500 golemtext">{provider["golem.node.debug.subnet"]}</div>
-                                        {provider["golem.com.payment.platform.erc20-mainnet-glm.address"] ? (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue golembadge text-white golemtext">
-                                                Mainnet
-                                            </span>
+                                        {provider.online ? (
+                                            provider["golem.com.payment.platform.erc20-mainnet-glm.address"] ? (
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue golembadge text-white golemtext">
+                                                    Mainnet
+                                                </span>
+                                            ) : (
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-yellow-500 text-white golemtext">
+                                                    Testnet
+                                                </span>
+                                            )
                                         ) : (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-yellow-500 text-white golemtext">
-                                                Testnet
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 golembadge text-white golemtext">
+                                                Offline
                                             </span>
                                         )}
 
