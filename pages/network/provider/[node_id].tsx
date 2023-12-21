@@ -65,6 +65,21 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
     if (nodeError || incomeError) return <div>Failed to load</div>
     if (!nodeData || !updatedIncome) return <div>Loading...</div>
 
+    type Provider = {
+        runtimes: {
+            vm?: any
+            wasmtime?: any
+        }
+    }
+
+    type Usage = "golem.usage.cpu_sec" | "golem.usage.duration_sec"
+
+    // Assuming PriceHashmap returns a specific type, replace 'any' with that type
+    function priceHashMapOrDefault(provider: Provider, usage: Usage): any {
+        const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
+        return PriceHashmap(runtime.properties, usage)
+    }
+
     return (
         <div className="min-h-full z-10 relative">
             <SEO
@@ -246,13 +261,13 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                             <EarningSection
                                 icon={<GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />}
                                 title={"CPU/h"}
-                                value={PriceHashmap(nodeData[0].runtimes.vm?.properties, "golem.usage.cpu_sec")}
+                                value={priceHashMapOrDefault(nodeData[0], "golem.usage.cpu_sec")}
                                 unit="GLM"
                             />
                             <EarningSection
                                 icon={<GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />}
                                 title={"Env/h"}
-                                value={PriceHashmap(nodeData[0].runtimes.vm?.properties, "golem.usage.duration_sec")}
+                                value={priceHashMapOrDefault(nodeData[0], "golem.usage.duration_sec")}
                                 unit="GLM"
                             />
                             <EarningSection
