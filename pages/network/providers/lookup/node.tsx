@@ -15,7 +15,7 @@ const NodeLookup = () => {
         setError("")
         await new Promise((r) => setTimeout(r, 800))
         try {
-            const response = await fetcher(`v1/provider/node/${wallet.toLowerCase()}`)
+            const response = await fetcher(`v2/provider/node/${wallet.toLowerCase()}`)
             if (response.length === 0) {
                 setError("Node not found")
                 setLoading(false)
