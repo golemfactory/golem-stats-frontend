@@ -123,7 +123,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
     return (
         <div className="flex flex-col">
             <h2 className="text-xl mb-2 font-medium  dark:text-gray-300">Filters</h2>
-            <div className="flex gap-2 mb-2">
+            <div className="flex flex-wrap gap-4 mb-2">
                 <div>
                     <label htmlFor="providerName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
                         Node Name
@@ -139,8 +139,6 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         />
                     </div>
                 </div>
-            </div>
-            <div className="flex flex-wrap gap-2 mb-2">
                 <div>
                     <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
                         Cores
@@ -185,37 +183,37 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         />
                     </div>
                 </div>
-            </div>
-            <div>
-                <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                    Network
-                </label>
-                <select
-                    id="network"
-                    name="network"
-                    className="mt-2 block dark:bg-gray-700 dark:text-gray-400 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    onChange={(event) => handleNameSearchChange(event, "network")}
-                >
-                    <option>Mainnet</option>
-                    <option>Testnet</option>
-                </select>
-            </div>
-            {enableShowingOfflineNodes && (
-                <div className="mt-2">
+                <div>
                     <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Show offline nodes
+                        Network
                     </label>
                     <select
-                        id="showOffline"
-                        name="showOffline"
+                        id="network"
+                        name="network"
                         className="mt-2 block dark:bg-gray-700 dark:text-gray-400 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        onChange={(event) => handleFilterChange("showOffline", event.target.value)}
+                        onChange={(event) => handleNameSearchChange(event, "network")}
                     >
-                        <option value="False">Hide Offline</option>
-                        <option value="True">Show Offline</option>
+                        <option>Mainnet</option>
+                        <option>Testnet</option>
                     </select>
                 </div>
-            )}
+                {enableShowingOfflineNodes && (
+                    <div>
+                        <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            Show offline nodes
+                        </label>
+                        <select
+                            id="showOffline"
+                            name="showOffline"
+                            className="mt-2 block dark:bg-gray-700 dark:text-gray-400 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            onChange={(event) => handleFilterChange("showOffline", event.target.value)}
+                        >
+                            <option value="False">Hide Offline</option>
+                            <option value="True">Show Offline</option>
+                        </select>
+                    </div>
+                )}
+            </div>
 
             <table className="divide-y-12 divide-gray-900 border-separate rowspacing w-full inline-block lg:table md:table xl:table col-span-12">
                 <thead>
