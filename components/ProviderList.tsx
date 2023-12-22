@@ -30,22 +30,33 @@ const displayPages = (currentPage: number, lastPage: number) => {
 const useProviderPagination = (data) => {
     const [page, setPage] = useState(1)
 
-    const sortedData = useMemo(() => [...(data || [])].sort((a, b) => b.earnings_total - a.earnings_total), [data])
+    const sortedData = useMemo(() => {
+        if (!data) return []
+        return [...data].sort((a, b) => Number(b.online) - Number(a.online) || b.earnings_total - a.earnings_total)
+    }, [data])
 
-    const paginatedData = sortedData.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+    const paginatedData = useMemo(() => {
+        return sortedData.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+    }, [sortedData, page])
 
     const lastPage = Math.ceil(sortedData.length / ITEMS_PER_PAGE)
 
     return { page, data: paginatedData, lastPage, setPage }
 }
 
-export const ProviderList = ({ endpoint, initialData }) => {
+export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
     const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 10000, initialData })
 
-    const [filters, setFilters] = useState({})
+    const [filters, setFilters] = useState({ showOffline: false })
 
     const handleFilterChange = useCallback((key, value) => {
+        if (key === "showOffline") {
+            value = value === "True"
+        } else if (value === "") {
+            value = null // Allow clearing of filter values
+        }
         setFilters((prevFilters) => ({ ...prevFilters, [key]: value }))
+        setPage(1)
     }, [])
     const handleNameSearchChange = (event, filterKey) => {
         const value = event.target.value
@@ -53,8 +64,11 @@ export const ProviderList = ({ endpoint, initialData }) => {
     }
 
     const filterProvider = useCallback((provider, filters) => {
+        if (!filters.showOffline && !provider.online) {
+            return false
+        }
         return Object.entries(filters).every(([filterKey, filterValue]) => {
-            if (!filterValue) return true
+            if (filterValue === null) return true // Ignore empty filters
 
             const properties = provider?.runtimes?.vm?.properties || {}
             let valueToCheck
@@ -75,6 +89,9 @@ export const ProviderList = ({ endpoint, initialData }) => {
                     // Assuming filterValue is either "Mainnet" or "Testnet"
                     const isMainnet = properties["golem.com.payment.platform.erc20-mainnet-glm.address"] !== undefined
                     return (filterValue === "Mainnet" && isMainnet) || (filterValue === "Testnet" && !isMainnet)
+                case "showOffline":
+                    // Show both online and offline providers
+                    return true
                 default:
                     valueToCheck = provider[filterKey]
                     if (typeof filterValue === "boolean") {
@@ -100,8 +117,8 @@ export const ProviderList = ({ endpoint, initialData }) => {
     const handleNext = () => setPage(page < lastPage ? page + 1 : lastPage)
     const handlePrevious = () => setPage(page > 1 ? page - 1 : 1)
     const visiblePages = displayPages(page, lastPage)
-    if (error) return <div>Error loading data.</div>
-    if (!rawData) return <div>Loading...</div>
+    if (error) return <div className="text-black dark:text-white">Error loading data.</div>
+    if (!rawData) return <div className="text-black dark:text-white">Loading...</div>
 
     return (
         <div className="flex flex-col">
@@ -183,6 +200,22 @@ export const ProviderList = ({ endpoint, initialData }) => {
                     <option>Testnet</option>
                 </select>
             </div>
+            {enableShowingOfflineNodes && (
+                <div className="mt-2">
+                    <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                        Show offline nodes
+                    </label>
+                    <select
+                        id="showOffline"
+                        name="showOffline"
+                        className="mt-2 block dark:bg-gray-700 dark:text-gray-400 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        onChange={(event) => handleFilterChange("showOffline", event.target.value)}
+                    >
+                        <option value="False">Hide Offline</option>
+                        <option value="True">Show Offline</option>
+                    </select>
+                </div>
+            )}
 
             <table className="divide-y-12 divide-gray-900 border-separate rowspacing w-full inline-block lg:table md:table xl:table col-span-12">
                 <thead>
@@ -231,34 +264,53 @@ export const ProviderList = ({ endpoint, initialData }) => {
                             <td className="px-6 py-4 rounded-l-lg">
                                 <div className="flex items-center">
                                     <div className="flex-shrink-0 h-12 w-12 bg-golemblue rounded-md p-3 relative">
-                                        {provider.computing_now ? (
-                                            <div>
-                                                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500 animate-ping"></div>
-                                                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500"></div>
-                                            </div>
-                                        ) : (
-                                            <div>
-                                                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300 golemping animate-ping"></div>
-                                                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300 golemping"></div>
-                                            </div>
-                                        )}
-                                        <GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                                        {
+                                            // Check if the provider is offline
+                                            !provider.online ? (
+                                                <div>
+                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-gray-500"></div>
+                                                </div>
+                                            ) : provider.computing_now ? (
+                                                // Check if the provider is online and computing
+                                                <div>
+                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500 animate-ping"></div>
+                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500"></div>
+                                                </div>
+                                            ) : (
+                                                // Provider is online but not computing
+                                                <div>
+                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300 animate-ping"></div>
+                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300"></div>
+                                                </div>
+                                            )
+                                        }
+                                        <GolemIcon
+                                            className={`h-6 w-6 text-white ${provider.online ? "opacity-100" : "opacity-50"}`}
+                                            aria-hidden="true"
+                                        />
                                     </div>
+
                                     <div className="ml-4">
                                         <div className="text-sm font-medium text-gray-900 golemtext dark:text-gray-300">
                                             {provider.runtimes.vm?.properties["golem.node.id.name"]}
                                         </div>
+
                                         <div className="text-sm text-gray-500 golemtext">
                                             {provider.runtimes.vm?.properties["golem.node.debug.subnet"]}
                                         </div>
-
-                                        {provider.runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ? (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue golembadge text-white golemtext">
-                                                Mainnet
-                                            </span>
+                                        {provider.online ? (
+                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ? (
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue golembadge text-white golemtext">
+                                                    Mainnet
+                                                </span>
+                                            ) : (
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-yellow-500 text-white golemtext">
+                                                    Testnet
+                                                </span>
+                                            )
                                         ) : (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-yellow-500 text-white golemtext">
-                                                Testnet
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 golembadge text-white golemtext">
+                                                Offline
                                             </span>
                                         )}
                                         <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-golemblue text-white golemtext">
