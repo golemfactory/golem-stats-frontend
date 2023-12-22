@@ -39,7 +39,7 @@ const NodeOperator: NextPage<NodeOperatorProps> = ({ wallet_id, initialData }) =
             />
             <h1 className="text-2xl  font-medium dark:text-gray-300">Nodes operated by wallet</h1>
             <span className="text-gray-500 dark:text-gray-400 mb-6 block">{wallet_id}</span>
-            <ProviderList initialData={initialData} showOffline={true} endpoint={`v2/provider/wallet/${wallet_id}`} />
+            <ProviderList initialData={initialData} enableShowingOfflineNodes={true} endpoint={`v2/provider/wallet/${wallet_id}`} />
         </>
     )
 }
