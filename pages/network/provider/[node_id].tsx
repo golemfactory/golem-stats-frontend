@@ -52,7 +52,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
     }
 
     const { data: nodeData = initialData, error: nodeError } = useSWR(
-        node_id ? `v1/provider/node/${node_id.toLowerCase()}` : null,
+        node_id ? `v2/provider/node/${node_id.toLowerCase()}` : null,
         fetcher,
         {
             initialData: initialData,
@@ -65,11 +65,26 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
     if (nodeError || incomeError) return <div>Failed to load</div>
     if (!nodeData || !updatedIncome) return <div>Loading...</div>
 
+    type Provider = {
+        runtimes: {
+            vm?: any
+            wasmtime?: any
+        }
+    }
+
+    type Usage = "golem.usage.cpu_sec" | "golem.usage.duration_sec"
+
+    // Assuming PriceHashmap returns a specific type, replace 'any' with that type
+    function priceHashMapOrDefault(provider: Provider, usage: Usage): any {
+        const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
+        return PriceHashmap(runtime.properties, usage)
+    }
+
     return (
         <div className="min-h-full z-10 relative">
             <SEO
-                title={`${nodeData[0].data["golem.node.id.name"]} | Golem Network Stats`}
-                description={`Detailed Golem Network statistics for provider with name ${nodeData[0].data["golem.node.id.name"]}`}
+                title={`${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]} | Golem Network Stats`}
+                description={`Detailed Golem Network statistics for provider with name ${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}`}
                 url={`https://stats.golem.network/network/provider/${node_id}`}
             />
             <main className="pb-10">
@@ -78,7 +93,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                         <div className="grid grid-cols-1 gap-y-1">
                             <div className="lg:flex lg:flex-row lg:items-center md:gap-y-2 lg:gap-y-4 grid">
                                 <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-300 pr-2">
-                                    {nodeData[0].data["golem.node.id.name"]}
+                                    {nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}
                                 </h1>
                                 <div className="flex flex-wrap gap-2 mt-2 lg:mt-0 ">
                                     <div>
@@ -93,7 +108,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                         )}
                                     </div>
                                     <div>
-                                        {nodeData[0].data["golem.com.payment.platform.erc20-mainnet-glm.address"] ? (
+                                        {nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ? (
                                             <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue text-white">
                                                 Mainnet
                                             </span>
@@ -123,9 +138,9 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                             </div>
 
                             <p className="text-sm font-medium truncate text-gray-500 mt-2 ">{nodeData[0].node_id}</p>
-                            {nodeData[0].data["golem.inf.cpu.brand"] ? (
+                            {nodeData[0].runtimes.vm?.properties["golem.inf.cpu.brand"] ? (
                                 <p className="text-sm font-medium truncate text-gray-500 mt-2 ">
-                                    {nodeData[0].data["golem.inf.cpu.brand"]}
+                                    {nodeData[0].runtimes.vm?.properties["golem.inf.cpu.brand"]}
                                 </p>
                             ) : null}
                         </div>
@@ -133,7 +148,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                         <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
                             <button
                                 onClick={() => {
-                                    router.push(`/network/providers/operator/${nodeData[0].data["wallet"]}`)
+                                    router.push(`/network/providers/operator/${nodeData[0].runtimes.vm?.properties["wallet"]}`)
                                 }}
                                 className="inline-flex items-center justify-center px-2 py-2 border border-transparent text-sm font-medium rounded-md shadow-2xl text-white bg-golemblue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500"
                             >
@@ -142,11 +157,14 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                             <button
                                 aria-label="Show Polygon Wallet"
                                 onClick={() => {
-                                    if (nodeData[0].data["golem.com.payment.platform.erc20-mainnet-glm.address"]) {
-                                        window.open(`https://polygonscan.com/address/${nodeData[0].data["wallet"]}#tokentxns`, "_blank")
+                                    if (nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"]) {
+                                        window.open(
+                                            `https://polygonscan.com/address/${nodeData[0].runtimes.vm?.properties["wallet"]}#tokentxns`,
+                                            "_blank"
+                                        )
                                     } else {
                                         window.open(
-                                            `https://mumbai.polygonscan.com/address/${nodeData[0].data["wallet"]}#tokentxns`,
+                                            `https://mumbai.polygonscan.com/address/${nodeData[0].runtimes.vm?.properties["wallet"]}#tokentxns`,
                                             "_blank"
                                         )
                                     }
@@ -160,10 +178,16 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                             <button
                                 aria-label="Show Etherscan Wallet"
                                 onClick={() => {
-                                    if (nodeData[0].data["golem.com.payment.platform.erc20-mainnet-glm.address"]) {
-                                        window.open(`https://etherscan.io/address/${nodeData[0].data["wallet"]}`, "_blank")
+                                    if (nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"]) {
+                                        window.open(
+                                            `https://etherscan.io/address/${nodeData[0].runtimes.vm?.properties["wallet"]}`,
+                                            "_blank"
+                                        )
                                     } else {
-                                        window.open(`https://goerli.etherscan.io/address/${nodeData[0].data["wallet"]}`, "_blank")
+                                        window.open(
+                                            `https://goerli.etherscan.io/address/${nodeData[0].runtimes.vm?.properties["wallet"]}`,
+                                            "_blank"
+                                        )
                                     }
                                 }}
                                 type="button"
@@ -190,7 +214,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 </dt>
                                 <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
                                     <p className="text-2xl font-semibold text-gray-900 dark:text-gray-300">
-                                        {RoundingFunction(nodeData[0].data["golem.inf.cpu.threads"], 2)}
+                                        {RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.cpu.threads"], 2)}
                                     </p>
                                     <p className="text-golemblue ml-2 flex items-baseline text-sm font-semibold dark:text-gray-400">
                                         Cores
@@ -206,7 +230,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 </dt>
                                 <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
                                     <p className="text-2xl font-semibold text-gray-900 dark:text-gray-300">
-                                        {RoundingFunction(nodeData[0].data["golem.inf.mem.gib"], 2)}
+                                        {RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.mem.gib"], 2)}
                                     </p>
                                     <p className="text-golemblue ml-2 flex items-baseline text-sm font-semibold dark:text-gray-400">GB</p>
                                 </dd>
@@ -220,7 +244,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 </dt>
                                 <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
                                     <p className="text-2xl font-semibold text-gray-900 dark:text-gray-300">
-                                        {RoundingFunction(nodeData[0].data["golem.inf.storage.gib"], 2)}
+                                        {RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.storage.gib"], 2)}
                                     </p>
                                     <p className="text-golemblue ml-2 flex items-baseline text-sm font-semibold dark:text-gray-400">GB</p>
                                 </dd>
@@ -237,21 +261,21 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                             <EarningSection
                                 icon={<GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />}
                                 title={"CPU/h"}
-                                value={PriceHashmap(nodeData[0].data, "golem.usage.cpu_sec")}
+                                value={priceHashMapOrDefault(nodeData[0], "golem.usage.cpu_sec")}
                                 unit="GLM"
                             />
                             <EarningSection
                                 icon={<GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />}
                                 title={"Env/h"}
-                                value={PriceHashmap(nodeData[0].data, "golem.usage.duration_sec")}
+                                value={priceHashMapOrDefault(nodeData[0], "golem.usage.duration_sec")}
                                 unit="GLM"
                             />
                             <EarningSection
                                 icon={<GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />}
                                 title={"Start"}
                                 value={
-                                    nodeData[0].data["golem.com.pricing.model.linear.coeffs"][
-                                        nodeData[0].data["golem.com.pricing.model.linear.coeffs"].length - 1
+                                    nodeData[0].runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"][
+                                        nodeData[0].runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"].length - 1
                                     ]
                                 }
                                 unit="GLM"
@@ -288,7 +312,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 
 export async function getStaticProps({ params }: { params: { node_id: string } }) {
     try {
-        const initialData = await fetcher(`v1/provider/node/${params.node_id.toLowerCase()}`)
+        const initialData = await fetcher(`v2/provider/node/${params.node_id.toLowerCase()}`)
 
         const income = await fetcher(`v1/provider/node/${params.node_id.toLowerCase()}/earnings`)
 
@@ -298,117 +322,167 @@ export async function getStaticProps({ params }: { params: { node_id: string } }
             props: {
                 initialData: [
                     {
-                        earnings_total: 145.09000000000114,
-                        node_id: "0xdeadbeef",
-                        data: {
-                            id: "0xdeadbeef",
-                            wallet: "0xdeadbeef",
-                            "golem.com.scheme": "payu",
-                            "golem.inf.mem.gib": 200.0,
-                            "golem.node.id.name": "Golem Provider",
-                            "golem.runtime.name": "vm",
-                            "golem.inf.cpu.brand": "Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz",
-                            "golem.inf.cpu.cores": 10,
-                            "golem.inf.cpu.model": "Stepping 1 Family 6 Model 143",
-                            "golem.inf.cpu.vendor": "GenuineIntel",
-                            "golem.inf.cpu.threads": 20,
-                            "golem.inf.storage.gib": 300.0,
-                            "golem.runtime.version": "0.3.0",
-                            "golem.com.usage.vector": ["golem.usage.cpu_sec", "golem.usage.duration_sec"],
-                            "golem.com.pricing.model": "linear",
-                            "golem.node.debug.subnet": "public",
-                            "golem.node.net.is-public": true,
-                            "golem.inf.cpu.architecture": "x86_64",
-                            "golem.inf.cpu.capabilities": [
-                                "sse3",
-                                "pclmulqdq",
-                                "dtes64",
-                                "monitor",
-                                "dscpl",
-                                "vmx",
-                                "smx",
-                                "eist",
-                                "tm2",
-                                "ssse3",
-                                "fma",
-                                "cmpxchg16b",
-                                "pdcm",
-                                "pcid",
-                                "dca",
-                                "sse41",
-                                "sse42",
-                                "x2apic",
-                                "movbe",
-                                "popcnt",
-                                "tsc_deadline",
-                                "aesni",
-                                "xsave",
-                                "osxsave",
-                                "avx",
-                                "f16c",
-                                "rdrand",
-                                "fpu",
-                                "vme",
-                                "de",
-                                "pse",
-                                "tsc",
-                                "msr",
-                                "pae",
-                                "mce",
-                                "cx8",
-                                "apic",
-                                "sep",
-                                "mtrr",
-                                "pge",
-                                "mca",
-                                "cmov",
-                                "pat",
-                                "pse36",
-                                "clfsh",
-                                "ds",
-                                "acpi",
-                                "mmx",
-                                "fxsr",
-                                "sse",
-                                "sse2",
-                                "ss",
-                                "htt",
-                                "tm",
-                                "pbe",
-                                "fsgsbase",
-                                "adjust_msr",
-                                "bmi1",
-                                "hle",
-                                "avx2",
-                                "smep",
-                                "bmi2",
-                                "rep_movsb_stosb",
-                                "invpcid",
-                                "rtm",
-                                "rdtm",
-                                "deprecate_fpu_cs_ds",
-                                "rdta",
-                                "rdseed",
-                                "adx",
-                                "smap",
-                                "processor_trace",
-                            ],
-                            "golem.runtime.capabilities": ["inet", "vpn", "manifest-support", "start-entrypoint"],
-                            "golem.srv.caps.multi-activity": true,
-                            "golem.srv.caps.payload-manifest": true,
-                            "golem.activity.caps.transfer.protocol": ["http", "https", "gftp"],
-                            "golem.com.pricing.model.linear.coeffs": [5.555552778e-6, 0.0, 0.0],
-                            "golem.com.scheme.payu.payment-timeout-sec?": 120,
-                            "golem.com.payment.debit-notes.accept-timeout?": 240,
-                            "golem.com.scheme.payu.debit-note.interval-sec?": 120,
-                            "golem.com.payment.platform.erc20-mainnet-glm.address": "0x1ceedf872c95aad95980ca9357b20cb74bc0464b",
-                            "golem.com.payment.platform.erc20-polygon-glm.address": "0x1ceedf872c95aad95980ca9357b20cb74bc0464b",
-                            "golem.com.payment.platform.zksync-mainnet-glm.address": "0x1ceedf872c95aad95980ca9357b20cb74bc0464b",
-                        },
+                        earnings_total: 0.0,
+                        node_id: "0x7ad8ce2f95f69be197d136e308303d2395e68379",
                         online: true,
-                        version: "0.12.0",
-                        updated_at: "2023-06-19T15:15:19.357045+02:00",
-                        created_at: "2021-10-28T00:17:55.097326+02:00",
+                        version: "0.14.0",
+                        updated_at: "2023-12-21T13:58:43.215982+01:00",
+                        created_at: "2023-03-10T14:14:56.079641+01:00",
+                        runtimes: {
+                            wasmtime: {
+                                monthly_price_glm: null,
+                                updated_at: "2023-12-21 12:58:39.477879+00:00",
+                                properties: {
+                                    id: "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    wallet: "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.scheme": "payu",
+                                    "golem.inf.mem.gib": 8.0,
+                                    "golem.node.id.name": "fractal_02_0.h",
+                                    "golem.runtime.name": "wasmtime",
+                                    "golem.inf.cpu.cores": 8,
+                                    "golem.inf.cpu.threads": 1,
+                                    "golem.inf.storage.gib": 20.0,
+                                    "golem.runtime.version": "0.2.1",
+                                    "golem.com.usage.vector": ["golem.usage.cpu_sec", "golem.usage.duration_sec"],
+                                    "golem.com.pricing.model": "linear",
+                                    "golem.node.debug.subnet": "public",
+                                    "golem.node.net.is-public": false,
+                                    "golem.inf.cpu.architecture": "x86_64",
+                                    "golem.srv.caps.multi-activity": true,
+                                    "golem.srv.caps.payload-manifest": false,
+                                    "golem.activity.caps.transfer.protocol": ["gftp", "https", "http"],
+                                    "golem.com.pricing.model.linear.coeffs": [0.000222, 0.0002, 0.1],
+                                    "golem.com.scheme.payu.payment-timeout-sec?": 120,
+                                    "golem.com.payment.debit-notes.accept-timeout?": 240,
+                                    "golem.com.scheme.payu.debit-note.interval-sec?": 120,
+                                    "golem.com.payment.platform.erc20-goerli-tglm.address": "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.payment.platform.erc20-mumbai-tglm.address": "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.payment.platform.erc20-holesky-tglm.address": "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.payment.platform.erc20next-goerli-tglm.address":
+                                        "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.payment.platform.erc20next-mumbai-tglm.address":
+                                        "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.payment.platform.erc20next-holesky-tglm.address":
+                                        "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                },
+                            },
+                            vm: {
+                                monthly_price_glm: 5292.6184,
+                                updated_at: "2023-12-21 12:58:43.147853+00:00",
+                                properties: {
+                                    id: "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    wallet: "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.scheme": "payu",
+                                    "golem.inf.mem.gib": 8.0,
+                                    "golem.node.id.name": "fractal_02_0.h",
+                                    "golem.runtime.name": "vm",
+                                    "golem.inf.cpu.brand": "Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz",
+                                    "golem.inf.cpu.cores": 8,
+                                    "golem.inf.cpu.model": "Stepping 13 Family 6 Model 302",
+                                    "golem.inf.cpu.vendor": "GenuineIntel",
+                                    "golem.inf.cpu.threads": 1,
+                                    "golem.inf.storage.gib": 20.0,
+                                    "golem.runtime.version": "0.3.0",
+                                    "golem.com.usage.vector": ["golem.usage.cpu_sec", "golem.usage.duration_sec"],
+                                    "golem.com.pricing.model": "linear",
+                                    "golem.node.debug.subnet": "public",
+                                    "golem.node.net.is-public": false,
+                                    "golem.inf.cpu.architecture": "x86_64",
+                                    "golem.inf.cpu.capabilities": [
+                                        "sse3",
+                                        "pclmulqdq",
+                                        "dtes64",
+                                        "monitor",
+                                        "dscpl",
+                                        "vmx",
+                                        "smx",
+                                        "eist",
+                                        "tm2",
+                                        "ssse3",
+                                        "fma",
+                                        "cmpxchg16b",
+                                        "pdcm",
+                                        "pcid",
+                                        "sse41",
+                                        "sse42",
+                                        "x2apic",
+                                        "movbe",
+                                        "popcnt",
+                                        "tsc_deadline",
+                                        "aesni",
+                                        "xsave",
+                                        "osxsave",
+                                        "avx",
+                                        "f16c",
+                                        "rdrand",
+                                        "fpu",
+                                        "vme",
+                                        "de",
+                                        "pse",
+                                        "tsc",
+                                        "msr",
+                                        "pae",
+                                        "mce",
+                                        "cx8",
+                                        "apic",
+                                        "sep",
+                                        "mtrr",
+                                        "pge",
+                                        "mca",
+                                        "cmov",
+                                        "pat",
+                                        "pse36",
+                                        "clfsh",
+                                        "ds",
+                                        "acpi",
+                                        "mmx",
+                                        "fxsr",
+                                        "sse",
+                                        "sse2",
+                                        "ss",
+                                        "htt",
+                                        "tm",
+                                        "pbe",
+                                        "fsgsbase",
+                                        "adjust_msr",
+                                        "bmi1",
+                                        "hle",
+                                        "avx2",
+                                        "smep",
+                                        "bmi2",
+                                        "rep_movsb_stosb",
+                                        "invpcid",
+                                        "rtm",
+                                        "deprecate_fpu_cs_ds",
+                                        "mpx",
+                                        "rdseed",
+                                        "adx",
+                                        "smap",
+                                        "clflushopt",
+                                        "processor_trace",
+                                        "sgx",
+                                        "sgx_lc",
+                                    ],
+                                    "golem.runtime.capabilities": ["inet", "vpn", "manifest-support", "start-entrypoint"],
+                                    "golem.srv.caps.multi-activity": true,
+                                    "golem.srv.caps.payload-manifest": true,
+                                    "golem.activity.caps.transfer.protocol": ["http", "https", "gftp"],
+                                    "golem.com.pricing.model.linear.coeffs": [0.000222, 0.0002, 0.1],
+                                    "golem.com.scheme.payu.payment-timeout-sec?": 120,
+                                    "golem.com.payment.debit-notes.accept-timeout?": 240,
+                                    "golem.com.scheme.payu.debit-note.interval-sec?": 120,
+                                    "golem.com.payment.platform.erc20-goerli-tglm.address": "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.payment.platform.erc20-mumbai-tglm.address": "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.payment.platform.erc20-holesky-tglm.address": "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.payment.platform.erc20next-goerli-tglm.address":
+                                        "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.payment.platform.erc20next-mumbai-tglm.address":
+                                        "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                    "golem.com.payment.platform.erc20next-holesky-tglm.address":
+                                        "0x7ad8ce2f95f69be197d136e308303d2395e68379",
+                                },
+                            },
+                        },
                         computing_now: false,
                     },
                 ],
