@@ -108,7 +108,7 @@ export const ProviderList = ({ endpoint, initialData }) => {
             <h2 className="text-xl mb-2 font-medium  dark:text-gray-300">Filters</h2>
             <div className="flex gap-2 mb-2">
                 <div>
-                    <label htmlFor="providerName" className="block text-sm font-medium leading-6 text-gray-900">
+                    <label htmlFor="providerName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
                         Node Name
                     </label>
                     <div className="mt-2">
@@ -117,7 +117,7 @@ export const ProviderList = ({ endpoint, initialData }) => {
                             name="providerName"
                             id="providerName"
                             onChange={(event) => handleNameSearchChange(event, "golem.node.id.name")}
-                            className="block  rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
                             placeholder="Search by Name"
                         />
                     </div>
@@ -125,7 +125,7 @@ export const ProviderList = ({ endpoint, initialData }) => {
             </div>
             <div className="flex flex-wrap gap-2 mb-2">
                 <div>
-                    <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900">
+                    <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
                         Cores
                     </label>
                     <div className="mt-2">
@@ -134,13 +134,13 @@ export const ProviderList = ({ endpoint, initialData }) => {
                             name="cores"
                             id="cores"
                             onChange={(event) => handleNameSearchChange(event, "golem.inf.cpu.threads")}
-                            className="block  rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
                         />
                     </div>
                 </div>
                 <div>
-                    <label htmlFor="memory" className="block text-sm font-medium leading-6 text-gray-900">
-                        Memory <span className="text-xs font-light text-gray-600">(±0.5 GB tolerance)</span>
+                    <label htmlFor="memory" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                        Memory <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
                     </label>
 
                     <div className="mt-2">
@@ -149,13 +149,13 @@ export const ProviderList = ({ endpoint, initialData }) => {
                             name="memory"
                             id="memory"
                             onChange={(event) => handleNameSearchChange(event, "golem.inf.mem.gib")}
-                            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
                         />
                     </div>
                 </div>
                 <div>
-                    <label htmlFor="disk" className="block text-sm font-medium leading-6 text-gray-900">
-                        Disk <span className="text-xs font-light text-gray-600">(±0.5 GB tolerance)</span>
+                    <label htmlFor="disk" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                        Disk <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
                     </label>
 
                     <div className="mt-2">
@@ -164,19 +164,19 @@ export const ProviderList = ({ endpoint, initialData }) => {
                             name="disk"
                             id="disk"
                             onChange={(event) => handleNameSearchChange(event, "golem.inf.storage.gib")}
-                            className="block  rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
                         />
                     </div>
                 </div>
             </div>
             <div>
-                <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900">
+                <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
                     Network
                 </label>
                 <select
                     id="network"
                     name="network"
-                    className="mt-2 block  rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    className="mt-2 block dark:bg-gray-700 dark:text-gray-400 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     onChange={(event) => handleNameSearchChange(event, "network")}
                 >
                     <option>Mainnet</option>
