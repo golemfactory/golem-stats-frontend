@@ -33,7 +33,6 @@ const processData = (apiResponse: any[], yaxisLabel: string) => {
 
         result.push([obj.date, RoundingFunction(value, 0)])
     })
-    console.log(result)
 
     return [
         {

@@ -26,7 +26,6 @@ export const MarketAgreementOutcome = () => {
         data.market_agreements_requestorUnreachable,
         data.market_agreements_debitnoteDeadline,
       ]);
-      console.log(series);
     } else if (error) {
       console.log(error);
     }

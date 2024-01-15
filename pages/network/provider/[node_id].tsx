@@ -6,7 +6,10 @@ import { RoundingFunction } from "@/lib/RoundingFunction"
 import { CircleStackIcon, CpuChipIcon, Square3Stack3DIcon } from "@heroicons/react/24/solid"
 import { useRouter } from "next/router"
 import useSWR from "swr"
+import { useState } from "react"
 import { SEO } from "@/components/SEO"
+import { useSession } from "next-auth/react"
+import { HealthCheckModal, OpenHealthCheckModalButton } from "@/components/ProviderHealthCheck"
 
 const useIncome = (node_id: string | undefined, initialIncome: object) => {
     const { data, error } = useSWR(node_id ? `v1/provider/node/${node_id.toLowerCase()}/earnings` : null, fetcher, {
@@ -18,8 +21,6 @@ const useIncome = (node_id: string | undefined, initialIncome: object) => {
 
     if (data) {
         const keys = Object.keys(data)
-
-        console.log(keys)
 
         keys.forEach((key) => {
             formattedIncome[key] = RoundingFunction(parseFloat(data[key]), 10)
@@ -45,6 +46,8 @@ const EarningSection = ({ icon, title, value, unit }: { icon: React.ReactNode; t
 export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: object; initialIncome: object }) => {
     const router = useRouter()
     let { node_id } = router.query
+    const { data: session } = useSession()
+    const [open, setOpen] = useState(false)
 
     // if node_id is an array, use the first value
     if (Array.isArray(node_id)) {
@@ -82,6 +85,9 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 
     return (
         <div className="min-h-full z-10 relative">
+            <div className="fixed z-20 bottom-5 right-5">
+                <OpenHealthCheckModalButton setOpen={setOpen} />
+            </div>
             <SEO
                 title={`${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]} | Golem Network Stats`}
                 description={`Detailed Golem Network statistics for provider with name ${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}`}
@@ -95,6 +101,8 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-300 pr-2">
                                     {nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}
                                 </h1>
+
+                                <HealthCheckModal open={open} setOpen={setOpen} node_id={node_id} online={nodeData[0].online} />
                                 <div className="flex flex-wrap gap-2 mt-2 lg:mt-0 ">
                                     <div>
                                         {nodeData[0].online ? (

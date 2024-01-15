@@ -56,7 +56,6 @@ export const InvoicesPaid: React.FC = () => {
 
   useEffect(() => {
     if (data && !error) {
-      console.log(data.percentage_paid);
       setSeries([RoundingFunction(data.percentage_paid)]);
 
       setChartOptions((prev) => ({
