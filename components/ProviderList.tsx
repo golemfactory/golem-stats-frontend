@@ -237,16 +237,14 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             Total Earnings
                         </th>
                         <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            CPU/h
+                            Monthly cost USD
                         </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Env/h
-                        </th>
+
                         <th
                             scope="col"
                             className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider rounded-r-lg whitespace-nowrap"
                         >
-                            Start price
+                            Monthly cost GLM
                         </th>
                     </tr>
                 </thead>
@@ -314,6 +312,11 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                         <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-golemblue text-white golemtext">
                                             v{provider.version}
                                         </span>
+                                        {provider.runtimes.vm?.is_overpriced ? (
+                                            <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-red-500 text-white golemtext">
+                                                Overpriced
+                                            </span>
+                                        ) : null}
                                     </div>
                                 </div>
                             </td>
@@ -358,24 +361,13 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {priceHashMapOrDefault(provider, "golem.usage.cpu_sec")}{" "}
-                                    <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
+                                    {RoundingFunction(provider.runtimes.vm?.monthly_price_usd)}{" "}
+                                    <span className="text-golemblue golemgradient dark:text-gray-400">$</span>
                                 </a>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {priceHashMapOrDefault(provider, "golem.usage.duration_sec")}{" "}
-                                    <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
-                                </a>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium rounded-r-lg">
-                                <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {
-                                        (
-                                            provider.runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"] ||
-                                            provider.runtimes.wasmtime.properties["golem.com.pricing.model.linear.coeffs"]
-                                        ).slice(-1)[0]
-                                    }{" "}
+                                    {RoundingFunction(provider.runtimes.vm?.monthly_price_glm)}{" "}
                                     <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
                                 </a>
                             </td>
