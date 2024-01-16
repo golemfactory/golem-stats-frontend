@@ -316,6 +316,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                             <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-red-500 text-white golemtext">
                                                 Overpriced
                                             </span>
+                                        ) : provider.runtimes.vm?.cheaper_than ? (
+                                            <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-green-500 text-white golemtext">
+                                                Great Price
+                                            </span>
                                         ) : null}
                                     </div>
                                 </div>

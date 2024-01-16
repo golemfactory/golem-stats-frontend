@@ -145,8 +145,14 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                     </div>
                                     {nodeData[0].runtimes.vm?.is_overpriced ? (
                                         <div>
-                                            <span className="px-2  inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 text-white">
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 text-white">
                                                 Overpriced
+                                            </span>
+                                        </div>
+                                    ) : nodeData[0].runtimes.vm?.cheaper_than ? (
+                                        <div>
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-500 text-white">
+                                                Great Price
                                             </span>
                                         </div>
                                     ) : null}
@@ -172,6 +178,18 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                     <br></br>
                                     <br></br>This nodes monthly USD cost is ${nodeData[0].runtimes.vm?.monthly_price_usd} which is roughly{" "}
                                     {RoundingFunction(nodeData[0].runtimes.vm?.times_more_expensive)} times more expensive compared to AWS
+                                </p>
+                            ) : nodeData[0].runtimes.vm?.cheaper_than ? (
+                                <p className="text-sm font-medium truncate text-green-500 mt-2">
+                                    Comparing this node against an AWS {nodeData[0].runtimes.vm?.cheaper_than.name} instance with{" "}
+                                    {nodeData[0].runtimes.vm?.cheaper_than.vcpu} cores and {nodeData[0].runtimes.vm?.cheaper_than.memory} GB
+                                    memory shows that
+                                    <br></br>
+                                    this provider is more cost-effective. The Monthly USD price of the AWS{" "}
+                                    {nodeData[0].runtimes.vm?.cheaper_than.name} instance is $(
+                                    {nodeData[0].runtimes.vm?.cheaper_than.price_usd * 730}).<br></br>
+                                    <br></br>This node's monthly USD cost is ${nodeData[0].runtimes.vm?.monthly_price_usd}, which is roughly{" "}
+                                    {RoundingFunction(nodeData[0].runtimes.vm?.times_cheaper)} times cheaper compared to AWS.
                                 </p>
                             ) : null}
                         </div>
