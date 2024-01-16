@@ -52,7 +52,7 @@ export const OpenHealthCheckModalButton: React.FC<OpenModalButtonProps> = ({ set
             className="inline-flex items-center justify-center px-2 py-2 border border-transparent text-sm font-medium rounded-md shadow-2xl text-white bg-golemblue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500"
             onClick={() => setOpen(true)}
         >
-            Healthcheck provider <HeartIcon className="h-6 w-6 ml-1 text-green-600" aria-hidden="true" />
+            Healthcheck provider 
         </button>
     )
 }
