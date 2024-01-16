@@ -86,7 +86,7 @@ export const HealthCheckModal: React.FC<HealthCheckModalProps> = ({ open, setOpe
     const { data: statusData, error: statusError } = useSWR(
         taskId ? [process.env.NEXT_PUBLIC_API_URL + "v2/healthcheck/frontend/status", taskId, session?.user.accessToken] : null,
         fetcher,
-        { refreshInterval: 5000 }
+        { refreshInterval: 2000 }
     )
 
     if (statusError) {
