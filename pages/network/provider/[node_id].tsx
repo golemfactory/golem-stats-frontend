@@ -167,10 +167,11 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                     <br></br>
                                     this provider is most likely overpriced. We suggest configuring a pricing setting of: CPU/h 0 GLM, Env/h{" "}
                                     {nodeData[0].runtimes.vm?.suggest_env_per_hour_price} GLM, Start 0 GLM. <br></br>which equals the
-                                    monthly USD price (${nodeData[0].runtimes.vm?.overpriced_compared_to.price_usd}) of the{" "}
+                                    Monthly USD price (${nodeData[0].runtimes.vm?.overpriced_compared_to.price_usd * 730}) of the{" "}
                                     {nodeData[0].runtimes.vm?.overpriced_compared_to.name} instance
                                     <br></br>
-                                    <br></br>This nodes monthly USD cost is ${nodeData[0].runtimes.vm?.monthly_price_usd}
+                                    <br></br>This nodes monthly USD cost is ${nodeData[0].runtimes.vm?.monthly_price_usd} which is roughly{" "}
+                                    {RoundingFunction(nodeData[0].runtimes.vm?.times_more_expensive)} times more expensive compared to AWS
                                 </p>
                             ) : null}
                         </div>
