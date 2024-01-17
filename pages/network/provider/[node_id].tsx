@@ -106,6 +106,17 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 <div className="flex flex-wrap gap-2 mt-2 lg:mt-0 ">
                                     <div>
                                         {nodeData[0].online ? (
+                                            <span className="px-2 lg:ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-500 text-white">
+                                                Online
+                                            </span>
+                                        ) : (
+                                            <span className="px-2 lg:ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 text-white">
+                                                Offline
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div>
+                                        {nodeData[0].online ? (
                                             nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ||
                                             nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-polygon-glm.address"] ||
                                             nodeData[0].runtimes.vm?.properties[
@@ -122,11 +133,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                                     Testnet
                                                 </span>
                                             )
-                                        ) : (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 golembadge text-white golemtext">
-                                                Offline
-                                            </span>
-                                        )}
+                                        ) : null}
                                     </div>
                                     <div>
                                         <span className="px-2  inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue text-white">
