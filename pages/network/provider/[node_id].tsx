@@ -106,23 +106,25 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 <div className="flex flex-wrap gap-2 mt-2 lg:mt-0 ">
                                     <div>
                                         {nodeData[0].online ? (
-                                            <span className="px-2 lg:ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-500 text-white">
-                                                Online
-                                            </span>
+                                            nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ||
+                                            nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-polygon-glm.address"] ||
+                                            nodeData[0].runtimes.vm?.properties[
+                                                "golem.com.payment.platform.erc20next-mainnet-glm.address"
+                                            ] ||
+                                            nodeData[0].runtimes.vm?.properties[
+                                                "golem.com.payment.platform.erc20next-polygon-glm.address"
+                                            ] ? (
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue golembadge text-white golemtext">
+                                                    Mainnet
+                                                </span>
+                                            ) : (
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-yellow-500 text-white golemtext">
+                                                    Testnet
+                                                </span>
+                                            )
                                         ) : (
-                                            <span className="px-2 lg:ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 text-white">
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 golembadge text-white golemtext">
                                                 Offline
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div>
-                                        {nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ? (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue text-white">
-                                                Mainnet
-                                            </span>
-                                        ) : (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-500 text-white">
-                                                Testnet
                                             </span>
                                         )}
                                     </div>

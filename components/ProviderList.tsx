@@ -297,7 +297,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                             {provider.runtimes.vm?.properties["golem.node.debug.subnet"]}
                                         </div>
                                         {provider.online ? (
-                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ? (
+                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ||
+                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20-polygon-glm.address"] ||
+                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20next-mainnet-glm.address"] ||
+                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20next-polygon-glm.address"] ? (
                                                 <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue golembadge text-white golemtext">
                                                     Mainnet
                                                 </span>
