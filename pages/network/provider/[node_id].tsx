@@ -10,7 +10,7 @@ import { useState } from "react"
 import { SEO } from "@/components/SEO"
 import { useSession } from "next-auth/react"
 import { HealthCheckModal, OpenHealthCheckModalButton } from "@/components/ProviderHealthCheck"
-
+import { isUpdateNeeded } from "@/components/ProviderList"
 const useIncome = (node_id: string | undefined, initialIncome: object) => {
     const { data, error } = useSWR(node_id ? `v1/provider/node/${node_id.toLowerCase()}/earnings` : null, fetcher, {
         initialData: initialIncome,
@@ -135,11 +135,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                             )
                                         ) : null}
                                     </div>
-                                    <div>
-                                        <span className="px-2  inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue text-white">
-                                            v{nodeData[0].version}
-                                        </span>
-                                    </div>
+
                                     <div>
                                         {nodeData[0].computing_now ? (
                                             <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-500 text-white">
@@ -151,6 +147,13 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                             </span>
                                         )}
                                     </div>
+                                    {isUpdateNeeded(nodeData[0].runtimes.vm?.updated_at) && (
+                                        <div>
+                                            <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 text-white">
+                                                Restart Provider Recommended
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

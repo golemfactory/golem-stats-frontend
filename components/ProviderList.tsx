@@ -44,6 +44,13 @@ const useProviderPagination = (data) => {
     return { page, data: paginatedData, lastPage, setPage }
 }
 
+export const isUpdateNeeded = (updatedAt) => {
+    const updatedAtDate = new Date(updatedAt)
+    const now = new Date()
+    const twoHours = 2 * 60 * 60 * 1000 // 2 hours in milliseconds
+    return now - updatedAtDate > twoHours
+}
+
 export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
     const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 10000, initialData })
 
@@ -314,9 +321,15 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                                 Offline
                                             </span>
                                         )}
+
                                         <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-golemblue text-white golemtext">
                                             v{provider.version}
                                         </span>
+                                        {isUpdateNeeded(provider.runtimes.vm?.updated_at) && (
+                                            <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 golembadge text-white golemtext">
+                                                1 Issue
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </td>
