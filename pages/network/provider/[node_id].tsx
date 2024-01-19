@@ -150,7 +150,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                     {isUpdateNeeded(nodeData[0].runtimes.vm?.updated_at) && (
                                         <div>
                                             <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 text-white">
-                                                Restart Provider Recommended
+                                                Restart Recommended
                                             </span>
                                         </div>
                                     )}
@@ -163,6 +163,12 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                     {nodeData[0].runtimes.vm?.properties["golem.inf.cpu.brand"]}
                                 </p>
                             ) : null}
+                            {isUpdateNeeded(nodeData[0].runtimes.vm?.updated_at) && (
+                                <p className="text-sm font-medium truncate text-red-500 mt-2 ">
+                                    We've identified the provider might be having network issues.<br></br> We recommend restarting the
+                                    provider to ensure it's communicating properly with the network.
+                                </p>
+                            )}
                         </div>
 
                         <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
