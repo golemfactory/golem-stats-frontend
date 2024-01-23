@@ -23,6 +23,7 @@
         "eslint-config-next": "13.4.4",
         "ethers": "^6.10.0",
         "jwt-decode": "^4.0.0",
+        "moment-timezone": "^0.5.44",
         "next": "13.4.4",
         "next-auth": "^4.24.5",
         "next-sitemap": "^4.1.3",

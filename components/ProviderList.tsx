@@ -7,8 +7,8 @@ import { GolemIcon } from "./svg/GolemIcon"
 import { useState } from "react"
 import { CpuChipIcon, CircleStackIcon, Square3Stack3DIcon } from "@heroicons/react/24/solid"
 import { useRouter } from "next/router"
-import { useMemo, useEffect, useCallback } from "react"
-
+import { useMemo, useCallback } from "react"
+import moment from "moment-timezone"
 const ITEMS_PER_PAGE = 30
 
 const displayPages = (currentPage: number, lastPage: number) => {
@@ -45,10 +45,17 @@ const useProviderPagination = (data) => {
 }
 
 export const isUpdateNeeded = (updatedAt) => {
-    const updatedAtDate = new Date(updatedAt)
-    const now = new Date()
+    const timeZone = "Europe/Copenhagen"
+
+    // Get the current date/time in Europe/Copenhagen timezone
+    const nowInCopenhagen = moment.tz(timeZone)
+
+    // Parse updatedAt as a Moment object in the Europe/Copenhagen timezone
+    const updatedAtMoment = moment.tz(updatedAt, timeZone)
+
     const twoHours = 2 * 60 * 60 * 1000 // 2 hours in milliseconds
-    return now - updatedAtDate > twoHours
+
+    return nowInCopenhagen.diff(updatedAtMoment) > twoHours
 }
 
 export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
