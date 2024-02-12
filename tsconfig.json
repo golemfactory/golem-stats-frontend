@@ -18,6 +18,6 @@
             "@/*": ["./*"]
         }
     },
-    "include": ["next-env.d.ts", "web3.d.ts", "**/*.ts", "**/*.tsx", "lib/RoundingFunction.js", "next-auth.d.ts"],
+    "include": ["next-env.d.ts", "web3.d.ts", "**/*.ts", "**/*.tsx", "lib/RoundingFunction.js", "next-auth.d.ts", "components/analytics/Banner.jsx"],
     "exclude": ["node_modules"]
 }
