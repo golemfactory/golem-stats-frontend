@@ -7,7 +7,7 @@ function TopSourcesCard({ data }) {
     const [modalOpen, setModalOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
 
-    if (!data || !data.comparison_overview) return <p>Loading...</p>
+    if (!data) return <p>Loading...</p>
 
     /**
      * Formats the value as a percentage with additional context.
@@ -26,7 +26,7 @@ function TopSourcesCard({ data }) {
         }
     }
 
-    const formattedAndFilteredData = data.comparison_overview
+    const formattedAndFilteredData = data
         .filter((item) => item.golem_percentage_cheaper != null)
         .filter((item) => !searchQuery || item.ec2_instance_name.toLowerCase().includes(searchQuery.toLowerCase()))
         .map((item) => ({
@@ -41,7 +41,7 @@ function TopSourcesCard({ data }) {
         .sort((a, b) => b.value - a.value)
 
     const calculateAverage = () => {
-        const filteredData = data.comparison_overview.filter((item) => item.golem_percentage_cheaper != null)
+        const filteredData = data.filter((item) => item.golem_percentage_cheaper != null)
         const total = filteredData.reduce((acc, item) => acc + item.golem_percentage_cheaper, 0)
         return filteredData.length > 0 ? total / filteredData.length : 0
     }
@@ -65,7 +65,7 @@ function TopSourcesCard({ data }) {
                             Average Price Difference
                         </p>
                         <div className="flex items-baseline space-x-2">
-                            {data && data.comparison_overview ? (
+                            {data && data ? (
                                 <span className="text-tremor-metric font-semibold">{Math.abs(averageGolemCheaper).toFixed(2)}%</span>
                             ) : (
                                 <Skeleton width={250} height={30} />
