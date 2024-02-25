@@ -4,7 +4,7 @@ import useSWR from "swr"
 import { GlobeAltIcon } from "@heroicons/react/24/solid"
 import { AreaChart, Card } from "@tremor/react"
 
-export const NetworkActivity = ({ computingNow, setComputingNow }) => {
+export const NetworkActivity: React.FC = () => {
     const [data, setData] = useState([])
     const [loaded, setLoaded] = useState<boolean>(false)
 
@@ -26,7 +26,6 @@ export const NetworkActivity = ({ computingNow, setComputingNow }) => {
         if (response.data) {
             setData(extractChartData(response.data))
             setLoaded(true)
-            if (data.length) setComputingNow(data[data.length - 1])
         }
     }, [response.data])
 

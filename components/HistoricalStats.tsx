@@ -44,14 +44,13 @@ const customTooltip = ({ active, payload, label }) => {
     )
 }
 
-const NetworkStats = ({ metricData, computingNow }) => {
+const NetworkStats = ({ metricData }) => {
     const [selectedTimeFrame, setSelectedTimeFrame] = useState("1w")
     const tabs = [
         { name: "Providers", metric: "online", unit: "Providers" },
         { name: "Cores", metric: "cores", unit: "Cores" },
         { name: "Memory", metric: "memory", unit: "Terabytes" },
         { name: "Disk", metric: "disk", unit: "Terabytes" },
-        { name: "Computing", metric: "computing", unit: "Providers" },
     ]
     const timeFrames = Object.keys(metricData)
     const latest1wData = metricData["1w"][metricData["1w"].length - 1] || {}
@@ -87,7 +86,9 @@ const NetworkStats = ({ metricData, computingNow }) => {
 
         return date.toLocaleString("en-US", formatOptions)
     }
-    const MetricCardSummary = ({ category, data, unit, color, computingNow }) => {
+    const MetricCardSummary = ({ category, data, unit, color }) => {
+        console.log(category, data, unit, color)
+
         const latestDataPoint = latest1wData[category] || 0
         const total = `${Intl.NumberFormat("us").format(latestDataPoint)}`
         return (
@@ -95,7 +96,7 @@ const NetworkStats = ({ metricData, computingNow }) => {
                 <div>
                     <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">Right now</p>
                     <div className="flex items-baseline space-x-2">
-                        <span className="text-tremor-metric font-semibold">{category !== "computing" ? total : computingNow}</span>
+                        <span className="text-tremor-metric font-semibold">{total}</span>
                         <span className="text-tremor-default font-medium text-golemblue">{unit}</span>
                     </div>
                 </div>
@@ -132,7 +133,6 @@ const NetworkStats = ({ metricData, computingNow }) => {
                                     data={metricData[selectedTimeFrame]}
                                     unit={tab.unit}
                                     color={tab.color}
-                                    computingNow={computingNow}
                                 />
                                 <div className="order-1 md:order-2 pb-8  pt-4">
                                     <TabGroup>

@@ -7,7 +7,6 @@ import { fetcher } from "@/fetcher"
 import EarningsCard from "@/components/Earnings"
 import TopSourcesCard from "@/components/cards/TopSourcesCard"
 import Skeleton from "react-loading-skeleton"
-import { useState } from "react"
 
 export default function Index() {
     const { data: metricsData, error } = useSWR("v2/network/historical/stats", fetcher, {
@@ -19,7 +18,6 @@ export default function Index() {
     const { data: overview, error: overviewError } = useSWR("v2/network/comparison", fetcher, {
         refreshInterval: 10000,
     })
-    const [computingNow, setComputingNow] = useState(0)
     if (error) return <div>Failed to load</div>
     if (!metricsData) return <div>Loading...</div>
     const timePeriods = [
@@ -33,10 +31,10 @@ export default function Index() {
         <div className="grid gap-y-4">
             <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-7">
-                    <NetworkActivity computingNow={computingNow} setComputingNow={setComputingNow} />
+                    <NetworkActivity />
                 </div>
                 <div className="col-span-5">
-                    <NetworkStats computingNow={computingNow} metricData={metricsData} />
+                    <NetworkStats metricData={metricsData} />
                 </div>
 
                 <div className="col-span-4">
