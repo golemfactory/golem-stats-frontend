@@ -49,10 +49,10 @@ export const OpenHealthCheckModalButton: React.FC<OpenModalButtonProps> = ({ set
     return (
         <button
             type="button"
-            className="inline-flex items-center justify-center px-2 py-2 border border-transparent text-sm font-medium rounded-md shadow-2xl text-white bg-golemblue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500"
+            className="inline-flex items-center justify-center px-2 py-2 border border-transparent text-sm font-medium  shadow-2xl text-white bg-golemblue hover:bg-white hover:text-golemblue transition duration-300 hover:border hover:border-golemblue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500"
             onClick={() => setOpen(true)}
         >
-            Healthcheck provider 
+            Healthcheck provider
         </button>
     )
 }

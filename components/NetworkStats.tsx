@@ -14,6 +14,7 @@ type AvgEarningsData = {
 import { fetcher } from "@/fetcher";
 
 import { RoundingFunction } from "@/lib/RoundingFunction";
+import EarningsCard from "./Earnings";
 
 const NetworkStats: React.FC = () => {
   const { data: data6h, isLoading: data1Loading } = useSWR<EarningsData>(
@@ -70,32 +71,14 @@ const NetworkStats: React.FC = () => {
       <h1 className="text-2xl  font-medium dark:text-gray-300">
         Network Statistics
       </h1>
-      <dl className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Avg Earnings Per Task"
-          value={averageearnings}
-          loading={avgEarningsDataLoading}
-          unit="GLM"
-        />
-        <StatCard
-          title="Network Earnings (6h)"
-          value={earnings6h}
-          unit="GLM"
-          loading={data1Loading}
-        />
-        <StatCard
-          title="Network Earnings (24h)"
-          value={earnings24h}
-          unit="GLM"
-          loading={data24Loading}
-        />
-        <StatCard
-          title="Total Network Earnings"
-          value={totalEarnings}
-          unit="GLM"
-          loading={data90dLoading}
-        />
-      </dl>
+      <EarningsCard
+        title="Earnings"
+        value={totalEarnings}
+        unit="GLM"
+        today={earnings6h}
+        sevenDays={earnings24h}
+        thirtyDays={earnings}
+        ninetyDays={0}
     </div>
   );
 };

@@ -4,6 +4,7 @@ import useSWR from "swr"
 import { ApexOptions } from "apexcharts"
 import { fetcher } from "@/fetcher"
 import { RoundingFunction } from "@/lib/RoundingFunction"
+import { Card } from "@tremor/react"
 
 const ApexCharts = dynamic(() => import("react-apexcharts"), { ssr: false })
 
@@ -153,13 +154,13 @@ export const HistoricalPriceChart: React.FC<HistoricalPriceProps> = ({ endpoint,
     }, [apiResponse])
 
     return (
-        <div className="relative bg-white dark:bg-gray-800 p-6 rounded-xl">
+        <Card>
             <h1 className="text-2xl font-medium dark:text-gray-300 mb-2">{title}</h1>
 
             <div className="mt-4">
                 <ApexCharts width="100%" height="350" type="area" options={options} series={series} />
             </div>
-        </div>
+        </Card>
     )
 }
 

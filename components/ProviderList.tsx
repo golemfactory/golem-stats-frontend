@@ -9,6 +9,25 @@ import { CpuChipIcon, CircleStackIcon, Square3Stack3DIcon } from "@heroicons/rea
 import { useRouter } from "next/router"
 import { useMemo, useCallback } from "react"
 import moment from "moment-timezone"
+import { TextInput, Select, SelectItem, Card } from "@tremor/react"
+import UptimeDots from "./UptimeDots"
+import { Tooltip as ReactTooltip } from "react-tooltip"
+import {
+    RiArrowDownCircleLine,
+    RiArrowDownLine,
+    RiArrowUpCircleLine,
+    RiArrowUpLine,
+    RiCloseCircleLine,
+    RiQuestionLine,
+    RiShieldCheckLine,
+} from "@remixicon/react"
+import ReputationIndicator from "./ReputationIndicator"
+import Link from "next/link"
+import HardwareBadge from "./HardwareBadge"
+import NvidiaIcon from "./svg/NvidiaIcon"
+import IntelIcon from "./svg/IntelIcon"
+import AMDIcon from "./svg/AMDIcon"
+
 const ITEMS_PER_PAGE = 30
 
 const displayPages = (currentPage: number, lastPage: number) => {
@@ -32,7 +51,22 @@ const useProviderPagination = (data) => {
 
     const sortedData = useMemo(() => {
         if (!data) return []
-        return [...data].sort((a, b) => Number(b.online) - Number(a.online) || b.earnings_total - a.earnings_total)
+
+        return [...data].sort((a, b) => {
+            // Check for the presence of provider.runtimes["vm-nvidia"] and give top priority
+            const aHasNvidia = a.runtimes?.["vm-nvidia"] !== undefined
+            const bHasNvidia = b.runtimes?.["vm-nvidia"] !== undefined
+
+            if (aHasNvidia && !bHasNvidia) return -1
+            if (bHasNvidia && !aHasNvidia) return 1
+
+            // Then handle null values in taskReputation by pushing them to the bottom
+            if (a.taskReputation === null) return 1
+            if (b.taskReputation === null) return -1
+
+            // Finally, sort in descending order by taskReputation
+            return b.taskReputation - a.taskReputation
+        })
     }, [data])
 
     const paginatedData = useMemo(() => {
@@ -42,6 +76,11 @@ const useProviderPagination = (data) => {
     const lastPage = Math.ceil(sortedData.length / ITEMS_PER_PAGE)
 
     return { page, data: paginatedData, lastPage, setPage }
+}
+
+const priceHashMapOrDefault = (provider, usage) => {
+    const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
+    return PriceHashmap(runtime.properties, usage)
 }
 
 export const isUpdateNeeded = (updatedAt) => {
@@ -72,8 +111,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
         setFilters((prevFilters) => ({ ...prevFilters, [key]: value }))
         setPage(1)
     }, [])
-    const handleNameSearchChange = (event, filterKey) => {
-        const value = event.target.value
+    const handleNameSearchChange = (value, filterKey) => {
         handleFilterChange(filterKey, value)
     }
 
@@ -116,18 +154,22 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
         })
     }, [])
 
-    const filteredData = useMemo(
-        () => (rawData ? rawData.filter((provider) => filterProvider(provider, filters)) : []),
-        [rawData, filters, filterProvider]
-    )
+    const filteredData = useMemo(() => {
+        return rawData
+            ? rawData.filter((provider) => {
+                  // First, apply the existing filter condition
+                  const isProviderFiltered = filterProvider(provider, filters)
 
-    const priceHashMapOrDefault = (provider, usage) => {
-        const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
-        return PriceHashmap(runtime.properties, usage)
-    }
+                  // Then, check for the presence of either provider.runtimes.vm or provider.runtimes["vm-nvidia"]
+                  const hasRequiredRuntime = provider.runtimes && (provider.runtimes.vm || provider.runtimes["vm-nvidia"])
+
+                  // Include the provider only if both conditions are met
+                  return isProviderFiltered && hasRequiredRuntime
+              })
+            : []
+    }, [rawData, filters, filterProvider])
 
     const { page, data: paginatedData, lastPage, setPage } = useProviderPagination(filteredData)
-    const router = useRouter()
     const handleNext = () => setPage(page < lastPage ? page + 1 : lastPage)
     const handlePrevious = () => setPage(page > 1 ? page - 1 : 1)
     const visiblePages = displayPages(page, lastPage)
@@ -135,308 +177,345 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
     if (!rawData) return <div className="text-black dark:text-white">Loading...</div>
 
     return (
-        <div className="flex flex-col">
-            <h2 className="text-xl mb-2 font-medium  dark:text-gray-300">Filters</h2>
-            <div className="flex flex-wrap gap-4 mb-2">
-                <div>
-                    <label htmlFor="providerName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Node Name
-                    </label>
-                    <div className="mt-2">
-                        <input
-                            type="text"
-                            name="providerName"
-                            id="providerName"
-                            onChange={(event) => handleNameSearchChange(event, "golem.node.id.name")}
-                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
-                            placeholder="Search by Name"
-                        />
+        <div className="flex flex-col ">
+            <Card className="pb-9">
+                <h2 className="text-xl mb-2 font-medium  dark:text-gray-300">Filters</h2>
+                <div className="flex flex-wrap gap-4 ">
+                    <div>
+                        <label htmlFor="providerName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            Node Name
+                        </label>
+                        <div className="mt-2">
+                            <TextInput
+                                type="text"
+                                name="providerName"
+                                id="providerName"
+                                onValueChange={(value) => handleNameSearchChange(value, "golem.node.id.name")}
+                                placeholder="Search by Name"
+                            />
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Cores
-                    </label>
-                    <div className="mt-2">
-                        <input
-                            type="number"
-                            name="cores"
-                            id="cores"
-                            onChange={(event) => handleNameSearchChange(event, "golem.inf.cpu.threads")}
-                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
-                        />
+                    <div>
+                        <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            Cores
+                        </label>
+                        <div className="mt-2">
+                            <TextInput
+                                type="number"
+                                name="cores"
+                                id="cores"
+                                onValueChange={(value) => handleNameSearchChange(value, "golem.inf.cpu.threads")}
+                                placeholder="Number of Cores"
+                            />
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label htmlFor="memory" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Memory <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
-                    </label>
+                    <div>
+                        <label htmlFor="memory" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            Memory <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
+                        </label>
 
-                    <div className="mt-2">
-                        <input
-                            type="number"
-                            name="memory"
-                            id="memory"
-                            onChange={(event) => handleNameSearchChange(event, "golem.inf.mem.gib")}
-                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
-                        />
+                        <div className="mt-2">
+                            <TextInput
+                                type="number"
+                                name="memory"
+                                id="memory"
+                                onValueChange={(value) => handleNameSearchChange(value, "golem.inf.mem.gib")}
+                                placeholder="Memory in GB"
+                            />
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label htmlFor="disk" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Disk <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
-                    </label>
+                    <div>
+                        <label htmlFor="disk" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            Disk <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
+                        </label>
 
-                    <div className="mt-2">
-                        <input
-                            type="number"
-                            name="disk"
-                            id="disk"
-                            onChange={(event) => handleNameSearchChange(event, "golem.inf.storage.gib")}
-                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
-                        />
+                        <div className="mt-2">
+                            <TextInput
+                                type="number"
+                                name="disk"
+                                id="disk"
+                                onValueChange={(value) => handleNameSearchChange(value, "golem.inf.storage.gib")}
+                                placeholder="Disk in GB"
+                            />
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Network
-                    </label>
-                    <select
-                        id="network"
-                        name="network"
-                        className="mt-2 block dark:bg-gray-700 dark:text-gray-400 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        onChange={(event) => handleNameSearchChange(event, "network")}
-                    >
-                        <option>Mainnet</option>
-                        <option>Testnet</option>
-                    </select>
-                </div>
-                {enableShowingOfflineNodes && (
                     <div>
                         <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            Show offline nodes
+                            Network
                         </label>
-                        <select
-                            id="showOffline"
-                            name="showOffline"
-                            className="mt-2 block dark:bg-gray-700 dark:text-gray-400 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            onChange={(event) => handleFilterChange("showOffline", event.target.value)}
+                        <Select
+                            defaultValue="Mainnet"
+                            id="network"
+                            name="network"
+                            className="z-50 mt-2"
+                            onValueChange={(value) => handleNameSearchChange(value, "network")}
                         >
-                            <option value="False">Hide Offline</option>
-                            <option value="True">Show Offline</option>
-                        </select>
+                            <SelectItem value="Mainnet">Mainnet</SelectItem>
+                            <SelectItem value="Testnet">Testnet</SelectItem>
+                        </Select>
                     </div>
-                )}
-            </div>
+                    {enableShowingOfflineNodes && (
+                        <div>
+                            <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Show offline nodes
+                            </label>
+                            <Select id="showOffline" name="showOffline" onValueChange={(value) => handleFilterChange("showOffline", value)}>
+                                <SelectItem value="False">Hide Offline</SelectItem>
+                                <SelectItem value="True">Show Offline</SelectItem>
+                            </Select>
+                        </div>
+                    )}
+                </div>
+            </Card>
+            <Card>
+                <div className="grid grid-cols-12 gap-4 px-4 bg-golemblue text-white py-4 my-4 font-medium">
+                    <div className="col-span-2 inline-flex items-center">
+                        <p>Provider</p>
+                        <RiQuestionLine data-tooltip-id="provider-tooltip" className="h-4 w-4 ml-1" />
+                        <ReactTooltip
+                            id="provider-tooltip"
+                            place="bottom"
+                            content="The name of the provider, the subnet it is running on, and the version of the provider."
+                            className="break-words max-w-64 z-50"
+                        />
+                    </div>
+                    <div className="col-span-4 inline-flex items-center">
+                        <p>Hardware</p>
+                        <RiQuestionLine data-tooltip-id="hardware-tooltip" className="h-4 w-4 ml-1" />
+                        <ReactTooltip
+                            id="hardware-tooltip"
+                            place="bottom"
+                            content="GPU support is currently in beta testing. CPU is supported by default."
+                            className="break-words max-w-64 z-50"
+                        />
+                    </div>
+                    <div className="col-span-2 inline-flex items-center">
+                        <p>Price</p>
+                        <RiQuestionLine data-tooltip-id="price-tooltip" className="h-4 w-4 ml-1" />
+                        <ReactTooltip
+                            id="price-tooltip"
+                            place="bottom"
+                            content="The price of the provider per hour assuming 100% utilization.
 
-            <table className="divide-y-12 divide-gray-900 border-separate rowspacing w-full inline-block lg:table md:table xl:table col-span-12">
-                <thead>
-                    <tr>
-                        <th
-                            scope="col"
-                            className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider rounded-l-lg"
-                        >
-                            Provider
-                        </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Cores
-                        </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Memory
-                        </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Disk
-                        </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Total Earnings
-                        </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            CPU/h
-                        </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Env/h
-                        </th>
-                        <th
-                            scope="col"
-                            className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider rounded-r-lg whitespace-nowrap"
-                        >
-                            Start price
-                        </th>
-                    </tr>
-                </thead>
-                <tbody className="bg-gray-50 dark:bg-gray-800 divide-y-12 divide-gray-900">
-                    {paginatedData?.map((provider) => (
-                        <tr
-                            onClick={() => {
-                                router.push(`/network/provider/${provider.node_id}`)
-                            }}
-                            key={provider.node_id}
-                            className="hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer my-12 golemtr shadow-sm"
-                        >
-                            <td className="px-6 py-4 rounded-l-lg">
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0 h-12 w-12 bg-golemblue rounded-md p-3 relative">
-                                        {
-                                            // Check if the provider is offline
-                                            !provider.online ? (
-                                                <div>
-                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-gray-500"></div>
-                                                </div>
-                                            ) : provider.computing_now ? (
-                                                // Check if the provider is online and computing
-                                                <div>
-                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500 animate-ping"></div>
-                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500"></div>
-                                                </div>
-                                            ) : (
-                                                // Provider is online but not computing
-                                                <div>
-                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300 animate-ping"></div>
-                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300"></div>
-                                                </div>
-                                            )
-                                        }
-                                        <GolemIcon
-                                            className={`h-6 w-6 text-white ${provider.online ? "opacity-100" : "opacity-50"}`}
-                                            aria-hidden="true"
-                                        />
+
+                            The percentage indicates how much cheaper or more expensive the provider is compared to an AWS instance of similar specs. Green indicates cheaper, red indicates more expensive."
+                            className="break-words max-w-64 z-50"
+                        />
+                    </div>
+                    <div className="col-span-2 inline-flex items-center">
+                        <p>Reputation</p>
+                        <RiQuestionLine data-tooltip-id="reputation-tooltip" className="h-4 w-4 ml-1" />
+                        <ReactTooltip
+                            id="reputation-tooltip"
+                            place="bottom"
+                            content="The reputation of the provider based on the success ratio of the tasks it has completed. A value of 1.0 indicates a perfect reputation."
+                            className="break-words max-w-64 z-50"
+                        />
+                    </div>
+                    <div className="col-span-2 inline-flex items-center">
+                        <p>Uptime</p>
+                        <RiQuestionLine data-tooltip-id="uptime-tooltip" className="h-4 w-4 ml-1" />
+                        <ReactTooltip
+                            id="uptime-tooltip"
+                            place="bottom"
+                            content="The uptime of the provider since it was first seen on the network."
+                            className="break-words max-w-64 z-50"
+                        />
+                    </div>
+                </div>
+                <div className="grid grid-cols-5 gap-4 h-full">
+                    {paginatedData?.map((provider) => {
+                        const cpuVendor = provider.runtimes.vm?.properties["golem.inf.cpu.vendor"]
+                        let IconComponent
+                        let additionalClasses = ""
+
+                        switch (cpuVendor) {
+                            case "GenuineIntel":
+                                IconComponent = IntelIcon // Your Intel icon component
+                                break
+                            case "AuthenticAMD":
+                                IconComponent = AMDIcon // Your AMD icon component
+                                additionalClasses = "fill-red-500" // Apply specific class for AMD
+                                break
+                            default:
+                                IconComponent = DefaultIcon // A default icon component, if you have one
+                        }
+
+                        return (
+                            <Link
+                                href={{
+                                    pathname: "/network/provider/[node_id]",
+                                    query: { node_id: provider.node_id },
+                                }}
+                                key={provider.id}
+                                className="col-span-5 grid grid-cols-12 gap-4 items-center bg-golembackground py-4 px-4 hover:bg-gray-200 hover:cursor-pointer"
+                            >
+                                <div className="col-span-2 flex items-center gap-2">
+                                    <div className="flex items-center">
+                                        <div className="flex-shrink-0 h-12 w-12 bg-golemblue  p-3 relative">
+                                            {
+                                                // Check if the provider is offline
+                                                !provider.online ? (
+                                                    <div>
+                                                        <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-gray-500"></div>
+                                                    </div>
+                                                ) : provider.computing_now ? (
+                                                    // Check if the provider is online and computing
+                                                    <div>
+                                                        <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500 animate-ping"></div>
+                                                        <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500"></div>
+                                                    </div>
+                                                ) : (
+                                                    // Provider is online but not computing
+                                                    <div>
+                                                        <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300 animate-ping"></div>
+                                                        <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300"></div>
+                                                    </div>
+                                                )
+                                            }
+                                            <GolemIcon
+                                                className={`h-6 w-6 text-white ${provider.online ? "opacity-100" : "opacity-50"}`}
+                                                aria-hidden="true"
+                                            />
+                                        </div>
                                     </div>
-
-                                    <div className="ml-4">
-                                        <div className="text-sm font-medium text-gray-900 golemtext dark:text-gray-300">
+                                    <div className="ml-1">
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white ">
                                             {provider.runtimes.vm?.properties["golem.node.id.name"]}
-                                        </div>
-
-                                        <div className="text-sm text-gray-500 golemtext">
+                                        </p>
+                                        <p className="text-sm  text-gray-400 dark:text-white ">
                                             {provider.runtimes.vm?.properties["golem.node.debug.subnet"]}
-                                        </div>
-                                        {provider.online ? (
-                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ||
-                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20-polygon-glm.address"] ||
-                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20next-mainnet-glm.address"] ||
-                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20next-polygon-glm.address"] ? (
-                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue golembadge text-white golemtext">
-                                                    Mainnet
-                                                </span>
-                                            ) : (
-                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-yellow-500 text-white golemtext">
-                                                    Testnet
-                                                </span>
-                                            )
-                                        ) : (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 golembadge text-white golemtext">
-                                                Offline
-                                            </span>
-                                        )}
+                                        </p>
+                                        <p className="text-sm  text-gray-400 dark:text-white">{provider.version}</p>
+                                    </div>
+                                </div>
 
-                                        <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-golemblue text-white golemtext">
-                                            v{provider.version}
-                                        </span>
-                                        {isUpdateNeeded(provider.runtimes.vm?.updated_at) && (
-                                            <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 golembadge text-white golemtext">
-                                                1 Issue
-                                            </span>
+                                <div className="col-span-4 flex items-center gap-2">
+                                    <div className="grid grid-cols-1 gap-2">
+                                        <div className="flex-container">
+                                            <HardwareBadge
+                                                title="CPU"
+                                                icon={<IconComponent className={`h-4 w-4 ${additionalClasses}`} />}
+                                                value={provider.runtimes.vm?.properties["golem.inf.cpu.brand"]}
+                                            />
+                                        </div>
+                                        {provider.runtimes["vm-nvidia"]?.properties && (
+                                            <div className="flex-container">
+                                                <HardwareBadge
+                                                    title="GPU"
+                                                    icon={<NvidiaIcon className="h-5 w-5 flex-shrink-0" />}
+                                                    value={provider.runtimes["vm-nvidia"].properties["golem.!exp.gap-35.v1.inf.gpu.model"]}
+                                                />
+                                            </div>
                                         )}
                                     </div>
                                 </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                    <div className="bg-golemblue rounded-md p-3">
-                                        <CpuChipIcon className="h-4 w-4 text-white" aria-hidden="true" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <div className="text-sm font-medium text-gray-900 golemtext dark:text-gray-300">
-                                            {provider.runtimes.vm?.properties["golem.inf.cpu.threads"]}
-                                        </div>
-                                        <div className="text-sm text-gray-500 golemtext">Cores</div>
+                                <div className="col-span-2 flex items-center gap-2">
+                                    <div>
+                                        <p data-tooltip-id={`price-hourly${provider.node_id}`} className="text-sm font-medium">
+                                            ${RoundingFunction(provider.runtimes.vm?.hourly_price_usd)} /Hour
+                                            <ReactTooltip
+                                                id={`price-hourly${provider.node_id}`}
+                                                place="bottom"
+                                                content={`Calculated using the formula: Assuming 100% usage on ${
+                                                    provider.runtimes.vm?.properties["golem.inf.cpu.threads"]
+                                                } CPU threads at a rate of ${priceHashMapOrDefault(
+                                                    provider,
+                                                    "golem.usage.cpu_sec"
+                                                )} GLM per thread, plus an environment rate of ${priceHashMapOrDefault(
+                                                    provider,
+                                                    "golem.usage.duration_sec"
+                                                )} GLM per hour, and a start price of ${
+                                                    provider.runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"]?.slice(-1)[0]
+                                                } GLM. These costs are then converted to USD based on the current GLM price.`}
+                                                className="break-words max-w-64 z-50"
+                                            />
+                                        </p>
+                                        {provider.runtimes?.vm?.times_cheaper && (
+                                            <p
+                                                data-tooltip-id={`price-comparison-tooltip${provider.node_id}`}
+                                                className="text-sm text-green-500 dark:text-gray-400"
+                                            >
+                                                -{RoundingFunction(provider.runtimes.vm?.times_cheaper)}%{" "}
+                                                <RiArrowDownLine className="inline-block h-4 w-4 text-green-500" />
+                                                <ReactTooltip
+                                                    id={`price-comparison-tooltip${provider.node_id}`}
+                                                    place="bottom"
+                                                    content={`Based on available data, this provider's pricing is approximately ${RoundingFunction(
+                                                        provider.runtimes.vm?.times_cheaper
+                                                    )}% cheaper than an AWS instance of similar specifications.`}
+                                                    className="break-words max-w-64 z-50"
+                                                />
+                                            </p>
+                                        )}
+                                        {provider.runtimes?.vm?.times_more_expensive && (
+                                            <p
+                                                data-tooltip-id={`price-comparison-tooltip${provider.node_id}`}
+                                                className="text-sm text-red-500 dark:text-gray-400"
+                                            >
+                                                +{RoundingFunction(provider.runtimes.vm?.times_more_expensive)}%
+                                                <RiArrowUpLine className="inline-block h-4 w-4 text-red-500" />
+                                                <ReactTooltip
+                                                    id={`price-comparison-tooltip${provider.node_id}`}
+                                                    place="bottom"
+                                                    content={`Based on available data, this provider's pricing is approximately ${RoundingFunction(
+                                                        provider.runtimes.vm?.times_more_expensive
+                                                    )}% higher than an AWS instance of similar specifications.`}
+                                                    className="break-words max-w-64 z-50"
+                                                />
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
-                            </td>
-                            <td className="px-6 py-4">
-                                <dt className="flex flex-row items-center">
-                                    <div className="bg-golemblue rounded-md p-3">
-                                        <Square3Stack3DIcon className="h-4 w-4 text-white" aria-hidden="true" />
-                                    </div>
-                                    <p className="ml-2 text-sm font-medium text-gray-900 golemtext dark:text-gray-300">
-                                        {RoundingFunction(provider.runtimes.vm?.properties["golem.inf.mem.gib"], 2)} GB
-                                    </p>
-                                </dt>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <dt className="flex flex-row items-center">
-                                    <div className="bg-golemblue rounded-md p-3">
-                                        <CircleStackIcon className="h-4 w-4 text-white" aria-hidden="true" />
-                                    </div>
-                                    <p className="ml-2 text-sm font-medium text-gray-900 golemtext dark:text-gray-300">
-                                        {RoundingFunction(provider.runtimes.vm?.properties["golem.inf.storage.gib"], 2)} GB
-                                    </p>
-                                </dt>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {RoundingFunction(provider.earnings_total, 2)}{" "}
-                                    <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
-                                </a>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {priceHashMapOrDefault(provider, "golem.usage.cpu_sec")}{" "}
-                                    <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
-                                </a>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {priceHashMapOrDefault(provider, "golem.usage.duration_sec")}{" "}
-                                    <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
-                                </a>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium rounded-r-lg">
-                                <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {
-                                        (
-                                            provider.runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"] ||
-                                            provider.runtimes.wasmtime.properties["golem.com.pricing.model.linear.coeffs"]
-                                        ).slice(-1)[0]
-                                    }{" "}
-                                    <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
-                                </a>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <div className="flex justify-center mt-4 gap-2">
-                <button
-                    onClick={handlePrevious}
-                    disabled={page === 1}
-                    className={`px-5 py-2 rounded-md ${
-                        page === 1 ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed" : "text-white bg-golemblue"
-                    }`}
-                >
-                    Previous
-                </button>
-                {visiblePages.map((pageNumber) => (
+                                <div className="col-span-2 flex items-center gap-2">
+                                    <ReputationIndicator taskReputation={provider.taskReputation} />
+                                </div>
+                                <div className="col-span-2 flex items-center gap-2">
+                                    <UptimeDots uptime={provider.uptime} />
+                                </div>
+                            </Link>
+                        )
+                    })}
+                </div>
+
+                <div className="flex justify-center mt-4 py-4 gap-2">
                     <button
-                        key={pageNumber}
-                        onClick={() => setPage(pageNumber)}
-                        className={`px-5 py-2 rounded-md ${
-                            page === pageNumber ? "text-white bg-golemblue" : "text-white bg-golemblue/60 hover:bg-golemblue"
+                        onClick={handlePrevious}
+                        disabled={page === 1}
+                        className={`px-5 py-2 ${
+                            page === 1
+                                ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed border border-gray-200"
+                                : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-golemblue border border-golemblue "
                         }`}
                     >
-                        {pageNumber}
+                        Previous
                     </button>
-                ))}
-                <button
-                    onClick={handleNext}
-                    disabled={page === lastPage}
-                    className={`px-5 py-2 rounded-md ${
-                        page === lastPage ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed" : "text-white bg-golemblue"
-                    }`}
-                >
-                    Next
-                </button>
-            </div>
+                    {visiblePages.map((pageNumber) => (
+                        <button
+                            key={pageNumber}
+                            onClick={() => setPage(pageNumber)}
+                            className={`px-5 py-2  ${
+                                page === pageNumber
+                                    ? "text-golemblue bg-white border border-golemblue"
+                                    : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-golemblue border border-golemblue "
+                            }`}
+                        >
+                            {pageNumber}
+                        </button>
+                    ))}
+                    <button
+                        onClick={handleNext}
+                        disabled={page === lastPage}
+                        className={`px-5 py-2  ${
+                            page === lastPage
+                                ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed border border-gray-200"
+                                : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-golemblue border border-golemblue "
+                        }`}
+                    >
+                        Next
+                    </button>
+                </div>
+            </Card>
         </div>
     )
 }

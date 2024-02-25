@@ -3,6 +3,7 @@ import dynamic from "next/dynamic"
 import useSWR from "swr"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 import { fetcher } from "@/fetcher"
+import { Card } from "@tremor/react"
 
 const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false })
 
@@ -58,7 +59,7 @@ export const TasksRequestedChart = () => {
                 <button
                     key={option.value}
                     className={`
-                    focus:outline-none bg-golemblue text-white px-3 py-2 rounded-md hover:bg-golemblue/80`}
+                    golembutton`}
                     onClick={() => updateDisplayCount(option.value)}
                 >
                     {option.label}
@@ -68,7 +69,7 @@ export const TasksRequestedChart = () => {
     )
 
     return (
-        <div className="bg-white dark:bg-gray-800 pt-5 mb-2 px-4 sm:px-6 shadow rounded-lg overflow-hidden min-h-screen">
+        <Card className="min-h-screen">
             <div className="relative">
                 <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300 animate-ping"></div>
                 <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300"></div>
@@ -79,6 +80,6 @@ export const TasksRequestedChart = () => {
                 </div>
             </div>
             <ApexChart width="100%" height={"100%"} options={chartOptions} series={series} type="bar" />
-        </div>
+        </Card>
     )
 }

@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 import { fetcher } from "@/fetcher"
 import { LoadingSpinner } from "@/components/LoadingSpinner"
 import { SEO } from "@/components/SEO"
+import { Card, TextInput } from "@tremor/react"
 const OperatorLookup = () => {
     const [wallet, setWallet] = useState("")
     const router = useRouter()
@@ -39,7 +40,7 @@ const OperatorLookup = () => {
                 url="https://stats.golem.network/network/providers/lookup/operator"
             />
             <h1 className="text-2xl mb-2 font-medium mt-6 dark:text-gray-300">Node Lookup</h1>
-            <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-12 bg-white dark:bg-gray-800 px-4 py-6 mb-6 sm:px-6 shadow rounded-lg overflow-hidden">
+            <Card className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-12 overflow-hidden">
                 <div className="col-span-12">
                     <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Search Operator</h1>
                 </div>
@@ -53,28 +54,27 @@ const OperatorLookup = () => {
                     <label htmlFor="name" className="block text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Wallet Address
                     </label>
-                    <div className="flex">
-                        <input
+                    <div className="flex gap-x-4">
+                        <TextInput
                             name="name"
                             id="name"
                             value={wallet}
-                            onChange={(e) => setWallet(e.target.value)}
+                            onValueChange={(address) => setWallet(address)}
                             placeholder="0x..."
-                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
                         />
                         <button
                             type="submit"
                             disabled={wallet.length != 42}
                             className={`
                                 ${wallet.length != 42 && "opacity-50 cursor-not-allowed"}
-                            ml-2 w-32 bg-golemblue hover:bg-golemblue/80 text-white font-bold py-2 px-4 rounded flex justify-center items-center`}
+                                golembutton`}
                         >
                             {loading ? <LoadingSpinner className="h-6 text-center flex justify-center" /> : "Search"}
                         </button>
                     </div>
                 </form>
                 <div className="col-span-12">{error && <div className="text-red-500">{error}</div>}</div>
-            </div>
+            </Card>
         </>
     )
 }

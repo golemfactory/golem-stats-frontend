@@ -2,10 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+.golembutton {
+    @apply text-white px-5 py-2 flex items-center bg-golemblue hover:bg-white transition duration-300 hover:text-golemblue border border-golemblue;
+}
+
 html,
 body {
     @apply dark:bg-slate-900;
-    @apply bg-gray-100;
+    @apply bg-golembackground;
     min-height: 100vh;
 }
 

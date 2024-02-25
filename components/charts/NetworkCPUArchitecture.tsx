@@ -3,6 +3,7 @@ import useSWR from "swr"
 import dynamic from "next/dynamic"
 import { fetcher } from "@/fetcher"
 import { ApexOptions } from "apexcharts"
+import { Card } from "@tremor/react"
 
 const DynamicApexChart = dynamic(() => import("react-apexcharts"), {
     ssr: false,
@@ -24,7 +25,7 @@ export const NetworkCPUArchitecture: React.FC = () => {
                 const firstRuntimeKey = Object.keys(obj.runtimes)[0]
 
                 // Check if the first runtime has the required property
-                if (obj.runtimes[firstRuntimeKey].properties["golem.inf.cpu.architecture"]) {
+                if (obj.runtimes[firstRuntimeKey].properties?.["golem.inf.cpu.architecture"]) {
                     const architecture = obj.runtimes[firstRuntimeKey].properties["golem.inf.cpu.architecture"]
 
                     // Increment the count based on the architecture type
@@ -85,7 +86,7 @@ export const NetworkCPUArchitecture: React.FC = () => {
     }
 
     return (
-        <div className="bg-white dark:bg-gray-800 h-full pt-5 px-4 sm:px-6 shadow rounded-lg overflow-hidden">
+        <Card>
             <div className="relative">
                 <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300 animate-ping"></div>
                 <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300"></div>
@@ -95,6 +96,6 @@ export const NetworkCPUArchitecture: React.FC = () => {
                 </span>
                 <DynamicApexChart className="py-3" width="100%" height="250" type="donut" options={chartOptions} series={data} />
             </div>
-        </div>
+        </Card>
     )
 }

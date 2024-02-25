@@ -5,6 +5,7 @@ import useSWR from "swr"
 import { ApexOptions } from "apexcharts"
 import { fetcher } from "@/fetcher"
 import { RoundingFunction } from "@/lib/RoundingFunction"
+import { Card } from "@tremor/react"
 
 const ApexCharts = dynamic(() => import("react-apexcharts"), { ssr: false })
 
@@ -88,7 +89,7 @@ export const NetworkCPUVendorDistribution: React.FC = () => {
     }
 
     return (
-        <div className="bg-white dark:bg-gray-800 pt-5 px-4 sm:px-6 shadow rounded-lg overflow-hidden">
+        <Card>
             <div className="relative">
                 <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300 animate-ping" />
                 <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300" />
@@ -99,6 +100,6 @@ export const NetworkCPUVendorDistribution: React.FC = () => {
                 </span>
                 <ApexCharts className="py-6" width="100%" height="250" series={data} type="donut" options={chartOptions} />
             </div>
-        </div>
+        </Card>
     )
 }
