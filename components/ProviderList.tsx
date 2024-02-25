@@ -269,7 +269,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
             </Card>
             <Card>
                 <div className="grid grid-cols-12 gap-4 px-4 bg-golemblue text-white py-4 my-4 font-medium">
-                    <div className="col-span-2 inline-flex items-center">
+                    <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
                         <p>Provider</p>
                         <RiQuestionLine data-tooltip-id="provider-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
@@ -279,7 +279,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             className="break-words max-w-64 z-50"
                         />
                     </div>
-                    <div className="col-span-4 inline-flex items-center">
+                    <div className="lg:col-span-4 md:col-span-4 col-span-12 inline-flex items-center">
                         <p>Hardware</p>
                         <RiQuestionLine data-tooltip-id="hardware-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
@@ -289,7 +289,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             className="break-words max-w-64 z-50"
                         />
                     </div>
-                    <div className="col-span-2 inline-flex items-center">
+                    <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
                         <p>Price</p>
                         <RiQuestionLine data-tooltip-id="price-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
@@ -302,7 +302,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             className="break-words max-w-64 z-50"
                         />
                     </div>
-                    <div className="col-span-2 inline-flex items-center">
+                    <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
                         <p>Reputation</p>
                         <RiQuestionLine data-tooltip-id="reputation-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
@@ -312,7 +312,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             className="break-words max-w-64 z-50"
                         />
                     </div>
-                    <div className="col-span-2 inline-flex items-center">
+                    <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
                         <p>Uptime</p>
                         <RiQuestionLine data-tooltip-id="uptime-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
@@ -323,7 +323,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         />
                     </div>
                 </div>
-                <div className="grid grid-cols-5 gap-4 h-full">
+                <div className="grid lg:grid-cols-5 gap-4 h-full grid-cols-12">
                     {paginatedData?.map((provider) => {
                         const cpuVendor = provider.runtimes.vm?.properties["golem.inf.cpu.vendor"]
                         let IconComponent
@@ -348,9 +348,9 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                     query: { node_id: provider.node_id },
                                 }}
                                 key={provider.id}
-                                className="col-span-5 grid grid-cols-12 gap-4 items-center bg-golembackground py-4 px-4 hover:bg-gray-200 hover:cursor-pointer"
+                                className="lg:col-span-5 col-span-12 grid grid-cols-12 gap-4 items-center bg-golembackground py-4 px-4 hover:bg-gray-200 hover:cursor-pointer"
                             >
-                                <div className="col-span-2 flex items-center gap-2">
+                                <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
                                     <div className="flex items-center">
                                         <div className="flex-shrink-0 h-12 w-12 bg-golemblue  p-3 relative">
                                             {
@@ -390,7 +390,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                     </div>
                                 </div>
 
-                                <div className="col-span-4 flex items-center gap-2">
+                                <div className="lg:col-span-4 md:col-span-6 col-span-12 flex items-center gap-2">
                                     <div className="grid grid-cols-1 gap-2">
                                         <div className="flex-container">
                                             <HardwareBadge
@@ -410,7 +410,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                         )}
                                     </div>
                                 </div>
-                                <div className="col-span-2 flex items-center gap-2">
+                                <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
                                     <div>
                                         <p data-tooltip-id={`price-hourly${provider.node_id}`} className="text-sm font-medium">
                                             ${RoundingFunction(provider.runtimes.vm?.hourly_price_usd)} /Hour
@@ -467,10 +467,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                         )}
                                     </div>
                                 </div>
-                                <div className="col-span-2 flex items-center gap-2">
+                                <div className="lg:col-span-2 col-span-4 lg:flex hidden items-center gap-2">
                                     <ReputationIndicator taskReputation={provider.taskReputation} />
                                 </div>
-                                <div className="col-span-2 flex items-center gap-2">
+                                <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
                                     <UptimeDots uptime={provider.uptime} />
                                 </div>
                             </Link>

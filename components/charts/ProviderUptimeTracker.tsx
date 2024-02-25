@@ -3,6 +3,7 @@ import { Accordion, AccordionBody, AccordionHeader, Card, List, ListItem, Tracke
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import { RiCloseFill } from "@remixicon/react"
+import StatusIndicator from "../StatusIndicator"
 
 const colorMapping = {
     online: "emerald-500",
@@ -58,28 +59,14 @@ export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps
                         <h3 className="font-semibold text-xl text-tremor-content-strong dark:text-dark-tremor-content-strong">
                             {nodeName}
                         </h3>
-                        <span className="text-tremor-default text-gray-500 ">{nodeId}</span>
+                        <div className="hidden md:flex">
+                            <span className="text-tremor-default text-gray-500 break-words truncate ">{nodeId}</span>
+                        </div>
                     </div>
-                    {data.current_status === "online" ? (
-                        <span
-                            tabIndex="1"
-                            className="capitalize inline-flex items-center gap-2 rounded-tremor-full px-3 py-1 text-tremor-default text-tremor-content-emphasis ring-1 ring-inset ring-tremor-ring dark:text-dark-tremor-content-emphasis dark:ring-dark-tremor-ring"
-                        >
-                            <span className="-ml-0.5 h-2 w-2 rounded-tremor-full bg-emerald-500 capitalize" aria-hidden={true} />
-                            Operational
-                        </span>
-                    ) : (
-                        <span
-                            tabIndex="1"
-                            className="capitalize inline-flex items-center gap-2 rounded-tremor-full px-3 py-1 text-tremor-default text-tremor-content-emphasis ring-1 ring-inset ring-tremor-ring dark:text-dark-tremor-content-emphasis dark:ring-dark-tremor-ring"
-                        >
-                            <span className="-ml-0.5 h-2 w-2 rounded-tremor-full bg-red-500 capitalize" aria-hidden={true} />
-                            {data.current_status}
-                        </span>
-                    )}
+                    <StatusIndicator current_status={data.current_status} />
                 </div>
-                <div className="mt-8 flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 gap-4 lg:gap-0">
                         {cpu && (
                             <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-1 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
                                 CPU
@@ -117,12 +104,12 @@ export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps
                             </span>
                         )}
                     </div>
-                    <p className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                    <p className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong hidden md:block">
                         {data.uptime_percentage.toFixed(2)}% uptime
                     </p>
                 </div>
                 <Tracker data={combinedData} className="mt-4 hidden w-full lg:flex" />
-                <div className="mt-6 flex flex-wrap items-center gap-2">
+                <div className="mt-6 flex flex-wrap items-center gap-2 hidden w-full lg:flex">
                     {Object.entries(colorMapping).map(([status, color]) => (
                         <span
                             key={status}

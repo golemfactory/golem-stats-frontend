@@ -135,8 +135,8 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
             <div className="fixed z-20 bottom-5 right-5">
                 <OpenHealthCheckModalButton setOpen={setOpen} />
             </div>
-            <div className="grid grid-cols-3 gap-4 mb-4">
-                <div className="col-span-2 min-h-full">
+            <div className="grid grid-cols-12 gap-4 mb-4">
+                <div className="lg:col-span-8 col-span-12 min-h-full">
                     <ProviderUptimeTrackerComponent
                         nodeId={node_id}
                         nodeName={nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}
@@ -145,7 +145,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                     />
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 h-full ">
+                <div className="grid grid-cols-1 col-span-12 lg:col-span-4 gap-4 h-full ">
                     <Card>
                         <div className="flex justify-between">
                             <div>
@@ -184,11 +184,11 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                 </div>
             </div>
             <div className="grid grid-cols-12 gap-4">
-                <Card className="col-span-4 flex flex-col">
+                <Card className="lg:col-span-4 col-span-12 flex flex-col">
                     <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Provider Settings</h3>
                     <div className="flex-1">
                         <Divider>Hardware</Divider>
-                        <div className="gap-4 flex mt-2 items-center justify-center">
+                        <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-center mt-2">
                             <HardwareBadge
                                 title="CPU"
                                 value={nodeData[0].runtimes.vm?.properties["golem.inf.cpu.threads"]}
@@ -210,7 +210,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                     </div>{" "}
                     <div className="flex-1">
                         <Divider>Pricing</Divider>
-                        <div className="gap-4 flex mt-2 items-center justify-center">
+                        <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-center mt-2">
                             <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-3 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
                                 CPU/h
                                 <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
@@ -251,7 +251,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                         </div>
                     </div>
                 </Card>
-                <div className="col-span-8">
+                <div className="lg:col-span-8 col-span-12">
                     <NodeActivityChart nodeId={nodeData[0].node_id.toLowerCase()} />
                 </div>
             </div>

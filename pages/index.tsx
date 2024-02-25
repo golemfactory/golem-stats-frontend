@@ -29,15 +29,22 @@ export default function Index() {
     ]
     return (
         <div className="grid gap-y-4">
+            {/* New parent grid for NetworkActivity and NetworkStats */}
             <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-7">
-                    <NetworkActivity />
-                </div>
-                <div className="col-span-5">
+                {/* NetworkStats will now appear first on mobile, but second on larger screens */}
+                <div className="lg:col-span-5 col-span-12 lg:order-none order-1">
                     <NetworkStats metricData={metricsData} />
                 </div>
 
-                <div className="col-span-4">
+                {/* NetworkActivity will now appear second on mobile, but first on larger screens */}
+                <div className="lg:col-span-7 col-span-12 lg:order-none order-2">
+                    <NetworkActivity />
+                </div>
+            </div>
+
+            {/* Remaining components in the layout */}
+            <div className="grid grid-cols-12 gap-4">
+                <div className="lg:col-span-4 col-span-12">
                     <EarningsCard
                         title="Network Total Earnings"
                         value={networkEarnings?.network_total_earnings?.total_earnings || null}
@@ -45,7 +52,7 @@ export default function Index() {
                         timePeriods={timePeriods}
                     />
                 </div>
-                <div className="col-span-8">{overview ? <TopSourcesCard data={overview} /> : <Skeleton height={500} />}</div>
+                <div className="lg:col-span-8 col-span-12">{overview ? <TopSourcesCard data={overview} /> : <Skeleton height={500} />}</div>
             </div>
         </div>
     )
