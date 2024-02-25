@@ -30,7 +30,7 @@ interface ProviderUptimeTrackerProps {
 }
 
 export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps> = ({ nodeId, nodeName, cpu, gpu }) => {
-    const { data, error } = useSWR<UptimeTrackerResponse>(`v2/preovider/uptime/${nodeId}`, fetcher, {
+    const { data, error } = useSWR<UptimeTrackerResponse>(`v2/provider/uptime/${nodeId}`, fetcher, {
         refreshInterval: 60000,
     })
 
