@@ -30,15 +30,13 @@ export default function Index() {
     return (
         <div className="grid gap-y-4">
             {/* New parent grid for NetworkActivity and NetworkStats */}
-            <div className="grid grid-cols-12 gap-4">
-                {/* NetworkStats will now appear first on mobile, but second on larger screens */}
-                <div className="lg:col-span-5 col-span-12 lg:order-none order-1">
-                    <NetworkStats metricData={metricsData} />
-                </div>
-
-                {/* NetworkActivity will now appear second on mobile, but first on larger screens */}
+            <div className="grid grid-cols-12 gap-4 ">
                 <div className="lg:col-span-7 col-span-12 lg:order-none order-2">
                     <NetworkActivity />
+                </div>
+
+                <div className="lg:col-span-5 col-span-12 lg:order-none order-1">
+                    <NetworkStats metricData={metricsData} />
                 </div>
             </div>
 
