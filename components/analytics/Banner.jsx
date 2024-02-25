@@ -1,6 +1,6 @@
 const AnalyticsBanner = ({ setPreviousConsent, setAskedForConsent, posthog }) => {
     return (
-        <div className="fixed bottom-0 left-0 right-0 bg-golemblue text-white z-50 border-t border-gray-700">
+        <div className="fixed bottom-0 left-0 right-0 bg-golemmain text-white z-50 border-t border-gray-700">
             <div className="mx-auto max-w-7xl px-6 gap-8 py-3 items-center lg:flex lg:px-8">
                 <div>
                     Golem Stats uses cookies to improve the user experience. Cookies are optional but its recommended and helps us improve

@@ -48,13 +48,13 @@ const displayPages = (currentPage: number, lastPage: number) => {
     return pages
 }
 
-const useProviderPagination = (data) => {
+const useProviderPagination = (data, sortBy) => {
     const [page, setPage] = useState(1)
 
     const sortedData = useMemo(() => {
         if (!data) return []
 
-        return [...data].sort((a, b) => {
+        const sorted = [...data].sort((a, b) => {
             // Check for the presence of provider.runtimes["vm-nvidia"] and give top priority
             const aHasNvidia = a.runtimes?.["vm-nvidia"] !== undefined
             const bHasNvidia = b.runtimes?.["vm-nvidia"] !== undefined
@@ -69,7 +69,21 @@ const useProviderPagination = (data) => {
             // Finally, sort in descending order by taskReputation
             return b.taskReputation - a.taskReputation
         })
-    }, [data])
+
+        if (sortBy) {
+            switch (sortBy) {
+                case "price":
+                    return sorted.sort((a, b) => a.runtimes.vm?.hourly_price_usd - b.runtimes.vm?.hourly_price_usd)
+                case "reputation":
+                    return sorted.sort((a, b) => b.taskReputation - a.taskReputation)
+                case "uptime":
+                    return sorted.sort((a, b) => b.uptime - a.uptime)
+                default:
+                    return sorted
+            }
+        }
+        return sorted
+    }, [data, sortBy])
 
     const paginatedData = useMemo(() => {
         return sortedData.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
@@ -107,12 +121,15 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
     const handleFilterChange = useCallback((key, value) => {
         if (key === "showOffline") {
             value = value === "True"
+        } else if (["sortBy"].includes(key)) {
+            // No value manipulation needed, used for sorting
         } else if (value === "") {
             value = null // Allow clearing of filter values
         }
         setFilters((prevFilters) => ({ ...prevFilters, [key]: value }))
         setPage(1)
     }, [])
+
     const handleNameSearchChange = (value, filterKey) => {
         handleFilterChange(filterKey, value)
     }
@@ -121,6 +138,11 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
         if (!filters.showOffline && !provider.online) {
             return false
         }
+        if (filters.sortBy) {
+            // Skip sorting filter here. Sorting handled separately
+            return true
+        }
+
         return Object.entries(filters).every(([filterKey, filterValue]) => {
             if (filterValue === null) return true // Ignore empty filters
 
@@ -128,6 +150,17 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
             let valueToCheck
 
             switch (filterKey) {
+                case "taskReputation":
+                    valueToCheck = provider.taskReputation
+                    if (valueToCheck === null || valueToCheck === undefined) return false // Exclude if no reputation data
+                    return valueToCheck >= parseFloat(filterValue)
+                case "uptime":
+                    valueToCheck = provider.uptime
+                    return valueToCheck >= parseFloat(filterValue)
+                case "runtimes.vm.hourly_price_usd":
+                    valueToCheck = provider.runtimes?.vm?.hourly_price_usd
+                    if (valueToCheck === undefined) return false // Exclude if no price data
+                    return valueToCheck <= parseFloat(filterValue)
                 case "golem.node.id.name":
                     valueToCheck = properties["golem.node.id.name"]
                     return valueToCheck?.toString().toLowerCase().includes(filterValue.toLowerCase())
@@ -147,11 +180,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     // Show both online and offline providers
                     return true
                 default:
-                    valueToCheck = provider[filterKey]
-                    if (typeof filterValue === "boolean") {
-                        return filterValue === valueToCheck
-                    }
-                    return valueToCheck?.toString().toLowerCase().includes(filterValue.toLowerCase())
+                    return true
             }
         })
     }, [])
@@ -171,7 +200,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
             : []
     }, [rawData, filters, filterProvider])
 
-    const { page, data: paginatedData, lastPage, setPage } = useProviderPagination(filteredData)
+    const { page, data: paginatedData, lastPage, setPage } = useProviderPagination(filteredData, filters.sortBy)
     const handleNext = () => setPage(page < lastPage ? page + 1 : lastPage)
     const handlePrevious = () => setPage(page > 1 ? page - 1 : 1)
     const visiblePages = displayPages(page, lastPage)
@@ -180,91 +209,143 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
         <div className="flex flex-col ">
             <Card className="pb-9">
                 <h2 className="text-xl mb-2 font-medium  dark:text-gray-300">Filters</h2>
-                <div className="flex flex-wrap gap-4 ">
-                    <div>
-                        <label htmlFor="providerName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            Node Name
-                        </label>
-                        <div className="mt-2">
-                            <TextInput
-                                type="text"
-                                name="providerName"
-                                id="providerName"
-                                onValueChange={(value) => handleNameSearchChange(value, "golem.node.id.name")}
-                                placeholder="Search by Name"
-                            />
+                <div className="grid grid-cols-1 gap-4">
+                    <div className="flex flex-wrap gap-4 ">
+                        <div>
+                            <label htmlFor="providerName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Node Name
+                            </label>
+                            <div className="mt-2">
+                                <TextInput
+                                    type="text"
+                                    name="providerName"
+                                    id="providerName"
+                                    onValueChange={(value) => handleNameSearchChange(value, "golem.node.id.name")}
+                                    placeholder="Search by Name"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            Cores
-                        </label>
-                        <div className="mt-2">
-                            <TextInput
-                                type="number"
-                                name="cores"
-                                id="cores"
-                                onValueChange={(value) => handleNameSearchChange(value, "golem.inf.cpu.threads")}
-                                placeholder="Number of Cores"
-                            />
+                        <div>
+                            <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Cores
+                            </label>
+                            <div className="mt-2">
+                                <TextInput
+                                    type="number"
+                                    name="cores"
+                                    id="cores"
+                                    onValueChange={(value) => handleNameSearchChange(value, "golem.inf.cpu.threads")}
+                                    placeholder="Number of Cores"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <label htmlFor="memory" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            Memory <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
-                        </label>
+                        <div>
+                            <label htmlFor="memory" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Memory <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
+                            </label>
 
-                        <div className="mt-2">
-                            <TextInput
-                                type="number"
-                                name="memory"
-                                id="memory"
-                                onValueChange={(value) => handleNameSearchChange(value, "golem.inf.mem.gib")}
-                                placeholder="Memory in GB"
-                            />
+                            <div className="mt-2">
+                                <TextInput
+                                    type="number"
+                                    name="memory"
+                                    id="memory"
+                                    onValueChange={(value) => handleNameSearchChange(value, "golem.inf.mem.gib")}
+                                    placeholder="Memory in GB"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <label htmlFor="disk" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            Disk <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
-                        </label>
+                        <div>
+                            <label htmlFor="disk" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Disk <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
+                            </label>
 
-                        <div className="mt-2">
-                            <TextInput
-                                type="number"
-                                name="disk"
-                                id="disk"
-                                onValueChange={(value) => handleNameSearchChange(value, "golem.inf.storage.gib")}
-                                placeholder="Disk in GB"
-                            />
+                            <div className="mt-2">
+                                <TextInput
+                                    type="number"
+                                    name="disk"
+                                    id="disk"
+                                    onValueChange={(value) => handleNameSearchChange(value, "golem.inf.storage.gib")}
+                                    placeholder="Disk in GB"
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            Network
-                        </label>
-                        <Select
-                            defaultValue="Mainnet"
-                            id="network"
-                            name="network"
-                            className="z-50 mt-2"
-                            onValueChange={(value) => handleNameSearchChange(value, "network")}
-                        >
-                            <SelectItem value="Mainnet">Mainnet</SelectItem>
-                            <SelectItem value="Testnet">Testnet</SelectItem>
-                        </Select>
-                    </div>
-                    {enableShowingOfflineNodes && (
+                    <div className="flex flex-wrap gap-4">
+                        <div>
+                            <label htmlFor="reputation" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Reputation
+                            </label>
+                            <div className="mt-2">
+                                <TextInput
+                                    type="number"
+                                    name="reputation"
+                                    id="reputation"
+                                    onValueChange={(value) => handleNameSearchChange(value, "taskReputation")}
+                                    placeholder="Minimum reputation"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="uptime" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Uptime
+                            </label>
+                            <div className="mt-2">
+                                <TextInput
+                                    type="number"
+                                    name="uptime"
+                                    id="uptime"
+                                    onValueChange={(value) => handleNameSearchChange(value, "uptime")}
+                                    placeholder="Minimum uptime percentage"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Price ($/Hour)
+                            </label>
+                            <div className="mt-2">
+                                <TextInput
+                                    type="number"
+                                    name="price"
+                                    id="price"
+                                    onValueChange={(value) => handleNameSearchChange(value, "runtimes.vm.hourly_price_usd")}
+                                    placeholder="Maximum price per hour"
+                                />
+                            </div>
+                        </div>
+
                         <div>
                             <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                Show offline nodes
+                                Network
                             </label>
-                            <Select id="showOffline" name="showOffline" onValueChange={(value) => handleFilterChange("showOffline", value)}>
-                                <SelectItem value="False">Hide Offline</SelectItem>
-                                <SelectItem value="True">Show Offline</SelectItem>
+                            <Select
+                                defaultValue="Mainnet"
+                                id="network"
+                                name="network"
+                                className="z-50 mt-2"
+                                onValueChange={(value) => handleNameSearchChange(value, "network")}
+                            >
+                                <SelectItem value="Mainnet">Mainnet</SelectItem>
+                                <SelectItem value="Testnet">Testnet</SelectItem>
                             </Select>
                         </div>
-                    )}
+
+                        {enableShowingOfflineNodes && (
+                            <div>
+                                <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                    Show offline nodes
+                                </label>
+                                <Select
+                                    id="showOffline"
+                                    name="showOffline"
+                                    onValueChange={(value) => handleFilterChange("showOffline", value)}
+                                >
+                                    <SelectItem value="False">Hide Offline</SelectItem>
+                                    <SelectItem value="True">Show Offline</SelectItem>
+                                </Select>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </Card>
             <Card>
@@ -331,7 +412,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                               </div>
                           ))
                         : paginatedData?.map((provider) => {
-                              const cpuVendor = provider.runtimes.vm?.properties["golem.inf.cpu.vendor"]
+                              const cpuVendor = provider.runtimes.vm?.properties?.["golem.inf.cpu.vendor"]
                               let IconComponent
                               let additionalClasses = ""
 
@@ -344,7 +425,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                       additionalClasses = "fill-red-500" // Apply specific class for AMD
                                       break
                                   default:
-                                      IconComponent = DefaultIcon // A default icon component, if you have one
+                                      IconComponent = CpuChipIcon
                               }
 
                               return (
@@ -387,10 +468,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                           </div>
                                           <div className="ml-1">
                                               <p className="text-sm font-medium text-gray-900 dark:text-white ">
-                                                  {provider.runtimes.vm?.properties["golem.node.id.name"]}
+                                                  {provider.runtimes.vm?.properties?.["golem.node.id.name"]}
                                               </p>
                                               <p className="text-sm  text-gray-400 dark:text-white ">
-                                                  {provider.runtimes.vm?.properties["golem.node.debug.subnet"]}
+                                                  {provider.runtimes.vm?.properties?.["golem.node.debug.subnet"]}
                                               </p>
                                               <p className="text-sm  text-gray-400 dark:text-white">{provider.version}</p>
                                           </div>
@@ -402,7 +483,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                                   <HardwareBadge
                                                       title="CPU"
                                                       icon={<IconComponent className={`h-4 w-4 ${additionalClasses}`} />}
-                                                      value={provider.runtimes.vm?.properties["golem.inf.cpu.brand"]}
+                                                      value={provider.runtimes.vm?.properties?.["golem.inf.cpu.brand"]}
                                                   />
                                               </div>
                                               {provider.runtimes["vm-nvidia"]?.properties && (
@@ -411,7 +492,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                                           title="GPU"
                                                           icon={<NvidiaIcon className="h-5 w-5 flex-shrink-0" />}
                                                           value={
-                                                              provider.runtimes["vm-nvidia"].properties[
+                                                              provider.runtimes["vm-nvidia"].properties?.[
                                                                   "golem.!exp.gap-35.v1.inf.gpu.model"
                                                               ]
                                                           }
@@ -423,12 +504,12 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                       <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
                                           <div>
                                               <p data-tooltip-id={`price-hourly${provider.node_id}`} className="text-sm font-medium">
-                                                  ${RoundingFunction(provider.runtimes.vm?.hourly_price_usd)} /Hour
+                                                  ${RoundingFunction(provider.runtimes.vm?.hourly_price_usd, 6)} /Hour
                                                   <ReactTooltip
                                                       id={`price-hourly${provider.node_id}`}
                                                       place="bottom"
                                                       content={`Calculated using the formula: Assuming 100% usage on ${
-                                                          provider.runtimes.vm?.properties["golem.inf.cpu.threads"]
+                                                          provider.runtimes.vm?.properties?.["golem.inf.cpu.threads"]
                                                       } CPU threads at a rate of ${priceHashMapOrDefault(
                                                           provider,
                                                           "golem.usage.cpu_sec"
@@ -436,9 +517,9 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                                           provider,
                                                           "golem.usage.duration_sec"
                                                       )} GLM per hour, and a start price of ${
-                                                          provider.runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"]?.slice(
-                                                              -1
-                                                          )[0]
+                                                          provider.runtimes.vm?.properties?.[
+                                                              "golem.com.pricing.model.linear.coeffs"
+                                                          ]?.slice(-1)[0]
                                                       } GLM. These costs are then converted to USD based on the current GLM price.`}
                                                       className="break-words max-w-64 z-50"
                                                   />

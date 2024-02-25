@@ -7,6 +7,7 @@ import { ElementType } from "react"
 import { useRouter } from "next/router"
 import { NetworkCTA, provider, network, providerCTA } from "@/lib/NavRoutes"
 import DarkModeToggle from "./DarkModeToggle"
+import GolemNavIcon from "./svg/GolemNavIcon"
 
 const NavItem = ({
     item,
@@ -129,7 +130,7 @@ export const Navbar: React.FC = () => {
             <nav className="mx-auto items-center grid grid-cols-4 lg:flex p-6 lg:px-8" aria-label="Global">
                 <div className="flex lg:flex-1 col-span-3">
                     <Link href="/" className="text-xl font-medium -m-1.5 p-1.5">
-                        Golem Network Stats
+                        <GolemNavIcon className="w-1/4 fill-white text-white" />
                     </Link>
                 </div>
                 <div className="flex lg:hidden justify-end">
@@ -153,7 +154,15 @@ export const Navbar: React.FC = () => {
                         Requestor
                     </Link>
                 </div>
-                <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+                <div className="hidden lg:flex lg:flex-1 gap-x-4 lg:justify-end items-center">
+                    <Link
+                        href={"https://golem.network"}
+                        target="_blank"
+                        rel={"noreferrer noopener"}
+                        className="font-semibold leading-6 text-white"
+                    >
+                        Golem Homepage
+                    </Link>
                     <DarkModeToggle />
                 </div>
             </nav>
