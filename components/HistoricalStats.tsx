@@ -87,7 +87,6 @@ const NetworkStats = ({ metricData }) => {
         return date.toLocaleString("en-US", formatOptions)
     }
     const MetricCardSummary = ({ category, data, unit, color }) => {
-        console.log(category, data, unit, color)
 
         const latestDataPoint = latest1wData[category] || 0
         const total = `${Intl.NumberFormat("us").format(latestDataPoint)}`

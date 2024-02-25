@@ -478,7 +478,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     })}
                 </div>
 
-                <div className="flex justify-center mt-4 py-4 gap-2">
+                <div className="flex justify-center mt-4 py-4 gap-2 flex-wrap">
                     <button
                         onClick={handlePrevious}
                         disabled={page === 1}

@@ -10,7 +10,6 @@ const ReputationIndicator: React.FC<ReputationIndicatorProps> = ({ taskReputatio
     let displayValue: string
     let showTooltip = false
 
-    console.log(taskReputation)
 
     if (taskReputation === null || taskReputation === undefined) {
         displayValue = "N/A"
