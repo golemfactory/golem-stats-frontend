@@ -21,9 +21,9 @@ export async function getStaticPaths() {
     const nodes: any = await fetcher("v2/network/online") // endpoint to get all wallet_ids
 
     const paths = nodes
-        .filter((node: any) => node.runtimes.vm?.properties["wallet"] !== undefined) // filter nodes that have the wallet property defined
+        .filter((node: any) => node.runtimes.vm?.properties && node.runtimes.vm.properties["wallet"] !== undefined) // filter nodes that have both properties object and the wallet property defined
         .map((node: any) => ({
-            params: { wallet_id: node.runtimes.vm?.properties["wallet"].toString() },
+            params: { wallet_id: node.runtimes.vm.properties["wallet"].toString() },
         }))
 
     return { paths, fallback: true }
