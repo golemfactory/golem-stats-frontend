@@ -104,7 +104,7 @@ const NetworkStats = ({ metricData }) => {
     }
 
     return (
-        <Card className="p-0 shadow-xl">
+        <Card>
             <div className="relative p-6">
                 <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network Stats</h1>
                 <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
