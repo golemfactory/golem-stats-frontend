@@ -1,11 +1,11 @@
-import { RiCheckboxCircleFill } from "@remixicon/react"
+import { RiCheckboxCircleFill, RiBarChartFill } from "@remixicon/react"
 import { Accordion, AccordionBody, AccordionHeader, Card, List, ListItem, Tracker } from "@tremor/react"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import { RiCloseFill } from "@remixicon/react"
 import StatusIndicator from "../StatusIndicator"
 import Skeleton from "react-loading-skeleton"
-
+import "react-loading-skeleton/dist/skeleton.css"
 const colorMapping = {
     online: "emerald-500",
     offline: "red-500",
@@ -30,12 +30,30 @@ interface ProviderUptimeTrackerProps {
 }
 
 export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps> = ({ nodeId, nodeName, cpu, gpu }) => {
-    const { data, error } = useSWR<UptimeTrackerResponse>(`v2/provider/uptime/${nodeId}`, fetcher, {
+    const { data, error } = useSWR<UptimeTrackerResponse>(`v2/preovider/uptime/${nodeId}`, fetcher, {
         refreshInterval: 60000,
     })
 
-    if (error) return <div>Failed to load</div>
-    if (!data) return <Skeleton width={500} height={500} />
+    if (error)
+        return (
+            <Card className="h-full py-1 flex justify-center items-center">
+                <div className="mt-4 flex h-44 items-center justify-center rounded-tremor-small border border-dashed border-tremor-border p-4 dark:border-dark-tremor-border">
+                    <div className="text-center">
+                        <RiBarChartFill
+                            className="mx-auto h-7 w-7 text-tremor-content-subtle dark:text-dark-tremor-content-subtle"
+                            aria-hidden={true}
+                        />
+                        <p className="mt-2 text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                            No data to show
+                        </p>
+                        <p className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                            There was an error fetching the data, please try again later
+                        </p>
+                    </div>
+                </div>
+            </Card>
+        )
+    if (!data) return <Skeleton className="h-full py-1" />
     const reversedData = [...data.data].reverse() // Create a copy and reverse it
 
     const combinedData = reversedData.map((item) => {

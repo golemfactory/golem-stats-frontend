@@ -18,8 +18,7 @@ export default function Index() {
     const { data: overview, error: overviewError } = useSWR("v2/network/comparison", fetcher, {
         refreshInterval: 10000,
     })
-    if (error) return <div>Failed to load</div>
-    if (!metricsData) return <div>Loading...</div>
+
     const timePeriods = [
         { period: "6 Hours", earnings: networkEarnings?.network_earnings_6h?.total_earnings || null },
         { period: "24 Hours", earnings: networkEarnings?.network_earnings_24h?.total_earnings || null },
@@ -36,19 +35,23 @@ export default function Index() {
                 </div>
 
                 <div className="lg:col-span-5 col-span-12 lg:order-none order-1">
-                    <NetworkStats metricData={metricsData} />
+                    {metricsData ? <NetworkStats metricData={metricsData} /> : <Skeleton height={580} />}
                 </div>
             </div>
 
             {/* Remaining components in the layout */}
             <div className="grid grid-cols-12 gap-4">
                 <div className="lg:col-span-4 col-span-12">
-                    <EarningsCard
-                        title="Network Total Earnings"
-                        value={networkEarnings?.network_total_earnings?.total_earnings || null}
-                        unit="GLM"
-                        timePeriods={timePeriods}
-                    />
+                    {networkEarnings ? (
+                        <EarningsCard
+                            title="Network Total Earnings"
+                            value={networkEarnings?.network_total_earnings?.total_earnings || null}
+                            unit="GLM"
+                            timePeriods={timePeriods}
+                        />
+                    ) : (
+                        <Skeleton height={500} />
+                    )}
                 </div>
                 <div className="lg:col-span-8 col-span-12">{overview ? <TopSourcesCard data={overview} /> : <Skeleton height={500} />}</div>
             </div>
