@@ -4,6 +4,7 @@ import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import { RiCloseFill } from "@remixicon/react"
 import StatusIndicator from "../StatusIndicator"
+import Skeleton from "react-loading-skeleton"
 
 const colorMapping = {
     online: "emerald-500",
@@ -34,7 +35,7 @@ export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps
     })
 
     if (error) return <div>Failed to load</div>
-    if (!data) return <div>Loading...</div>
+    if (!data) return <Skeleton width={500} height={500} />
     const reversedData = [...data.data].reverse() // Create a copy and reverse it
 
     const combinedData = reversedData.map((item) => {
