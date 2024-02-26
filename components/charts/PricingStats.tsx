@@ -145,6 +145,7 @@ const PricingStats = () => {
                                 colors={["blue-400", "golemblue", "golemmain"]}
                                 showLegend={true}
                                 showGradient={false}
+                                showAnimation={true}
                                 yAxisWidth={38}
                                 valueFormatter={(number) => `${Intl.NumberFormat("us").format(number)}`}
                                 className="h-72"

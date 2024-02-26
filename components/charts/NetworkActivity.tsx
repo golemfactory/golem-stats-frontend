@@ -60,7 +60,14 @@ export const NetworkActivity: React.FC = () => {
                         </div>
 
                         {loaded && (
-                            <AreaChart data={data} index="date" categories={["Providers computing"]} colors={["blue"]} yAxisWidth={30} />
+                            <AreaChart
+                                data={data}
+                                index="date"
+                                categories={["Providers computing"]}
+                                colors={["blue"]}
+                                yAxisWidth={30}
+                                showAnimation={true}
+                            />
                         )}
                     </TabPanel>
                 </TabPanels>

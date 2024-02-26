@@ -33,6 +33,7 @@ const NodeActivityChart = ({ nodeId }) => {
                 categories={["Status"]}
                 showLegend={false}
                 showGradient={true}
+                showAnimation={true}
                 valueFormatter={valueFormatter}
                 showYAxis={true}
                 className="mt-6 h-48"

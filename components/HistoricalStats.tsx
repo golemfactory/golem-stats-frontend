@@ -163,6 +163,7 @@ const NetworkStats = ({ metricData }) => {
                                 categories={[tab.metric]}
                                 showLegend={false}
                                 showGradient={false}
+                                showAnimation={true}
                                 yAxisWidth={38}
                                 valueFormatter={(number) => `${Intl.NumberFormat("us").format(number)}`}
                                 className="h-72"

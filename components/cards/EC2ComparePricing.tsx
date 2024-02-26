@@ -84,7 +84,7 @@ function EC2vsGolemPricing({ data }) {
                     <span>Price on Golem</span>
                 </p>
 
-                <BarList data={formattedAndFilteredData.slice(0, 7)} valueFormatter={valueFormatter} />
+                <BarList data={formattedAndFilteredData.slice(0, 7)} valueFormatter={valueFormatter} showAnimation={true} />
 
                 <div className="absolute inset-x-0 bottom-0 flex justify-center rounded-b-tremor-default bg-gradient-to-t from-tremor-background to-transparent py-7 dark:from-dark-tremor-background">
                     <button
