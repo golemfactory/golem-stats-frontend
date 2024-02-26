@@ -322,7 +322,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                 defaultValue="Mainnet"
                                 id="network"
                                 name="network"
-                                className="z-50 mt-2"
+                                className="z-40 mt-2"
                                 onValueChange={(value) => handleNameSearchChange(value, "network")}
                             >
                                 <SelectItem value="Mainnet">Mainnet</SelectItem>
@@ -338,10 +338,11 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                 <Select
                                     id="showOffline"
                                     name="showOffline"
+                                    className="z-40 mt-2"
                                     onValueChange={(value) => handleFilterChange("showOffline", value)}
                                 >
-                                    <SelectItem value="False">Hide Offline</SelectItem>
-                                    <SelectItem value="True">Show Offline</SelectItem>
+                                    <SelectItem value="False">False</SelectItem>
+                                    <SelectItem value="True">True</SelectItem>
                                 </Select>
                             </div>
                         )}

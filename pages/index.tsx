@@ -5,7 +5,7 @@ import { NetworkActivity } from "@/components/charts/NetworkActivity"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import EarningsCard from "@/components/Earnings"
-import EC2vsGolemPricing from "@/components/cards/TopSourcesCard"
+import EC2vsGolemPricing from "@/components/cards/EC2ComparePricing"
 import Skeleton from "react-loading-skeleton"
 
 export default function Index() {
