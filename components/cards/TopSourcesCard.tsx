@@ -3,7 +3,7 @@ import { Card, Dialog, DialogPanel, TextInput, BarList, Divider } from "@tremor/
 import { RiArrowRightUpLine, RiSearchLine } from "@remixicon/react"
 import AWSIcon from "../svg/AWSIcon"
 
-function TopSourcesCard({ data }) {
+function EC2vsGolemPricing({ data }) {
     const [modalOpen, setModalOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
 
@@ -144,4 +144,4 @@ function TopSourcesCard({ data }) {
     )
 }
 
-export default TopSourcesCard
+export default EC2vsGolemPricing

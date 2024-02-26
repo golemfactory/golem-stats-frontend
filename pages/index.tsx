@@ -5,7 +5,7 @@ import { NetworkActivity } from "@/components/charts/NetworkActivity"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import EarningsCard from "@/components/Earnings"
-import TopSourcesCard from "@/components/cards/TopSourcesCard"
+import EC2vsGolemPricing from "@/components/cards/TopSourcesCard"
 import Skeleton from "react-loading-skeleton"
 
 export default function Index() {
@@ -53,7 +53,9 @@ export default function Index() {
                         <Skeleton height={500} />
                     )}
                 </div>
-                <div className="lg:col-span-8 col-span-12">{overview ? <TopSourcesCard data={overview} /> : <Skeleton height={500} />}</div>
+                <div className="lg:col-span-8 col-span-12">
+                    {overview ? <EC2vsGolemPricing data={overview} /> : <Skeleton height={500} />}
+                </div>
             </div>
         </div>
     )

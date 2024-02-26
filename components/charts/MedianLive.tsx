@@ -23,29 +23,34 @@ const PricingColumn = ({ title, value }: { title: string; value: number }) => {
 }
 
 const MedianLive = () => {
-    const { data, error } = useSWR("v1/network/pricing/median", fetcher, {
+    const { data, error } = useSWR("v2/network/pricing/median/1h", fetcher, {
         refreshInterval: 10000,
     })
 
     return (
-        <div>
-            <h1 className="text-2xl col-span-12 font-medium dark:text-gray-300">Live Median Pricing</h1>
+        <Card>
+            <h3 className="text-tremor-title text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium">
+                Median Live Pricing
+            </h3>
+            <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                The median pricing for CPU, Env, and Start based upon the list of providers who received a task in the last hour.
+            </p>
             <dl className="mt-2 grid grid-rows-4 grid-flow-col gap-4 grid-cols-12">
                 {data ? (
                     <>
-                        <PricingColumn title="CPU per hour" value={data.cpuhour} />
-                        <PricingColumn title="Env per hour" value={data.perhour} />
-                        <PricingColumn title="Start pricing" value={data.start} />
+                        <PricingColumn title="CPU per hour" value={data.cpu_median} />
+                        <PricingColumn title="Env per hour" value={data.env_median} />
+                        <PricingColumn title="Start pricing" value={data.start_median} />
                     </>
                 ) : (
-                    <>
+                    <div className="w-full grid grid-cols-1">
+                        <Skeleton height={100} className="w-full" />
                         <Skeleton height={100} />
                         <Skeleton height={100} />
-                        <Skeleton height={100} />
-                    </>
+                    </div>
                 )}
             </dl>
-        </div>
+        </Card>
     )
 }
 
