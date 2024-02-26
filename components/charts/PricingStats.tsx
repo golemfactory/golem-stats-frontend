@@ -128,7 +128,7 @@ const PricingStats = () => {
                                 </div>
                             </div>
                             <AreaChart
-                                data={metricData[selectedTimeFrame].map((item) => {
+                                data={(metricData[selectedTimeFrame] || []).map((item) => {
                                     // Transforming the item
                                     const transformedItem = {
                                         ...item,
