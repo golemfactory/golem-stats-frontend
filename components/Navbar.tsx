@@ -150,9 +150,6 @@ export const Navbar: React.FC = () => {
                     <PopoverGroup>
                         <PopoverArea title="Provider" items={provider} CTAs={providerCTA} />
                     </PopoverGroup>
-                    <Link href="/network/requestor" className="hidden lg:block  font-semibold leading-6 text-white">
-                        Requestor
-                    </Link>
                 </div>
                 <div className="hidden lg:flex lg:flex-1 gap-x-4 lg:justify-end items-center">
                     <Link
@@ -225,12 +222,6 @@ export const Navbar: React.FC = () => {
                                         </>
                                     )}
                                 </Disclosure>
-                                <Link
-                                    href="/network/requestor"
-                                    className="-mx-3 block  px-3 py-2 text-lg font-semibold leading-7 hover:bg-gray-50 dark:hover:bg-gray-700/80"
-                                >
-                                    Requestor
-                                </Link>
                             </div>
                         </div>
                     </div>

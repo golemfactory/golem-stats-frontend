@@ -1,150 +1,53 @@
-import React, { useState, useEffect } from "react"
-import dynamic from "next/dynamic"
-import { fetcher } from "@/fetcher"
-import { RoundingFunction } from "@/lib/RoundingFunction"
-import { ApexOptions } from "apexcharts"
+import { useState, useEffect } from "react"
 import useSWR from "swr"
-import { Card } from "@tremor/react"
-
-const DynamicApexChart = dynamic(() => import("react-apexcharts"), {
-    ssr: false,
-})
+import { fetcher } from "@/fetcher"
+import { Card, Tab, TabGroup, TabList, TabPanel, TabPanels, AreaChart } from "@tremor/react"
 
 type Props = {
     endpoint: string
     title: string
-    colors: string
+    colors: string[]
 }
 
 export const HistoricalComputingChart: React.FC<Props> = ({ endpoint, title, colors }) => {
-    const [options, setOptions] = useState<ApexOptions>({})
-    const [series, setSeries] = useState<any[]>([])
-    const { data: apiResponse } = useSWR<any[]>(endpoint, fetcher, {
+    const [data, setData] = useState([])
+    const { data: apiResponse } = useSWR(endpoint, fetcher, {
         refreshInterval: 10000,
     })
-    const { data: releaseData } = useSWR<any[]>("v1/api/yagna/releases", fetcher)
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString)
+        return date.toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    }
 
     useEffect(() => {
         if (apiResponse) {
-            const count: any[] = []
-            apiResponse.forEach((obj: any) => {
-                count.push({ x: new Date(obj.date).getTime(), y: obj.total })
-            })
-            setSeries([
-                {
-                    data: count,
-                    name: "Simultaneous providers computing",
-                },
-            ])
+            const formattedData = apiResponse.map(({ total, date }) => ({
+                date: formatDate(date),
+                "Simultaneous providers computing": total,
+            }))
+            setData(formattedData)
         }
     }, [apiResponse])
 
-    useEffect(() => {
-        if (releaseData) {
-            const annotations = releaseData.map((release: any) => {
-                return {
-                    x: new Date(release.published_at).getTime(),
-                    strokeDashArray: 0,
-                    borderColor: "#3F51B5",
-                    label: {
-                        borderColor: "#3F51B5",
-                        style: {
-                            color: "#fff",
-                            background: "#3F51B5",
-                        },
-                        text: `${release.tag_name} Released`,
-                    },
-                }
-            })
-
-            setOptions({
-                chart: {
-                    id: "area-datetime",
-                    type: "area",
-                    zoom: {
-                        autoScaleYaxis: true,
-                    },
-                    animations: {
-                        enabled: false,
-                        easing: "linear",
-                        dynamicAnimation: {
-                            speed: 1000,
-                        },
-                    },
-                },
-
-                tooltip: {
-                    enabled: true,
-                    x: {
-                        show: true,
-                        formatter: undefined,
-                    },
-                },
-                dataLabels: {
-                    enabled: false,
-                },
-                markers: {
-                    size: 0,
-                },
-                annotations: {
-                    xaxis: annotations,
-                },
-
-                fill: {
-                    type: "gradient",
-                    gradient: {
-                        shadeIntensity: 0.1,
-                        inverseColors: false,
-                        opacityFrom: 0.2,
-                        opacityTo: 0,
-                        stops: [0, 90, 100],
-                    },
-                },
-                yaxis: {
-                    title: {
-                        rotate: -90,
-                        offsetX: 0,
-                        offsetY: 0,
-                        style: {
-                            color: undefined,
-                            fontSize: "12px",
-                            fontWeight: 600,
-                            cssClass: "apexcharts-yaxis-title",
-                        },
-                    },
-                    labels: {
-                        formatter: function (value) {
-                            return value + " "
-                        },
-                    },
-                },
-                colors: ["#0000ff"],
-                xaxis: {
-                    type: "datetime",
-                    title: {
-                        offsetX: -25,
-                        offsetY: 0,
-                        style: {
-                            color: undefined,
-                            fontSize: "12px",
-                            fontWeight: 600,
-                            cssClass: "apexcharts-yaxis-title",
-                        },
-                    },
-                    labels: {},
-                    tickAmount: 10,
-                },
-            })
-        }
-    }, [releaseData])
-
     return (
-        <Card>
-            <h1 className="text-2xl font-medium dark:text-gray-300 mb-2">{title}</h1>
-
-            <div className="mt-4">
-                <DynamicApexChart width="100%" height="350" series={series} options={options} type="area" />
+        <Card className="h-full px-6">
+            <div className="px-6 mb-6">
+                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">{title}</h1>
+                <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                    A historical view of the maximum number of providers computing simultaneously at a given day.
+                </p>
             </div>
+            <TabGroup className="px-6">
+                <TabList className="mt-4">
+                    <Tab>Chart View</Tab>
+                </TabList>
+                <TabPanels>
+                    <TabPanel>
+                        <AreaChart data={data} index="date" categories={["Simultaneous providers computing"]} yAxisWidth={30} />
+                    </TabPanel>
+                </TabPanels>
+            </TabGroup>
         </Card>
     )
 }

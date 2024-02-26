@@ -11,7 +11,7 @@ const PricingStats = () => {
     const { data, error } = useSWR("v2/network/pricing/1h", fetcher, {
         refreshInterval: 10000,
     })
-    const [selectedTimeFrame, setSelectedTimeFrame] = useState("1w")
+    const [selectedTimeFrame, setSelectedTimeFrame] = useState("7d")
     const [selectedMetric, setSelectedMetric] = useState("Median")
     const tabs = [{ name: "Median" }, { name: "Average" }]
 
@@ -36,13 +36,12 @@ const PricingStats = () => {
         const date = new Date(dateString * 1000)
         let formatOptions = {}
         switch (timeFrame) {
-            case "1w":
-                formatOptions = { month: "short", day: "numeric", hour: "numeric", minute: "numeric", hour12: true }
-                break
-            case "2w":
-            case "4w":
+            case "7d":
+            case "1m":
                 formatOptions = { month: "short", day: "numeric" }
                 break
+            case "6m":
+            case "1y":
             case "All":
                 formatOptions = { month: "short", day: "numeric", year: "numeric" }
                 break

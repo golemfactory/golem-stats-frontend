@@ -45,7 +45,7 @@ const customTooltip = ({ active, payload, label }) => {
 }
 
 const NetworkStats = ({ metricData }) => {
-    const [selectedTimeFrame, setSelectedTimeFrame] = useState("1w")
+    const [selectedTimeFrame, setSelectedTimeFrame] = useState("1d")
     const tabs = [
         { name: "Providers", metric: "online", unit: "Providers" },
         { name: "Cores", metric: "cores", unit: "Cores" },
@@ -53,32 +53,37 @@ const NetworkStats = ({ metricData }) => {
         { name: "Disk", metric: "disk", unit: "Terabytes" },
     ]
     const timeFrames = Object.keys(metricData)
-    const latest1wData = metricData["1w"][metricData["1w"].length - 1] || {}
+    const latest1dData = metricData["1d"][metricData["1d"].length - 1] || {}
     const formatDate = (dateString, timeFrame) => {
         const date = new Date(dateString * 1000)
         let formatOptions = {}
 
         switch (timeFrame) {
-            case "1w":
+            case "1d":
                 formatOptions = {
                     month: "short",
                     day: "numeric",
-                    hour: "numeric",
-                    minute: "numeric",
-                    hour12: true,
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
                 }
                 break
-            case "2w":
-            case "4w":
+            case "7d":
                 formatOptions = {
                     month: "short",
                     day: "numeric",
+                }
+                break
+            case "1m":
+            case "1y":
+                formatOptions = {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
                 }
                 break
             case "All":
                 formatOptions = {
-                    month: "short",
-                    day: "numeric",
                     year: "numeric",
                 }
                 break
@@ -87,7 +92,7 @@ const NetworkStats = ({ metricData }) => {
         return date.toLocaleString("en-US", formatOptions)
     }
     const MetricCardSummary = ({ category, data, unit, color }) => {
-        const latestDataPoint = latest1wData[category] || 0
+        const latestDataPoint = latest1dData[category] || 0
         const total = `${Intl.NumberFormat("us").format(latestDataPoint)}`
         return (
             <div className="flex justify-between">

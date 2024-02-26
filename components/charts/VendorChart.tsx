@@ -1,105 +1,78 @@
 import React, { useEffect, useState } from "react"
-import dynamic from "next/dynamic"
 import useSWR from "swr"
-
-import { ApexOptions } from "apexcharts"
+import { Card, Divider, DonutChart, List, ListItem, Color } from "@tremor/react"
 import { fetcher } from "@/fetcher"
-import { RoundingFunction } from "@/lib/RoundingFunction"
-import { Card } from "@tremor/react"
 
-const ApexCharts = dynamic(() => import("react-apexcharts"), { ssr: false })
+const valueFormatter = (number) => number.toString()
 
 export const NetworkCPUVendorDistribution: React.FC = () => {
-    const [data, setData] = useState<number[]>([])
-    const [intelCount, setIntelCount] = useState(0)
-    const [amdCount, setAmdCount] = useState(0)
-    const [thirdTypeCpu, setThirdTypeCpu] = useState(0)
-
     const { data: apiResponse } = useSWR("v2/network/online", fetcher, {
         refreshInterval: 10000,
     })
 
+    const [chartData, setChartData] = useState([
+        { name: "Intel", amount: 0, color: "#0000F9" as Color },
+        { name: "AMD", amount: 0, color: "rgb(234, 53, 70)" as Color },
+        { name: "Other", amount: 0, color: "#8b07cd" as Color },
+    ])
+
     useEffect(() => {
-        if (apiResponse) {
-            setIntelCount(0)
-            setAmdCount(0)
-            setThirdTypeCpu(0)
+        let intelCount = 0
+        let amdCount = 0
+        let thirdTypeCpu = 0
 
-            apiResponse.forEach((obj: any) => {
-                // Check if 'vm' runtime is present
-                if (obj.runtimes && obj.runtimes.vm) {
-                    const vendor = obj.runtimes.vm.properties["golem.inf.cpu.vendor"]
-
-                    // Increment the appropriate count based on the vendor type
-                    if (vendor === "GenuineIntel") {
-                        setIntelCount((prevCount) => prevCount + 1)
-                    } else if (vendor === "AuthenticAMD") {
-                        setAmdCount((prevCount) => prevCount + 1)
-                    } else {
-                        // Increment count for third type CPUs if vendor is defined
-                        if (vendor !== undefined) {
-                            setThirdTypeCpu((prevCount) => prevCount + 1)
-                        }
-                    }
+        apiResponse?.forEach((obj) => {
+            const vendor = obj.runtimes?.vm?.properties["golem.inf.cpu.vendor"]
+            if (vendor) {
+                if (vendor === "GenuineIntel") {
+                    intelCount++
+                } else if (vendor === "AuthenticAMD") {
+                    amdCount++
+                } else {
+                    thirdTypeCpu++
                 }
-            })
+            }
+        })
 
-            setData([intelCount, amdCount, thirdTypeCpu])
-        }
-    }, [apiResponse, intelCount, amdCount, thirdTypeCpu])
-
-    const chartOptions: ApexOptions = {
-        chart: {
-            id: "Vendor-donut",
-            type: "donut",
-            zoom: {
-                autoScaleYaxis: true,
-            },
-        },
-        labels: ["Intel", "AMD", "Other"],
-        tooltip: {
-            enabled: true,
-            x: {
-                show: true,
-                format: "HH:mm:ss",
-                formatter: undefined,
-            },
-        },
-        dataLabels: {
-            enabled: true,
-        },
-        colors: ["#0000F9", "rgb(234, 53, 70)", "#8b07cd"],
-        markers: {
-            size: 0,
-        },
-        stroke: {
-            show: false,
-            width: 0,
-        },
-        fill: {
-            type: "gradient",
-            gradient: {
-                shadeIntensity: 0,
-                inverseColors: false,
-                opacityFrom: 1,
-                opacityTo: 1,
-                stops: [0, 90, 100],
-            },
-        },
-    }
+        setChartData([
+            { name: "Intel", amount: intelCount, color: "#0000F9" as Color },
+            { name: "AMD", amount: amdCount, color: "rgb(234, 53, 70)" as Color },
+            { name: "Other", amount: thirdTypeCpu, color: "#8b07cd" as Color },
+        ])
+    }, [apiResponse])
 
     return (
-        <Card>
-            <div className="relative">
-                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300 animate-ping" />
-                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300" />
-                <h3 className="text-2xl mb-2 font-medium dark:text-gray-300">Network CPU Vendor Distribution</h3>
-                <span className="dark:text-gray-400">
-                    AMD: <b className="mr-1">{amdCount}</b> <b>Intel: {intelCount}</b>
-                    <b className="mr-1"></b> Other: <b>{thirdTypeCpu}</b>
-                </span>
-                <ApexCharts className="py-6" width="100%" height="250" series={data} type="donut" options={chartOptions} />
+        <Card className="h-full">
+            <div className="px-6 mb-6">
+                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network CPU Vendor Distribution</h1>
+                <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                    Distribution of CPU vendors across the network.
+                </p>
             </div>
+            <Divider />
+            <DonutChart
+                className="mt-8"
+                data={chartData.map((item) => ({ ...item, amount: item.amount }))}
+                category="amount"
+                index="name"
+                colors={["blue", "red", "indigo"]}
+                showAnimation={true}
+                valueFormatter={valueFormatter}
+                showTooltip={true}
+            />
+            <List className="mt-2 px-6">
+                {chartData.map((item) => (
+                    <ListItem key={item.name} className="space-x-4 truncate">
+                        <div className={`flex h-8 items-center truncate pl-4`}>
+                            <span className="rounded-full w-3 h-3" style={{ backgroundColor: item.color }}></span>
+                            <span className="truncate dark:text-dark-tremor-content-emphasis ml-2">{item.name}</span>
+                        </div>
+                        <span className="font-medium tabular-nums text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                            {valueFormatter(item.amount)}
+                        </span>
+                    </ListItem>
+                ))}
+            </List>
         </Card>
     )
 }

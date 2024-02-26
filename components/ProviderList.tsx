@@ -385,12 +385,12 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         />
                     </div>
                     <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
-                        <p>Reputation</p>
+                        <p>Reputation Score</p>
                         <RiQuestionLine data-tooltip-id="reputation-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
                             id="reputation-tooltip"
                             place="bottom"
-                            content="The reputation of the provider based on the success ratio of the tasks it has completed. A value of 1.0 indicates a perfect reputation."
+                            content="The reputation score assesses if tasks were completed successfully or not while the provider was under evaluation by the reputation system. A score of 1.0 indicates a 100% success rate in task completion during this period, while a score of 0.0 is the lowest possible, reflecting complete failure in task completion. If the score is marked as N/A, it likely means that the provider hasn't been tested, possibly due to the high costs associated with conducting the test."
                             className="break-words max-w-64 z-50"
                         />
                     </div>

@@ -8,20 +8,22 @@ export const EarningsCard = ({ title, value, unit, timePeriods }) => {
     return (
         <div className="grid grid-cols-1 gap-4 h-full ">
             <Card className="px-6">
-                <div className="flex justify-between">
+                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network Earnings</h1>
+                <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                    Overview of Golem Network earnings, with real-time and trend data over periods of time.
+                </p>
+                <Divider />
+                <div className="flex justify-between mt-6">
                     <div>
-                        <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">{title}</p>
+                        <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">Network Total</p>
                         <div className="flex items-baseline space-x-2">
-                            {isLoading || value == null ? (
-                                <Skeleton width={250} height={30} />
-                            ) : (
-                                <span className="text-tremor-metric font-semibold">{RoundingFunction(value, 3)}</span>
-                            )}
-                            <span className="text-tremor-default font-medium text-golemblue">{unit}</span>
+                            <span className="text-tremor-metric font-semibold">
+                                {isLoading ? <Skeleton width={40} height={30} /> : RoundingFunction(value, 1)}
+                            </span>
+                            <span className="text-tremor-default font-medium text-golemblue">GLM</span>
                         </div>
                     </div>
                 </div>
-                <Divider />
                 <p className="items-space mt-6 flex justify-between text-tremor-label text-tremor-content dark:text-dark-tremor-content">
                     <span>Overview</span>
                 </p>

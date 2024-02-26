@@ -58,7 +58,8 @@ function EC2vsGolemPricing({ data }) {
                     Amazon Price Comparison
                 </h3>
                 <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                    Comparison of Golem Network pricing and AWS EC2 instance pricing.
+                    The comparison highlights the cost savings of using the Golem Network over Amazon's cloud services, with specific
+                    savings per instance type presented.
                 </p>
                 <Divider className="mt-4" />
                 <div className="flex justify-between">

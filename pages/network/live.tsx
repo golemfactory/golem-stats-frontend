@@ -15,10 +15,6 @@ export default function Home() {
                 url="https://stats.golem.network/network/live"
             />
             <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-12">
-                <div className="lg:col-span-12 -mb-4 -mt-4">
-                    <h1 className="text-2xl font-medium dark:text-gray-300">Live Network Data</h1>
-                </div>
-
                 <div className="lg:col-span-12">
                     <NetworkVersionAdoption />
                 </div>
