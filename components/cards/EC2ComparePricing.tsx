@@ -54,9 +54,7 @@ function EC2vsGolemPricing({ data }) {
     return (
         <>
             <Card>
-                <h3 className="text-tremor-title text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium">
-                    Amazon Price Comparison
-                </h3>
+                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Amazon Price Comparison</h1>
                 <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
                     The comparison highlights the cost savings of using the Golem Network over Amazon's cloud services, with specific
                     savings per instance type presented.
