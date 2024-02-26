@@ -73,7 +73,7 @@ const useIncome = (node_id: string | undefined, initialIncome: object) => {
 const EarningsBlock = ({ date, earnings }: { date: string; earnings: string }) => {
     return (
         <li className="relative flex w-full items-center space-x-3 rounded-tremor-small bg-tremor-background-subtle/60 p-1 hover:bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle/60 hover:dark:bg-dark-tremor-background-subtle">
-            <p className="flex w-full py-1.5 px-1.5 items-center justify-between space-x-4 truncate text-tremor-default font-medium">
+            <div className="flex w-full py-1.5 px-1.5 items-center justify-between space-x-4 truncate text-tremor-default font-medium">
                 <span className="truncate text-tremor-content dark:text-dark-tremor-content">
                     <div className="focus:outline-none">
                         {/* Extend link to entire card */}
@@ -81,11 +81,11 @@ const EarningsBlock = ({ date, earnings }: { date: string; earnings: string }) =
                         {date}
                     </div>
                 </span>
-                <span className="pr-1.5 text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                <div className="pr-1.5 text-tremor-content-strong dark:text-dark-tremor-content-strong">
                     {earnings}
                     <span className="text-golemblue"> GLM</span>
-                </span>
-            </p>
+                </div>
+            </div>
         </li>
     )
 }

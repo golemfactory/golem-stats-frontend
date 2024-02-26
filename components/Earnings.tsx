@@ -1,4 +1,4 @@
-import { Card } from "@tremor/react"
+import { Card, Divider } from "@tremor/react"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 import { RoundingFunction } from "@/lib/RoundingFunction"
@@ -7,7 +7,7 @@ export const EarningsCard = ({ title, value, unit, timePeriods }) => {
 
     return (
         <div className="grid grid-cols-1 gap-4 h-full ">
-            <Card>
+            <Card className="px-6">
                 <div className="flex justify-between">
                     <div>
                         <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">{title}</p>
@@ -15,12 +15,13 @@ export const EarningsCard = ({ title, value, unit, timePeriods }) => {
                             {isLoading || value == null ? (
                                 <Skeleton width={250} height={30} />
                             ) : (
-                                <span className="text-tremor-metric font-semibold">{RoundingFunction(value, 5)}</span>
+                                <span className="text-tremor-metric font-semibold">{RoundingFunction(value, 3)}</span>
                             )}
                             <span className="text-tremor-default font-medium text-golemblue">{unit}</span>
                         </div>
                     </div>
                 </div>
+                <Divider />
                 <p className="items-space mt-6 flex justify-between text-tremor-label text-tremor-content dark:text-dark-tremor-content">
                     <span>Overview</span>
                 </p>

@@ -87,7 +87,6 @@ const NetworkStats = ({ metricData }) => {
         return date.toLocaleString("en-US", formatOptions)
     }
     const MetricCardSummary = ({ category, data, unit, color }) => {
-
         const latestDataPoint = latest1wData[category] || 0
         const total = `${Intl.NumberFormat("us").format(latestDataPoint)}`
         return (
@@ -105,10 +104,11 @@ const NetworkStats = ({ metricData }) => {
 
     return (
         <Card>
-            <div className="relative p-6">
-                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network Stats</h1>
+            <div className="px-6 mb-6">
+                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network Statistics</h1>
                 <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                    The number of providers, cores, memory, and disk space available on the Golem Network.
+                    Overview of Golem Network's capacity, with real-time and trend data for providers online, cores, memory, and disk space
+                    available.
                 </p>
             </div>
 

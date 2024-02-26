@@ -2,8 +2,10 @@ import { useState, useEffect } from "react"
 import { fetcher } from "@/fetcher"
 import useSWR from "swr"
 import { GlobeAltIcon } from "@heroicons/react/24/solid"
-import { AreaChart, Card } from "@tremor/react"
+import { Card, Tab, TabGroup, TabList, TabPanel, TabPanels, AreaChart } from "@tremor/react"
 
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
 export const NetworkActivity: React.FC = () => {
     const [data, setData] = useState([])
     const [loaded, setLoaded] = useState<boolean>(false)
@@ -30,29 +32,39 @@ export const NetworkActivity: React.FC = () => {
     }, [response.data])
 
     return (
-        <Card className="h-full">
-            <div className="relative">
-                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300 animate-ping"></div>
-                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300"></div>
+        <Card className="h-full px-6">
+            <div className="px-6 mb-6">
                 <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network Activity</h1>
-                <div className="d-flex align-items-center">
-                    <dt>
-                        <div className="absolute bg-golemblue  p-3">
-                            <GlobeAltIcon className="h-6 w-6 text-white " aria-hidden="true" />
-                        </div>
-                    </dt>
-                    <dd className="ml-16 pb-6 sm:pb-7">
-                        <div className="relative">
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-300">
-                                {loaded && data.length ? data[data.length - 1]["Providers computing"] : "-"} Providers
-                            </p>
-                            <p className="text-sm font-medium text-green-500 truncate">Computing right now</p>
-                        </div>
-                    </dd>
-                </div>
+                <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                    Real-time tracking of providers on the Golem Network who are currently engaged in computing tasks for requestors.
+                </p>
             </div>
+            <TabGroup className="px-6">
+                <TabList className="mt-4">
+                    <Tab>Providers Computing</Tab>
+                </TabList>
+                <TabPanels>
+                    <TabPanel>
+                        <div className="flex justify-between mt-6">
+                            <div>
+                                <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
+                                    Right now
+                                </p>
+                                <div className="flex items-baseline space-x-2">
+                                    <span className="text-tremor-metric font-semibold">
+                                        {loaded ? data[data.length - 1]["Providers computing"] : <Skeleton width={40} height={30} />}
+                                    </span>
+                                    <span className="text-tremor-default font-medium text-golemblue">Providers</span>
+                                </div>
+                            </div>
+                        </div>
 
-            {loaded && <AreaChart data={data} index="date" categories={["Providers computing"]} colors={["blue"]} yAxisWidth={30} />}
+                        {loaded && (
+                            <AreaChart data={data} index="date" categories={["Providers computing"]} colors={["blue"]} yAxisWidth={30} />
+                        )}
+                    </TabPanel>
+                </TabPanels>
+            </TabGroup>
         </Card>
     )
 }

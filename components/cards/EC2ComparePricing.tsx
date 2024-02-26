@@ -2,6 +2,8 @@ import React, { useState } from "react"
 import { Card, Dialog, DialogPanel, TextInput, BarList, Divider } from "@tremor/react"
 import { RiArrowRightUpLine, RiSearchLine } from "@remixicon/react"
 import AWSIcon from "../svg/AWSIcon"
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
 
 function EC2vsGolemPricing({ data }) {
     const [modalOpen, setModalOpen] = useState(false)
@@ -62,15 +64,17 @@ function EC2vsGolemPricing({ data }) {
                 <div className="flex justify-between">
                     <div>
                         <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                            Average Price Difference
+                            Potential savings
                         </p>
                         <div className="flex items-baseline space-x-2">
                             {data && data ? (
-                                <span className="text-tremor-metric font-semibold">{Math.abs(averageGolemCheaper).toFixed(2)}%</span>
+                                <span className="text-tremor-metric font-semibold">
+                                    {Math.max(...data.map((item) => item.golem_percentage_cheaper)).toFixed(2)}%
+                                </span>
                             ) : (
                                 <Skeleton width={250} height={30} />
                             )}
-                            <span className="text-tremor-default font-medium text-golemblue">{comparisonText}</span>
+                            <span className="text-tremor-default font-medium text-golemblue">using Golem Network</span>
                         </div>
                     </div>
                 </div>
