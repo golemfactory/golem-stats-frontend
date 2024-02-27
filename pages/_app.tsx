@@ -10,6 +10,19 @@ import { useRouter } from "next/router"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 import { GoogleAnalytics } from "nextjs-google-analytics"
+import { Inter, Roboto_Mono } from "next/font/google"
+
+const inter = Inter({
+    subsets: ["latin"],
+    display: "swap",
+    variable: "--font-inter",
+})
+
+const robotoMono = Roboto_Mono({
+    subsets: ["latin"],
+    display: "swap",
+    variable: "--font-roboto-mono",
+})
 
 // Check that PostHog is client-side (used to handle Next.js SSR)
 if (typeof window !== "undefined") {
@@ -59,7 +72,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                 <SessionProvider session={session} refetchInterval={5 * 58}>
                     <NextNProgress color="#ffffff" />
                     <Navbar />
-                    <div className="mx-auto px-4 sm:px-6 lg:px-8 pb-10 mt-5 ">
+                    <div className={`mx-auto px-4 sm:px-6 lg:px-8 pb-10 mt-5 ${robotoMono.variable} ${inter.variable}`}>
                         <Component {...pageProps} />
 
                         {/* <Banner title="We are currently updating our infrastructure responsible for collecting metrics. This can cause instability on the stats page." /> */}

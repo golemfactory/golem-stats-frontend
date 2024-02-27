@@ -6,6 +6,28 @@
     @apply text-white px-5 py-2 flex items-center bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue border border-golemblue;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-inter) !important;
+}
+
+p,
+a,
+span,
+div,
+input,
+select,
+option,
+label,
+button,
+textarea {
+    font-family: var(--font-roboto-mono);
+}
+
 html,
 body {
     @apply dark:bg-slate-900;
