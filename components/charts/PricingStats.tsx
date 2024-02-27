@@ -57,7 +57,7 @@ const PricingStats = () => {
                     <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">The past hour</h3>
                     <div className="flex gap-4">
                         <div className="flex items-baseline space-x-2">
-                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
+                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
                                 {RoundingFunction(data[network][`cpu_${unit.toLowerCase()}`], 3)}
                             </span>
                             <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
@@ -66,7 +66,7 @@ const PricingStats = () => {
                         </div>
 
                         <div className="flex items-baseline space-x-2">
-                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
+                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
                                 {RoundingFunction(data[network][`env_${unit.toLowerCase()}`], 3)}
                             </span>
                             <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
@@ -74,7 +74,7 @@ const PricingStats = () => {
                             </span>
                         </div>
                         <div className="flex items-baseline space-x-2">
-                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
+                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
                                 {RoundingFunction(data[network][`start_${unit.toLowerCase()}`], 3)}
                             </span>
                             <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">

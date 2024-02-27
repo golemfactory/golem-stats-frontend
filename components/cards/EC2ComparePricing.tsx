@@ -67,7 +67,7 @@ function EC2vsGolemPricing({ data }) {
                         </h3>
                         <div className="flex items-baseline space-x-2">
                             {data && data ? (
-                                <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
+                                <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
                                     {Math.max(...data.map((item) => item.golem_percentage_cheaper)).toFixed(2)}%
                                 </span>
                             ) : (

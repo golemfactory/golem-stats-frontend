@@ -46,7 +46,7 @@ export const NetworkVersionAdoption: React.FC = () => {
                     </h3>
                     <div className="flex items-baseline space-x-2">
                         {latestYagnaVersion ? (
-                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
+                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
                                 {latestYagnaVersion.name}
                             </span>
                         ) : (

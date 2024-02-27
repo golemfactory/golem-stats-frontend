@@ -19,7 +19,7 @@ export const EarningsCard = ({ title, value, unit, timePeriods }) => {
                             Network Total
                         </p>
                         <div className="flex items-baseline space-x-2">
-                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
+                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
                                 {isLoading ? <Skeleton width={40} height={30} /> : RoundingFunction(value, 1)}
                             </span>
                             <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
@@ -41,7 +41,9 @@ export const EarningsCard = ({ title, value, unit, timePeriods }) => {
                                 <Skeleton height={20} className="w-full" />
                             ) : (
                                 <p className="flex w-full py-1.5 px-1.5 items-center justify-between space-x-4 truncate text-tremor-default font-medium">
-                                    <span className="truncate text-tremor-content dark:text-dark-tremor-content">{earnings.period}</span>
+                                    <span className="truncate text-tremor-content dark:text-dark-tremor-content font-inter">
+                                        {earnings.period}
+                                    </span>
                                     <span className="pr-1.5 text-tremor-content-strong dark:text-dark-tremor-content-strong">
                                         {RoundingFunction(earnings.earnings, 5)}
                                         <span className="text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue"> GLM</span>

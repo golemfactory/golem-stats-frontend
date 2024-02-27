@@ -209,7 +209,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                 <div className="grid grid-cols-1 gap-4">
                     <div className="flex flex-wrap gap-4 ">
                         <div>
-                            <label htmlFor="providerNameOrId" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            <label
+                                htmlFor="providerNameOrId"
+                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                            >
                                 Node Name or ID
                             </label>
                             <div className="mt-2">
@@ -223,7 +226,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             </div>
                         </div>
                         <div>
-                            <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter">
                                 Cores
                             </label>
                             <div className="mt-2">
@@ -237,7 +240,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             </div>
                         </div>
                         <div>
-                            <label htmlFor="memory" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            <label
+                                htmlFor="memory"
+                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                            >
                                 Memory <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
                             </label>
 
@@ -252,7 +258,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             </div>
                         </div>
                         <div>
-                            <label htmlFor="disk" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            <label htmlFor="disk" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter">
                                 Disk <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
                             </label>
 
@@ -269,7 +275,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     </div>
                     <div className="flex flex-wrap gap-4">
                         <div>
-                            <label htmlFor="reputation" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            <label
+                                htmlFor="reputation"
+                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                            >
                                 Reputation
                             </label>
                             <div className="mt-2">
@@ -283,7 +292,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             </div>
                         </div>
                         <div>
-                            <label htmlFor="uptime" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            <label
+                                htmlFor="uptime"
+                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                            >
                                 Uptime
                             </label>
                             <div className="mt-2">
@@ -297,7 +309,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             </div>
                         </div>
                         <div>
-                            <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter">
                                 Price ($/Hour)
                             </label>
                             <div className="mt-2">
@@ -312,7 +324,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         </div>
 
                         <div>
-                            <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                            <label
+                                htmlFor="network"
+                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                            >
                                 Network
                             </label>
                             <Select
@@ -329,7 +344,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
 
                         {enableShowingOfflineNodes && (
                             <div>
-                                <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                <label
+                                    htmlFor="network"
+                                    className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                                >
                                     Show offline nodes
                                 </label>
                                 <Select
@@ -349,7 +367,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
             <Card>
                 <div className="grid grid-cols-12 gap-4 px-4 bg-golemblue text-white py-4 my-4 font-medium">
                     <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
-                        <p>Provider</p>
+                        <p className="font-inter">Provider</p>
                         <RiQuestionLine data-tooltip-id="provider-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
                             id="provider-tooltip"
@@ -359,7 +377,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         />
                     </div>
                     <div className="lg:col-span-4 md:col-span-4 col-span-12 inline-flex items-center">
-                        <p>Hardware</p>
+                        <p className="font-inter">Hardware</p>
                         <RiQuestionLine data-tooltip-id="hardware-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
                             id="hardware-tooltip"
@@ -369,7 +387,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         />
                     </div>
                     <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
-                        <p>Price</p>
+                        <p className="font-inter">Price</p>
                         <RiQuestionLine data-tooltip-id="price-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
                             id="price-tooltip"
@@ -382,7 +400,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         />
                     </div>
                     <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
-                        <p>Reputation Score</p>
+                        <p className="font-inter">Reputation Score</p>
                         <RiQuestionLine data-tooltip-id="reputation-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
                             id="reputation-tooltip"
@@ -392,7 +410,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         />
                     </div>
                     <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
-                        <p>Uptime</p>
+                        <p className="font-inter">Uptime</p>
                         <RiQuestionLine data-tooltip-id="uptime-tooltip" className="h-4 w-4 ml-1" />
                         <ReactTooltip
                             id="uptime-tooltip"
@@ -466,7 +484,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                               </div>
                                           </div>
                                           <div className="ml-1">
-                                              <p className="text-sm font-medium text-gray-900 dark:text-white ">
+                                              <p className="text-sm font-medium text-gray-900 dark:text-white font-inter ">
                                                   {provider.runtimes.vm?.properties?.["golem.node.id.name"]}
                                               </p>
                                               <p className="text-sm  text-gray-400 dark:text-white ">

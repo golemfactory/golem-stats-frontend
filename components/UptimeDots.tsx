@@ -13,8 +13,8 @@ const UptimeDots: React.FC<UptimeDotsProps> = ({ uptime }) => {
         <div>
             {/* Uptime label and percentage */}
             <div className="flex items-center mb-2">
-                <span className="text-sm font-medium dark:text-dark-tremor-content-metric">
-                    {uptime.toFixed(2)}%<span className="text-xs font-normal text-gray-500 lg:hidden capitalize"> Uptime</span>
+                <span className="text-sm font-medium dark:text-dark-tremor-content-metric capitalize">
+                    {uptime.toFixed(2)}%<span className="text-xs font-normal text-gray-500 lg:hidden capitalize font-inter">Uptime</span>
                 </span>
             </div>
             {/* Dots representing uptime */}
