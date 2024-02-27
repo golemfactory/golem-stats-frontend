@@ -1,9 +1,10 @@
 import { Fragment, useRef, useState, useEffect } from "react"
-import { Dialog, Transition } from "@headlessui/react"
 import { HeartIcon } from "@heroicons/react/24/outline"
 import { useSession } from "next-auth/react"
 import useSWR from "swr"
 import { AccountMenu } from "./metamask/AccountMenu"
+import { Dialog, DialogPanel } from "@tremor/react"
+import { RiCloseCircleLine } from "@remixicon/react"
 
 type HealthCheckModalProps = {
     open: boolean
@@ -147,108 +148,64 @@ export const HealthCheckModal: React.FC<HealthCheckModalProps> = ({ open, setOpe
     }, [statusData])
 
     return (
-        <Transition.Root show={open} as={Fragment}>
-            <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={setOpen}>
-                <Transition.Child
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-                </Transition.Child>
-
-                <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:pt-24">
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                            enterTo="opacity-100 translate-y-0 sm:scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        <Dialog open={open} onClose={() => setOpen(false)} static={true} className="z-10">
+            <DialogPanel className="overflow-visible p-0 sm:max-w-2xl">
+                <div className="flex flex-col p-6">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-tremor-title font-medium text-tremor-content-strong">Healthcheck Provider</h3>
+                        <button
+                            onClick={() => setOpen(false)}
+                            aria-label="Close"
+                            className="rounded-tremor-small p-2 text-tremor-content-subtle hover:bg-tremor-background-subtle hover:text-tremor-content"
                         >
-                            <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6">
-                                <div>
-                                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                                        <HeartIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
-                                    </div>
-                                    <div className="mt-3 text-center sm:mt-5">
-                                        <Dialog.Title as="h3" className="text-2xl font-semibold leading-6 text-gray-900 dark:text-white">
-                                            Healthcheck Provider
-                                        </Dialog.Title>
-                                        <div className="mt-6 text-left">
-                                            <h3 className="text-lg font-semibold text-gray-700 dark:text-white">
-                                                Understanding Your Provider's Status
-                                            </h3>
-                                            <p className="text-md text-gray-500">
-                                                If you have any uncertainties regarding the functionality of your provider, the Stats page
-                                                offers a convenient solution. Here, you can schedule a task specifically designed to assess
-                                                and confirm the operational status of your provider,
-                                            </p>
-
-                                            <h3 className="text-lg font-semibold text-gray-700 mt-4 dark:text-white">
-                                                Healthcheck Authentication
-                                            </h3>
-                                            <p className="text-md text-gray-500">
-                                                To initiate a healthcheck, authenticate using MetaMask. Ensure that the wallet address in
-                                                your MetaMask account matches the address associated with your provider. This step is
-                                                required for scheduling a healthcheck.
-                                            </p>
-
-                                            <h3 className="text-lg font-semibold text-gray-700 mt-4 dark:text-white">
-                                                Important Information About Healthchecks
-                                            </h3>
-                                            <p className="text-md text-gray-500">
-                                                It is important to note that healthchecks, while provided as a free service for monitoring
-                                                the health of your provider,{" "}
-                                                <span className="text-red-500 font-semibold">
-                                                    do not offer compensation in the form of GLM tokens for completing these tasks.
-                                                </span>
-                                            </p>
-                                            <div className="py-8">
-                                                <AccountMenu mobile={true} />
-                                            </div>
-                                            {showNoPermission ? (
-                                                <p className="text-center text-red-500 font-semibold">
-                                                    You don't have permission to healthcheck this provider!
-                                                </p>
-                                            ) : null}
-                                            {statusData ? <StatusIndicator status={statusData.status} /> : null}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-                                    <button
-                                        type="button"
-                                        className="inline-flex w-full justify-center rounded-md disabled:opacity-50 disabled:hover:bg-golemblue bg-golemblue px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
-                                        onClick={() => requestHealthcheck()}
-                                        disabled={isChecking || !session || !online}
-                                    >
-                                        {!session
-                                            ? "Connect with MetaMask to benchmark"
-                                            : !online
-                                            ? "Node must be online to healthcheck"
-                                            : "Start Healthcheck"}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0 dark:ring-gray-700 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
-                                        onClick={() => setOpen(false)}
-                                        ref={cancelButtonRef}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </Dialog.Panel>
-                        </Transition.Child>
+                            <RiCloseCircleLine className="h-5 w-5" aria-hidden={true} />
+                        </button>
+                    </div>
+                    <div className="mt-6">
+                        <p className="text-tremor-default text-tremor-content">
+                            If you have any uncertainties regarding the functionality of your provider, the Stats page offers a solution.
+                        </p>
+                        <p className="mt-4 text-tremor-default text-tremor-content">
+                            To initiate a healthcheck, authenticate using MetaMask. Ensure that the wallet address in your MetaMask account
+                            matches the address associated with your provider.
+                        </p>
+                        <p className="mt-4 text-tremor-default text-red-500">
+                            It is important to note that healthchecks do not offer compensation in the form of GLM tokens for completing
+                            these tasks.
+                        </p>
+                    </div>
+                    <div className="py-8">
+                        <AccountMenu mobile={true} />
+                    </div>
+                    {showNoPermission && (
+                        <p className="text-center text-tremor-content-emphasis font-semibold dark:text-dark-tremor-content">
+                            You don't have permission to healthcheck this provider!
+                        </p>
+                    )}
+                    {statusData && <StatusIndicator status={statusData.status} />}
+                    <div className="flex justify-between mt-6">
+                        <button
+                            type="button"
+                            className="golembutton"
+                            onClick={requestHealthcheck}
+                            disabled={isChecking || !session || !online}
+                        >
+                            {!session
+                                ? "Connect with MetaMask to benchmark"
+                                : !online
+                                ? "Node must be online to healthcheck"
+                                : "Start Healthcheck"}
+                        </button>
+                        <button
+                            type="button"
+                            className="whitespace-nowrap rounded-tremor-small px-3 py-2 text-center text-tremor-default font-medium text-tremor-content-strong hover:bg-tremor-background-subtle"
+                            onClick={() => setOpen(false)}
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </div>
-            </Dialog>
-        </Transition.Root>
+            </DialogPanel>
+        </Dialog>
     )
 }

@@ -25,6 +25,7 @@ module.exports = {
                         DEFAULT: "#181ea9",
                         emphasis: colors.blue[700],
                         inverted: colors.white,
+                        golemblue: "#181ea9"
                     },
                     background: {
                         muted: colors.gray[50],
@@ -55,6 +56,7 @@ module.exports = {
                         DEFAULT: colors.blue[500],
                         emphasis: colors.blue[400],
                         inverted: colors.blue[950],
+                        golemblue: "#181ea9"
                     },
                     background: {
                         muted: "#131A2B",
@@ -74,6 +76,7 @@ module.exports = {
                         emphasis: colors.gray[200],
                         strong: colors.gray[50],
                         inverted: colors.gray[950],
+                        metric: colors.white,
                     },
                 },
             },

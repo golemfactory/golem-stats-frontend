@@ -134,6 +134,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
         <div className="min-h-full z-10 relative">
             <div className="fixed z-20 bottom-5 right-5">
                 <OpenHealthCheckModalButton setOpen={setOpen} />
+                <HealthCheckModal open={open} setOpen={setOpen} node_id={node_id} online={nodeData[0].online} />
             </div>
             <div className="grid grid-cols-12 gap-4 mb-4">
                 <div className="lg:col-span-8 col-span-12 min-h-full">

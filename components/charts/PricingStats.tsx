@@ -57,20 +57,20 @@ const PricingStats = () => {
                     <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">The past hour</p>
                     <div className="flex gap-4">
                         <div className="flex items-baseline space-x-2">
-                            <span className="text-tremor-metric font-semibold">
+                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
                                 {RoundingFunction(data[network][`cpu_${unit.toLowerCase()}`], 3)}
                             </span>
                             <span className="text-tremor-default font-medium text-golemblue">CPU/h</span>
                         </div>
 
                         <div className="flex items-baseline space-x-2">
-                            <span className="text-tremor-metric font-semibold">
+                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
                                 {RoundingFunction(data[network][`env_${unit.toLowerCase()}`], 3)}
                             </span>
                             <span className="text-tremor-default font-medium text-golemblue">Env/h</span>
                         </div>
                         <div className="flex items-baseline space-x-2">
-                            <span className="text-tremor-metric font-semibold">
+                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
                                 {RoundingFunction(data[network][`start_${unit.toLowerCase()}`], 3)}
                             </span>
                             <span className="text-tremor-default font-medium text-golemblue">Start Price</span>

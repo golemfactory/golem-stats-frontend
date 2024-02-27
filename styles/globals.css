@@ -12,6 +12,10 @@ body {
     @apply bg-golembackground;
     min-height: 100vh;
 }
+.dark .react-loading-skeleton {
+    --base-color: #1a202c; /* Tailwind's gray-900 */
+    --highlight-color: #2d3748; /* A slightly lighter shade for highlight */
+}
 
 .rowspacing {
     border-spacing: 0 15px;

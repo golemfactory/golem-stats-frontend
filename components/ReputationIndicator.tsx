@@ -10,10 +10,9 @@ const ReputationIndicator: React.FC<ReputationIndicatorProps> = ({ taskReputatio
     let displayValue: string
     let showTooltip = false
 
-
     if (taskReputation === null || taskReputation === undefined) {
         displayValue = "N/A"
-        color = "black" // Default color for N/A
+        color = "text-black dark:text-dark-tremor-content-metric" // Default color for N/A
         showTooltip = true
     } else {
         displayValue = taskReputation.toFixed(2)

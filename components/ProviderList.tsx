@@ -434,7 +434,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                           query: { node_id: provider.node_id },
                                       }}
                                       key={provider.id}
-                                      className="lg:col-span-5 col-span-12 grid grid-cols-12 gap-4 items-center bg-golembackground py-4 px-4 hover:bg-gray-200 hover:cursor-pointer"
+                                      className="lg:col-span-5 col-span-12 grid grid-cols-12 gap-4 items-center bg-golembackground dark:bg-transparent dark:hover:bg-gray-800 py-4 px-4 hover:bg-gray-200 hover:cursor-pointer dark:border-dark-tremor-border dark:border"
                                   >
                                       <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
                                           <div className="flex items-center">
@@ -502,7 +502,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                       </div>
                                       <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
                                           <div>
-                                              <p data-tooltip-id={`price-hourly${provider.node_id}`} className="text-sm font-medium">
+                                              <p
+                                                  data-tooltip-id={`price-hourly${provider.node_id}`}
+                                                  className="text-sm font-medium dark:text-dark-tremor-content-metric"
+                                              >
                                                   ${RoundingFunction(provider.runtimes.vm?.hourly_price_usd, 6)} /Hour
                                                   <ReactTooltip
                                                       id={`price-hourly${provider.node_id}`}
