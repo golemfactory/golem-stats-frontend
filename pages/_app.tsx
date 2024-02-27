@@ -61,7 +61,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
         }
     }, [])
     return (
-        <>
+        <div className={`${robotoMono.variable} ${inter.variable}`}>
             {!askedForConsent ? (
                 <>
                     <AnalyticsBanner posthog={posthog} setPreviousConsent={setPreviousConsent} setAskedForConsent={setAskedForConsent} />
@@ -72,13 +72,13 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                 <SessionProvider session={session} refetchInterval={5 * 58}>
                     <NextNProgress color="#ffffff" />
                     <Navbar />
-                    <div className={`mx-auto px-4 sm:px-6 lg:px-8 pb-10 mt-5 ${robotoMono.variable} ${inter.variable}`}>
+                    <div className={`mx-auto px-4 sm:px-6 lg:px-8 pb-10 mt-5 `}>
                         <Component {...pageProps} />
 
                         {/* <Banner title="We are currently updating our infrastructure responsible for collecting metrics. This can cause instability on the stats page." /> */}
                     </div>
                 </SessionProvider>
             </PostHogProvider>
-        </>
+        </div>
     )
 }

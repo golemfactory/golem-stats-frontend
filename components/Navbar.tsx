@@ -39,7 +39,7 @@ const NavItem = ({
                 />
             </div>
             <div className="flex-auto">
-                <Popover.Button as={asComponent} className="block font-semibold text-gray-900 dark:text-white">
+                <Popover.Button as={asComponent} className="block font-semibold text-gray-900 dark:text-white font-inter">
                     {item.name}
                     <span className="absolute inset-0" />
                 </Popover.Button>
@@ -61,7 +61,7 @@ const CTA = ({
     <Link
         href={item.href}
         target="_blank"
-        className="flex items-center justify-center gap-x-2.5 p-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700/80 dark:bg-gray-800 dark:text-gray-400 dark:border-top"
+        className="flex items-center justify-center gap-x-2.5 p-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700/80 dark:bg-gray-800 dark:text-gray-400 dark:border-top font-inter"
     >
         <item.icon className="h-5 w-5 flex-none text-gray-400" aria-hidden="true" />
         {item.name}
@@ -93,7 +93,7 @@ const PopoverArea = ({
     }>
 }) => (
     <>
-        <Popover.Button className="flex items-center gap-x-1  font-semibold leading-6 text-white">
+        <Popover.Button className="flex items-center gap-x-1  font-semibold leading-6 text-white font-inter">
             {title}
             <ChevronDownIcon className="h-5 w-5 flex-none text-white" aria-hidden="true" />
         </Popover.Button>

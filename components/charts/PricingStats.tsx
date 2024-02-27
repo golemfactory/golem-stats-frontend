@@ -54,7 +54,7 @@ const PricingStats = () => {
         return (
             <div className="flex justify-between">
                 <div>
-                    <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">The past hour</p>
+                    <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">The past hour</h3>
                     <div className="flex gap-4">
                         <div className="flex items-baseline space-x-2">
                             <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">

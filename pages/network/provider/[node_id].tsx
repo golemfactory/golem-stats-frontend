@@ -78,7 +78,7 @@ const EarningsBlock = ({ date, earnings }: { date: string; earnings: string }) =
                     <div className="focus:outline-none">
                         {/* Extend link to entire card */}
                         <span className="absolute inset-0" aria-hidden={true} />
-                        {date}
+                        <h3>{date}</h3>
                     </div>
                 </span>
                 <div className="pr-1.5 text-tremor-content-strong dark:text-dark-tremor-content-strong">
@@ -151,9 +151,9 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                     <Card>
                         <div className="flex justify-between">
                             <div>
-                                <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
+                                <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
                                     Total Earnings
-                                </p>
+                                </h3>
                                 <p className="flex items-baseline space-x-2 text-tremor-content-strong dark:text-dark-tremor-content-strong">
                                     <span className="text-tremor-metric font-semibold">{RoundingFunction(nodeData[0].earnings_total)}</span>
                                     <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">

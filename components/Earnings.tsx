@@ -15,7 +15,9 @@ export const EarningsCard = ({ title, value, unit, timePeriods }) => {
                 <Divider />
                 <div className="flex justify-between mt-6">
                     <div>
-                        <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">Network Total</p>
+                        <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content font-inter">
+                            Network Total
+                        </p>
                         <div className="flex items-baseline space-x-2">
                             <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
                                 {isLoading ? <Skeleton width={40} height={30} /> : RoundingFunction(value, 1)}

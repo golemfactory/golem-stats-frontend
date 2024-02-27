@@ -106,6 +106,8 @@ module.exports = {
             fontFamily: {
                 heading: ["Inter", "sans-serif"],
                 body: ["Roboto", "sans-serif"],
+                inter: ["var(--font-inter)"],
+                roboto: ["var(--font-roboto)"],
             },
         },
     },

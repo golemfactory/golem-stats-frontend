@@ -62,9 +62,9 @@ function EC2vsGolemPricing({ data }) {
                 <Divider className="mt-4" />
                 <div className="flex justify-between">
                     <div>
-                        <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
+                        <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
                             Potential savings
-                        </p>
+                        </h3>
                         <div className="flex items-baseline space-x-2">
                             {data && data ? (
                                 <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">

@@ -115,7 +115,7 @@ export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps
                 </div>
                 <Accordion className="mt-6 rounded-tremor-small">
                     <AccordionHeader className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                        Downtime overview ({downtimeItems.length})
+                        <div className="font-inter">Downtime overview ({downtimeItems.length})</div>
                     </AccordionHeader>
                     <AccordionBody>
                         <List>{downtimeItems}</List>
