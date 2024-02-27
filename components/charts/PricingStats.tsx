@@ -60,20 +60,26 @@ const PricingStats = () => {
                             <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
                                 {RoundingFunction(data[network][`cpu_${unit.toLowerCase()}`], 3)}
                             </span>
-                            <span className="text-tremor-default font-medium text-golemblue">CPU/h</span>
+                            <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                                CPU/h
+                            </span>
                         </div>
 
                         <div className="flex items-baseline space-x-2">
                             <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
                                 {RoundingFunction(data[network][`env_${unit.toLowerCase()}`], 3)}
                             </span>
-                            <span className="text-tremor-default font-medium text-golemblue">Env/h</span>
+                            <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                                Env/h
+                            </span>
                         </div>
                         <div className="flex items-baseline space-x-2">
                             <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
                                 {RoundingFunction(data[network][`start_${unit.toLowerCase()}`], 3)}
                             </span>
-                            <span className="text-tremor-default font-medium text-golemblue">Start Price</span>
+                            <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                                Start Price
+                            </span>
                         </div>
                     </div>
                 </div>

@@ -48,11 +48,7 @@ const StatusIndicator = ({ status }: { status: string }) => {
 
 export const OpenHealthCheckModalButton: React.FC<OpenModalButtonProps> = ({ setOpen }) => {
     return (
-        <button
-            type="button"
-            className="inline-flex items-center justify-center px-2 py-2 border border-transparent text-sm font-medium  shadow-2xl text-white bg-golemblue hover:bg-white hover:text-golemblue transition duration-300 hover:border hover:border-golemblue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500"
-            onClick={() => setOpen(true)}
-        >
+        <button type="button" className="golembutton" onClick={() => setOpen(true)}>
             Healthcheck provider
         </button>
     )
@@ -152,11 +148,13 @@ export const HealthCheckModal: React.FC<HealthCheckModalProps> = ({ open, setOpe
             <DialogPanel className="overflow-visible p-0 sm:max-w-2xl">
                 <div className="flex flex-col p-6">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-tremor-title font-medium text-tremor-content-strong">Healthcheck Provider</h3>
+                        <h3 className="text-tremor-title font-medium text-tremor-content-strong dark:text-dark-tremor-content-metric">
+                            Healthcheck Provider
+                        </h3>
                         <button
                             onClick={() => setOpen(false)}
                             aria-label="Close"
-                            className="rounded-tremor-small p-2 text-tremor-content-subtle hover:bg-tremor-background-subtle hover:text-tremor-content"
+                            className="rounded-tremor-small p-2 text-tremor-content-subtle hover:bg-tremor-background-subtle hover:text-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content dark:text-dark-tremor-content-subtle"
                         >
                             <RiCloseCircleLine className="h-5 w-5" aria-hidden={true} />
                         </button>
@@ -186,19 +184,15 @@ export const HealthCheckModal: React.FC<HealthCheckModalProps> = ({ open, setOpe
                     <div className="flex justify-between mt-6">
                         <button
                             type="button"
-                            className="golembutton"
+                            className="golembutton disabled:opacity-50"
                             onClick={requestHealthcheck}
                             disabled={isChecking || !session || !online}
                         >
-                            {!session
-                                ? "Connect with MetaMask to benchmark"
-                                : !online
-                                ? "Node must be online to healthcheck"
-                                : "Start Healthcheck"}
+                            {!online ? "Node must be online to healthcheck" : "Start Healthcheck"}
                         </button>
                         <button
                             type="button"
-                            className="whitespace-nowrap rounded-tremor-small px-3 py-2 text-center text-tremor-default font-medium text-tremor-content-strong hover:bg-tremor-background-subtle"
+                            className="whitespace-nowrap rounded-tremor-small px-3 py-2 text-center text-tremor-default font-medium text-tremor-content-strong hover:bg-tremor-background-subtle dark:hover:bg-dark-tremor-background-subtle hover:text-tremor-content dark:hover:text-dark-tremor-content dark:text-dark-tremor-content-strong"
                             onClick={() => setOpen(false)}
                         >
                             Cancel

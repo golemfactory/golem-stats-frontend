@@ -38,7 +38,9 @@ export const StatCard = ({ title, value, unit, loading }: { title: string; value
                             })()}
                         </p>
 
-                        <p className="ml-2 flex items-baseline text-sm font-semibold text-golemblue dark:text-gray-400">{unit}</p>
+                        <p className="ml-2 flex items-baseline text-sm font-semibold text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue dark:text-gray-400">
+                            {unit}
+                        </p>
                     </>
                 )}
             </dd>

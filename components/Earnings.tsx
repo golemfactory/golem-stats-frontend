@@ -20,7 +20,9 @@ export const EarningsCard = ({ title, value, unit, timePeriods }) => {
                             <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
                                 {isLoading ? <Skeleton width={40} height={30} /> : RoundingFunction(value, 1)}
                             </span>
-                            <span className="text-tremor-default font-medium text-golemblue">GLM</span>
+                            <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                                GLM
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -40,7 +42,7 @@ export const EarningsCard = ({ title, value, unit, timePeriods }) => {
                                     <span className="truncate text-tremor-content dark:text-dark-tremor-content">{earnings.period}</span>
                                     <span className="pr-1.5 text-tremor-content-strong dark:text-dark-tremor-content-strong">
                                         {RoundingFunction(earnings.earnings, 5)}
-                                        <span className="text-golemblue"> GLM</span>
+                                        <span className="text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue"> GLM</span>
                                     </span>
                                 </p>
                             )}

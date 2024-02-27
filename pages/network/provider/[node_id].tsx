@@ -83,7 +83,7 @@ const EarningsBlock = ({ date, earnings }: { date: string; earnings: string }) =
                 </span>
                 <div className="pr-1.5 text-tremor-content-strong dark:text-dark-tremor-content-strong">
                     {earnings}
-                    <span className="text-golemblue"> GLM</span>
+                    <span className="text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue"> GLM</span>
                 </div>
             </div>
         </li>
@@ -156,7 +156,9 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 </p>
                                 <p className="flex items-baseline space-x-2 text-tremor-content-strong dark:text-dark-tremor-content-strong">
                                     <span className="text-tremor-metric font-semibold">{RoundingFunction(nodeData[0].earnings_total)}</span>
-                                    <span className="text-tremor-default font-medium text-golemblue">GLM</span>
+                                    <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                                        GLM
+                                    </span>
                                 </p>
                             </div>
                             <div className="space-y-3">
@@ -219,7 +221,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">
                                     {priceHashMapOrDefault(nodeData[0], "golem.usage.cpu_sec")}
                                 </span>
-                                <span className="-ml-1.5 text-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
+                                <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
                                     {" "}
                                     GLM
                                 </span>
@@ -230,7 +232,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">
                                     {priceHashMapOrDefault(nodeData[0], "golem.usage.duration_sec")}
                                 </span>
-                                <span className="-ml-1.5 text-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
+                                <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
                                     {" "}
                                     GLM
                                 </span>
@@ -245,7 +247,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                         ]
                                     }
                                 </span>
-                                <span className="-ml-1.5 text-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
+                                <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
                                     {" "}
                                     GLM
                                 </span>

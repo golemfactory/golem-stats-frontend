@@ -46,11 +46,13 @@ export const NetworkVersionAdoption: React.FC = () => {
                     </p>
                     <div className="flex items-baseline space-x-2">
                         {latestYagnaVersion ? (
-                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">{latestYagnaVersion.name}</span>
+                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
+                                {latestYagnaVersion.name}
+                            </span>
                         ) : (
                             <Skeleton width={250} height={30} />
                         )}
-                        <span className="text-tremor-default font-medium text-golemblue"></span>
+                        <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue"></span>
                     </div>
                 </div>
             </div>

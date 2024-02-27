@@ -16,7 +16,9 @@ const PricingColumn = ({ title, value }: { title: string; value: number }) => {
             <p className="ml-16 text-sm font-medium text-gray-500 dark:text-gray-400 truncate">{title}</p>
             <dd className="ml-16 flex items-baseline ">
                 <p className="text-2xl font-semibold text-gray-900 dark:text-gray-300">{RoundingFunction(value)}</p>
-                <p className="ml-2 flex items-baseline text-sm font-semibold text-golemblue dark:text-gray-400">GLM</p>
+                <p className="ml-2 flex items-baseline text-sm font-semibold text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue dark:text-gray-400">
+                    GLM
+                </p>
             </dd>
         </Card>
     )

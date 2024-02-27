@@ -100,7 +100,9 @@ const NetworkStats = ({ metricData }) => {
                     <p className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">Right now</p>
                     <div className="flex items-baseline space-x-2">
                         <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">{total}</span>
-                        <span className="text-tremor-default font-medium text-golemblue">{unit}</span>
+                        <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                            {unit}
+                        </span>
                     </div>
                 </div>
             </div>

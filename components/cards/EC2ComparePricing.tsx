@@ -73,7 +73,9 @@ function EC2vsGolemPricing({ data }) {
                             ) : (
                                 <Skeleton width={250} height={30} />
                             )}
-                            <span className="text-tremor-default font-medium text-golemblue">using Golem Network</span>
+                            <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                                using Golem Network
+                            </span>
                         </div>
                     </div>
                 </div>

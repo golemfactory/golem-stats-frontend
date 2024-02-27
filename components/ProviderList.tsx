@@ -580,7 +580,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         className={`px-5 py-2 ${
                             page === 1
                                 ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed border border-gray-200"
-                                : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-golemblue border border-golemblue "
+                                : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
                         }`}
                     >
                         Previous
@@ -591,8 +591,8 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             onClick={() => setPage(pageNumber)}
                             className={`px-5 py-2  ${
                                 page === pageNumber
-                                    ? "text-golemblue bg-white border border-golemblue"
-                                    : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-golemblue border border-golemblue "
+                                    ? "text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue bg-white border border-golemblue"
+                                    : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
                             }`}
                         >
                             {pageNumber}
@@ -604,7 +604,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         className={`px-5 py-2  ${
                             page === lastPage
                                 ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed border border-gray-200"
-                                : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-golemblue border border-golemblue "
+                                : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
                         }`}
                     >
                         Next

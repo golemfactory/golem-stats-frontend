@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .golembutton {
-    @apply text-white px-5 py-2 flex items-center bg-golemblue hover:bg-white transition duration-300 hover:text-golemblue border border-golemblue;
+    @apply text-white px-5 py-2 flex items-center bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue border border-golemblue;
 }
 
 html,

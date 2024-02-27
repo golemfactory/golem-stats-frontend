@@ -54,7 +54,9 @@ export const NetworkActivity: React.FC = () => {
                                     <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric">
                                         {loaded ? data[data.length - 1]["Providers computing"] : <Skeleton width={40} height={30} />}
                                     </span>
-                                    <span className="text-tremor-default font-medium text-golemblue">Providers</span>
+                                    <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                                        Providers
+                                    </span>
                                 </div>
                             </div>
                         </div>
