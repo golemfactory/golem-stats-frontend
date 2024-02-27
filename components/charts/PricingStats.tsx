@@ -5,8 +5,10 @@ import { AreaChart, Card, Tab, TabGroup, TabList, TabPanel, TabPanels, Select } 
 import { RoundingFunction } from "@/lib/RoundingFunction"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
+import { MultiSelect, MultiSelectItem, SearchSelect, SearchSelectItem, SelectItem } from "@tremor/react"
 
 const PricingStats = () => {
+    const [network, setNetwork] = useState("mainnet")
     const { data: metricData } = useSWR("v2/network/pricing/historical", fetcher, { refreshInterval: 60000 })
     const { data, error } = useSWR("v2/network/pricing/1h", fetcher, {
         refreshInterval: 10000,
@@ -31,7 +33,7 @@ const PricingStats = () => {
                 </div>
             </Card>
         )
-    const timeFrames = Object.keys(metricData)
+    const timeFrames = Object.keys(metricData[network])
     const formatDate = (dateString, timeFrame) => {
         const date = new Date(dateString * 1000)
         let formatOptions = {}
@@ -56,20 +58,20 @@ const PricingStats = () => {
                     <div className="flex gap-4">
                         <div className="flex items-baseline space-x-2">
                             <span className="text-tremor-metric font-semibold">
-                                {RoundingFunction(data[`cpu_${unit.toLowerCase()}`], 3)}
+                                {RoundingFunction(data[network][`cpu_${unit.toLowerCase()}`], 3)}
                             </span>
                             <span className="text-tremor-default font-medium text-golemblue">CPU/h</span>
                         </div>
 
                         <div className="flex items-baseline space-x-2">
                             <span className="text-tremor-metric font-semibold">
-                                {RoundingFunction(data[`env_${unit.toLowerCase()}`], 3)}
+                                {RoundingFunction(data[network][`env_${unit.toLowerCase()}`], 3)}
                             </span>
                             <span className="text-tremor-default font-medium text-golemblue">Env/h</span>
                         </div>
                         <div className="flex items-baseline space-x-2">
                             <span className="text-tremor-metric font-semibold">
-                                {RoundingFunction(data[`start_${unit.toLowerCase()}`], 3)}
+                                {RoundingFunction(data[network][`start_${unit.toLowerCase()}`], 3)}
                             </span>
                             <span className="text-tremor-default font-medium text-golemblue">Start Price</span>
                         </div>
@@ -86,12 +88,20 @@ const PricingStats = () => {
     // </span>
     return (
         <Card>
-            <div className="relative p-6">
-                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Provider Pricing</h1>
-                <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                    The median and average pricing for CPU, Env, and Start based upon the list of providers who received a task in the time
-                    frame selected.
-                </p>
+            <div className="flex flex-col md:flex-row justify-between items-start p-6">
+                <div className="mb-4 md:mb-0">
+                    <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Provider Pricing</h1>
+                    <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                        The median and average pricing for CPU, Env, and Start based upon the list of providers who received a task in the
+                        time frame selected.
+                    </p>
+                </div>
+                <div>
+                    <Select value={network} onValueChange={setNetwork}>
+                        <SelectItem value="mainnet">Mainnet</SelectItem>
+                        <SelectItem value="testnet">Testnet</SelectItem>
+                    </Select>
+                </div>
             </div>
 
             <TabGroup>
@@ -128,7 +138,7 @@ const PricingStats = () => {
                                 </div>
                             </div>
                             <AreaChart
-                                data={(metricData[selectedTimeFrame] || []).map((item) => {
+                                data={(metricData.mainnet[selectedTimeFrame] || []).map((item) => {
                                     // Transforming the item
                                     const transformedItem = {
                                         ...item,
