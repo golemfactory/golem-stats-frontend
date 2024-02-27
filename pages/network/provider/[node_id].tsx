@@ -139,8 +139,9 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                 <div className="lg:col-span-8 col-span-12 min-h-full">
                     <ProviderUptimeTrackerComponent
                         nodeId={node_id}
+                        cpuVendor={nodeData[0].runtimes.vm?.properties["golem.inf.cpu.vendor"]}
                         nodeName={nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}
-                        cpu={nodeData[0].runtimes.vm?.properties["golem.inf.cpu.brand"]}
+                        cpu={nodeData[0].runtimes.vm?.properties["golem.inf.cpu.brand"] ?? "Unknown"}
                         gpu={nodeData[0].runtimes["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"] ?? null}
                     />
                 </div>

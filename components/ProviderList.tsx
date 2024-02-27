@@ -139,45 +139,42 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
             return false
         }
         if (filters.sortBy) {
-            // Skip sorting filter here. Sorting handled separately
             return true
         }
 
         return Object.entries(filters).every(([filterKey, filterValue]) => {
-            if (filterValue === null) return true // Ignore empty filters
+            if (filterValue === null) return true
 
             const properties = provider?.runtimes?.vm?.properties || {}
             let valueToCheck
 
             switch (filterKey) {
+                case "nodeIdOrName":
+                    return (
+                        provider.node_id.toString().toLowerCase().includes(filterValue.toLowerCase()) ||
+                        properties["golem.node.id.name"]?.toLowerCase().includes(filterValue.toLowerCase())
+                    )
                 case "taskReputation":
                     valueToCheck = provider.taskReputation
-                    if (valueToCheck === null || valueToCheck === undefined) return false // Exclude if no reputation data
                     return valueToCheck >= parseFloat(filterValue)
                 case "uptime":
                     valueToCheck = provider.uptime
                     return valueToCheck >= parseFloat(filterValue)
                 case "runtimes.vm.hourly_price_usd":
                     valueToCheck = provider.runtimes?.vm?.hourly_price_usd
-                    if (valueToCheck === undefined) return false // Exclude if no price data
                     return valueToCheck <= parseFloat(filterValue)
-                case "golem.node.id.name":
-                    valueToCheck = properties["golem.node.id.name"]
-                    return valueToCheck?.toString().toLowerCase().includes(filterValue.toLowerCase())
                 case "golem.inf.cpu.threads":
                     valueToCheck = properties["golem.inf.cpu.threads"]
                     return valueToCheck === parseInt(filterValue)
                 case "golem.inf.mem.gib":
                 case "golem.inf.storage.gib":
                     valueToCheck = parseFloat(properties[filterKey])
-                    const tolerance = 0.5 // define your tolerance level
+                    const tolerance = 0.5
                     return Math.abs(valueToCheck - parseFloat(filterValue)) <= tolerance
                 case "network":
-                    // Assuming filterValue is either "Mainnet" or "Testnet"
                     const isMainnet = properties["golem.com.payment.platform.erc20-mainnet-glm.address"] !== undefined
                     return (filterValue === "Mainnet" && isMainnet) || (filterValue === "Testnet" && !isMainnet)
                 case "showOffline":
-                    // Show both online and offline providers
                     return true
                 default:
                     return true
@@ -212,16 +209,16 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                 <div className="grid grid-cols-1 gap-4">
                     <div className="flex flex-wrap gap-4 ">
                         <div>
-                            <label htmlFor="providerName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                Node Name
+                            <label htmlFor="providerNameOrId" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+                                Node Name or ID
                             </label>
                             <div className="mt-2">
                                 <TextInput
                                     type="text"
-                                    name="providerName"
-                                    id="providerName"
-                                    onValueChange={(value) => handleNameSearchChange(value, "golem.node.id.name")}
-                                    placeholder="Search by Name"
+                                    name="providerNameOrId"
+                                    id="providerNameOrId"
+                                    onValueChange={(value) => handleNameSearchChange(value, "nodeIdOrName")}
+                                    placeholder="Search by Name or ID"
                                 />
                             </div>
                         </div>
@@ -413,7 +410,8 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                               </div>
                           ))
                         : paginatedData?.map((provider) => {
-                              const cpuVendor = provider.runtimes.vm?.properties?.["golem.inf.cpu.vendor"]
+                              const cpuVendor = provider.runtimes.vm?.properties?.["golem.inf.cpu.vendor"] || "Unknown"
+
                               let IconComponent
                               let additionalClasses = ""
 
@@ -484,7 +482,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                                   <HardwareBadge
                                                       title="CPU"
                                                       icon={<IconComponent className={`h-4 w-4 ${additionalClasses}`} />}
-                                                      value={provider.runtimes.vm?.properties?.["golem.inf.cpu.brand"]}
+                                                      value={provider.runtimes.vm?.properties?.["golem.inf.cpu.brand"] || "Unknown"}
                                                   />
                                               </div>
                                               {provider.runtimes["vm-nvidia"]?.properties && (
@@ -495,7 +493,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                                           value={
                                                               provider.runtimes["vm-nvidia"].properties?.[
                                                                   "golem.!exp.gap-35.v1.inf.gpu.model"
-                                                              ]
+                                                              ] || "Unknown"
                                                           }
                                                       />
                                                   </div>
