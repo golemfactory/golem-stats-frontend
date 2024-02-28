@@ -13,8 +13,6 @@ interface HardwareBadgeProps {
 
 const HardwareBadge: React.FC<HardwareBadgeProps> = ({ title, value, icon, showCPUVendorIcon = false, cpuVendor }) => {
     if (showCPUVendorIcon) {
-        let IconComponent
-        let additionalClasses = ""
 
         switch (cpuVendor) {
             case "GenuineIntel":

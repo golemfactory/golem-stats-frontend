@@ -16,7 +16,7 @@ export default function OnlineNodes({ initialData }: { initialData: any }) {
                 description={`  Nodes online on the Golem Network right now`}
                 url={`https://stats.golem.network/network/providers/online`}
             />
-            <ProviderList initialData={initialData} endpoint={"v2/network/online"} />
+            <ProviderList initialData={initialData} endpoint={"v2/network/online/new"} />
         </>
     )
 }

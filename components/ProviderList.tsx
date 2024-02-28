@@ -1,7 +1,7 @@
 // @ts-nocheck
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useMemo, useCallback } from "react"
 import moment from "moment-timezone"
 import { TextInput, Select, SelectItem, Card } from "@tremor/react"
@@ -91,9 +91,21 @@ export const isUpdateNeeded = (updatedAt) => {
 }
 
 export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
-    const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 60000, initialData })
-
+    const [pageNumber, setPageNumber] = useState(1)
+    const [totalPages, setTotalPages] = useState(0)
     const [filters, setFilters] = useState({ showOffline: false, runtime: "all" })
+
+    const { data, error } = useSWR(`${endpoint}?page=${pageNumber}&size=${ITEMS_PER_PAGE}`, fetcher, {
+        refreshInterval: 60000,
+        initialData,
+        onSuccess: (data) => {
+            setTotalPages(data.metadata.total_pages)
+        },
+    })
+
+    useEffect(() => {
+        setPage(1) // Reset to page 1 whenever filters change
+    }, [filters])
 
     const handleFilterChange = useCallback((key, value) => {
         if (key === "showOffline") {
@@ -162,8 +174,8 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
     }, [])
 
     const filteredData = useMemo(() => {
-        return rawData
-            ? rawData.filter((provider) => {
+        return data
+            ? data.data.filter((provider) => {
                   const isProviderFiltered = filterProvider(provider, filters)
 
                   const hasRequiredRuntime = provider.runtimes && (filters.runtime === "all" || provider.runtimes[filters.runtime])
@@ -171,13 +183,13 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                   return isProviderFiltered && hasRequiredRuntime
               })
             : []
-    }, [rawData, filters, filterProvider])
+    }, [data, filters, filterProvider])
 
     const { page, data: paginatedData, lastPage, setPage } = useProviderPagination(filteredData, filters.sortBy)
 
-    const handleNext = () => setPage(page < lastPage ? page + 1 : lastPage)
-    const handlePrevious = () => setPage(page > 1 ? page - 1 : 1)
-    const visiblePages = displayPages(page, lastPage)
+    const handleNext = () => setPageNumber(pageNumber < totalPages ? pageNumber + 1 : totalPages)
+    const handlePrevious = () => setPageNumber(pageNumber > 1 ? pageNumber - 1 : 1)
+    const visiblePages = displayPages(pageNumber, totalPages)
 
     return (
         <div className="flex flex-col ">
@@ -421,7 +433,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     </div>
                 </div>
                 <div className="grid lg:grid-cols-5 gap-4 h-full grid-cols-12">
-                    {!rawData
+                    {!data
                         ? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
                               <div key={index} className="lg:col-span-5 col-span-12">
                                   <Skeleton height={100} />
@@ -441,33 +453,33 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                 <div className="flex justify-center mt-4 py-4 gap-2 flex-wrap">
                     <button
                         onClick={handlePrevious}
-                        disabled={page === 1}
+                        disabled={pageNumber === 1}
                         className={`px-5 py-2 ${
-                            page === 1
+                            pageNumber === 1
                                 ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed border border-gray-200"
                                 : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
                         }`}
                     >
                         Previous
                     </button>
-                    {visiblePages.map((pageNumber) => (
+                    {visiblePages.map((p) => (
                         <button
-                            key={pageNumber}
-                            onClick={() => setPage(pageNumber)}
+                            key={p}
+                            onClick={() => setPageNumber(p)}
                             className={`px-5 py-2  ${
-                                page === pageNumber
+                                pageNumber === p
                                     ? "text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue bg-white border border-golemblue"
                                     : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
                             }`}
                         >
-                            {pageNumber}
+                            {p}
                         </button>
                     ))}
                     <button
                         onClick={handleNext}
-                        disabled={page === lastPage}
+                        disabled={pageNumber === totalPages}
                         className={`px-5 py-2  ${
-                            page === lastPage
+                            pageNumber === totalPages
                                 ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed border border-gray-200"
                                 : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
                         }`}
