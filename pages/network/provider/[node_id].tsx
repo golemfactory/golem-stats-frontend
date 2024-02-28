@@ -17,6 +17,8 @@ import { RiSearch2Line } from "@remixicon/react"
 import PolygonScanIcon from "@/components/svg/Polygonsscan"
 import Link from "next/link"
 import HardwareBadge from "@/components/HardwareBadge"
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
 
 const data = [
     {
@@ -113,7 +115,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
     const { income: updatedIncome, error: incomeError } = useIncome(node_id, initialIncome)
 
     if (nodeError || incomeError) return <div>Failed to load</div>
-    if (!nodeData || !updatedIncome) return <div>Loading...</div>
+    if (!nodeData || !updatedIncome) return <Skeleton height={900} />
 
     type Provider = {
         runtimes: {

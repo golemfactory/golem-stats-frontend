@@ -25,7 +25,7 @@ const NodeActivityChart = ({ nodeId }) => {
     const valueFormatter = (number) => (number > 0 ? "Computing" : "Idle")
 
     return (
-        <Card>
+        <Card className="h-full">
             <h3 className="text-lg font-medium text-gray-900">Node Activity</h3>
             <AreaChart
                 data={chartData}
