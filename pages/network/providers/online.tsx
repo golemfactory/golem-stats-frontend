@@ -3,7 +3,7 @@ import { SEO } from "@/components/SEO"
 import { fetcher } from "@/fetcher"
 
 export async function getStaticProps({ params }: { params: { wallet_id: string } }) {
-    const initialData = await fetcher(`v2/network/online`)
+    const initialData = await fetcher(`v2/network/online/new`)
 
     return { props: { initialData: initialData }, revalidate: 14400 }
 }
