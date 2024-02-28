@@ -17,9 +17,10 @@ export const NetworkActivity: React.FC = () => {
     const extractChartData = (apiData) => {
         if (!apiData || !apiData.data || !apiData.data.result || !apiData.data.result[0]) return []
         return apiData.data.result[0].values.map(([x, y]) => ({
-            date:
-                new Date(x * 1000).toLocaleTimeString("en-US", { hour: "numeric", minute: "numeric", hour12: true, timeZone: "UTC" }) +
-                " UTC",
+            date: new Date(x * 1000).toLocaleTimeString(navigator.language, {
+                hour: "2-digit",
+                minute: "2-digit",
+            }),
             "Providers computing": Number(y),
         }))
     }

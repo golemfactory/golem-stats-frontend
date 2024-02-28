@@ -1,34 +1,16 @@
 // @ts-nocheck
-import { PriceHashmap } from "@/lib/PriceHashmap"
-import useSWR, { SWRResponse } from "swr"
+import useSWR from "swr"
 import { fetcher } from "@/fetcher"
-import { RoundingFunction } from "@/lib/RoundingFunction"
-import { GolemIcon } from "./svg/GolemIcon"
 import { useState } from "react"
-import { CpuChipIcon, CircleStackIcon, Square3Stack3DIcon } from "@heroicons/react/24/solid"
-import { useRouter } from "next/router"
 import { useMemo, useCallback } from "react"
 import moment from "moment-timezone"
 import { TextInput, Select, SelectItem, Card } from "@tremor/react"
-import UptimeDots from "./UptimeDots"
 import { Tooltip as ReactTooltip } from "react-tooltip"
-import {
-    RiArrowDownCircleLine,
-    RiArrowDownLine,
-    RiArrowUpCircleLine,
-    RiArrowUpLine,
-    RiCloseCircleLine,
-    RiQuestionLine,
-    RiShieldCheckLine,
-} from "@remixicon/react"
-import ReputationIndicator from "./ReputationIndicator"
-import Link from "next/link"
-import HardwareBadge from "./HardwareBadge"
-import NvidiaIcon from "./svg/NvidiaIcon"
-import IntelIcon from "./svg/IntelIcon"
-import AMDIcon from "./svg/AMDIcon"
+import { RiQuestionLine } from "@remixicon/react"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
+import ProviderVmRuntimeView from "./ProviderVmRuntimeView"
+import ProviderVmNvidiaRuntimeView from "./ProviderVMNvidiaRuntimeView"
 
 const ITEMS_PER_PAGE = 30
 
@@ -94,11 +76,6 @@ const useProviderPagination = (data, sortBy) => {
     return { page, data: paginatedData, lastPage, setPage }
 }
 
-const priceHashMapOrDefault = (provider, usage) => {
-    const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
-    return PriceHashmap(runtime.properties, usage)
-}
-
 export const isUpdateNeeded = (updatedAt) => {
     const timeZone = "Europe/Copenhagen"
 
@@ -114,17 +91,16 @@ export const isUpdateNeeded = (updatedAt) => {
 }
 
 export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
-    const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 10000, initialData })
+    const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 60000, initialData })
 
-    const [filters, setFilters] = useState({ showOffline: false })
+    const [filters, setFilters] = useState({ showOffline: false, runtime: "all" })
 
     const handleFilterChange = useCallback((key, value) => {
         if (key === "showOffline") {
             value = value === "True"
-        } else if (["sortBy"].includes(key)) {
-            // No value manipulation needed, used for sorting
+        } else if (["sortBy", "runtime"].includes(key)) {
         } else if (value === "") {
-            value = null // Allow clearing of filter values
+            value = null
         }
         setFilters((prevFilters) => ({ ...prevFilters, [key]: value }))
         setPage(1)
@@ -136,6 +112,9 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
 
     const filterProvider = useCallback((provider, filters) => {
         if (!filters.showOffline && !provider.online) {
+            return false
+        }
+        if (filters.runtime !== "all" && !provider.runtimes?.[filters.runtime]) {
             return false
         }
         if (filters.sortBy) {
@@ -161,7 +140,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     valueToCheck = provider.uptime
                     return valueToCheck >= parseFloat(filterValue)
                 case "runtimes.vm.hourly_price_usd":
-                    valueToCheck = provider.runtimes?.vm?.hourly_price_usd
+                    valueToCheck = provider.runtimes?.[filters.runtime]?.hourly_price_usd ?? provider.runtimes?.vm?.hourly_price_usd
                     return valueToCheck <= parseFloat(filterValue)
                 case "golem.inf.cpu.threads":
                     valueToCheck = properties["golem.inf.cpu.threads"]
@@ -185,19 +164,17 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
     const filteredData = useMemo(() => {
         return rawData
             ? rawData.filter((provider) => {
-                  // First, apply the existing filter condition
                   const isProviderFiltered = filterProvider(provider, filters)
 
-                  // Then, check for the presence of either provider.runtimes.vm or provider.runtimes["vm-nvidia"]
-                  const hasRequiredRuntime = provider.runtimes && (provider.runtimes.vm || provider.runtimes["vm-nvidia"])
+                  const hasRequiredRuntime = provider.runtimes && (filters.runtime === "all" || provider.runtimes[filters.runtime])
 
-                  // Include the provider only if both conditions are met
                   return isProviderFiltered && hasRequiredRuntime
               })
             : []
     }, [rawData, filters, filterProvider])
 
     const { page, data: paginatedData, lastPage, setPage } = useProviderPagination(filteredData, filters.sortBy)
+
     const handleNext = () => setPage(page < lastPage ? page + 1 : lastPage)
     const handlePrevious = () => setPage(page > 1 ? page - 1 : 1)
     const visiblePages = displayPages(page, lastPage)
@@ -341,8 +318,31 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                 <SelectItem value="Testnet">Testnet</SelectItem>
                             </Select>
                         </div>
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                        <div>
+                            <label
+                                htmlFor="runtime"
+                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                            >
+                                Runtime
+                            </label>
+                            <Select
+                                id="runtime"
+                                name="runtime"
+                                defaultValue="all"
+                                className="z-40 mt-2"
+                                onValueChange={(value) => handleFilterChange("runtime", value)}
+                            >
+                                <SelectItem value="all">All</SelectItem>
+                                <SelectItem value="vm">VM</SelectItem>
+                                <SelectItem value="vm-nvidia">VM Nvidia</SelectItem>
+                            </Select>
+                        </div>
+                    </div>
 
-                        {enableShowingOfflineNodes && (
+                    {enableShowingOfflineNodes && (
+                        <div className="flex flex-wrap gap-4">
                             <div>
                                 <label
                                     htmlFor="network"
@@ -360,8 +360,8 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                     <SelectItem value="True">True</SelectItem>
                                 </Select>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </Card>
             <Card>
@@ -423,171 +423,18 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                 <div className="grid lg:grid-cols-5 gap-4 h-full grid-cols-12">
                     {!rawData
                         ? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
-                              <div className="lg:col-span-5 col-span-12">
-                                  <Skeleton key={index} height={100} />
+                              <div key={index} className="lg:col-span-5 col-span-12">
+                                  <Skeleton height={100} />
                               </div>
                           ))
                         : paginatedData?.map((provider) => {
-                              const cpuVendor = provider.runtimes.vm?.properties?.["golem.inf.cpu.vendor"] || "Unknown"
-
-                              let IconComponent
-                              let additionalClasses = ""
-
-                              switch (cpuVendor) {
-                                  case "GenuineIntel":
-                                      IconComponent = IntelIcon // Your Intel icon component
-                                      break
-                                  case "AuthenticAMD":
-                                      IconComponent = AMDIcon // Your AMD icon component
-                                      additionalClasses = "fill-red-500" // Apply specific class for AMD
-                                      break
-                                  default:
-                                      IconComponent = CpuChipIcon
+                              if (filters.runtime === "vm-nvidia" || (filters.runtime === "all" && provider.runtimes["vm-nvidia"])) {
+                                  return <ProviderVmNvidiaRuntimeView provider={provider} key={provider.node_id} />
+                              } else if (filters.runtime === "vm" || (filters.runtime === "all" && provider.runtimes["vm"])) {
+                                  return <ProviderVmRuntimeView provider={provider} key={provider.node_id} />
+                              } else {
+                                  return null
                               }
-
-                              return (
-                                  <Link
-                                      href={{
-                                          pathname: "/network/provider/[node_id]",
-                                          query: { node_id: provider.node_id },
-                                      }}
-                                      key={provider.id}
-                                      className="lg:col-span-5 col-span-12 grid grid-cols-12 gap-4 items-center bg-golembackground dark:bg-transparent dark:hover:bg-gray-800 py-4 px-4 hover:bg-gray-200 hover:cursor-pointer dark:border-dark-tremor-border dark:border"
-                                  >
-                                      <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
-                                          <div className="flex items-center">
-                                              <div className="flex-shrink-0 h-12 w-12 bg-golemblue  p-3 relative">
-                                                  {
-                                                      // Check if the provider is offline
-                                                      !provider.online ? (
-                                                          <div>
-                                                              <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-gray-500"></div>
-                                                          </div>
-                                                      ) : provider.computing_now ? (
-                                                          // Check if the provider is online and computing
-                                                          <div>
-                                                              <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500 animate-ping"></div>
-                                                              <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500"></div>
-                                                          </div>
-                                                      ) : (
-                                                          // Provider is online but not computing
-                                                          <div>
-                                                              <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300 animate-ping"></div>
-                                                              <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300"></div>
-                                                          </div>
-                                                      )
-                                                  }
-                                                  <GolemIcon
-                                                      className={`h-6 w-6 text-white ${provider.online ? "opacity-100" : "opacity-50"}`}
-                                                      aria-hidden="true"
-                                                  />
-                                              </div>
-                                          </div>
-                                          <div className="ml-1">
-                                              <p className="text-sm font-medium text-gray-900 dark:text-white font-inter ">
-                                                  {provider.runtimes.vm?.properties?.["golem.node.id.name"]}
-                                              </p>
-                                              <p className="text-sm  text-gray-400 dark:text-white ">
-                                                  {provider.runtimes.vm?.properties?.["golem.node.debug.subnet"]}
-                                              </p>
-                                              <p className="text-sm  text-gray-400 dark:text-white">{provider.version}</p>
-                                          </div>
-                                      </div>
-
-                                      <div className="lg:col-span-4 md:col-span-6 col-span-12 flex items-center gap-2">
-                                          <div className="grid grid-cols-1 gap-2">
-                                              <div className="flex-container">
-                                                  <HardwareBadge
-                                                      title="CPU"
-                                                      icon={<IconComponent className={`h-4 w-4 ${additionalClasses}`} />}
-                                                      value={provider.runtimes.vm?.properties?.["golem.inf.cpu.brand"] || "Unknown"}
-                                                  />
-                                              </div>
-                                              {provider.runtimes["vm-nvidia"]?.properties && (
-                                                  <div className="flex-container">
-                                                      <HardwareBadge
-                                                          title="GPU"
-                                                          icon={<NvidiaIcon className="h-5 w-5 flex-shrink-0" />}
-                                                          value={
-                                                              provider.runtimes["vm-nvidia"].properties?.[
-                                                                  "golem.!exp.gap-35.v1.inf.gpu.model"
-                                                              ] || "Unknown"
-                                                          }
-                                                      />
-                                                  </div>
-                                              )}
-                                          </div>
-                                      </div>
-                                      <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
-                                          <div>
-                                              <p
-                                                  data-tooltip-id={`price-hourly${provider.node_id}`}
-                                                  className="text-sm font-medium dark:text-dark-tremor-content-metric"
-                                              >
-                                                  ${RoundingFunction(provider.runtimes.vm?.hourly_price_usd, 6)} /Hour
-                                                  <ReactTooltip
-                                                      id={`price-hourly${provider.node_id}`}
-                                                      place="bottom"
-                                                      content={`Calculated using the formula: Assuming 100% usage on ${
-                                                          provider.runtimes.vm?.properties?.["golem.inf.cpu.threads"]
-                                                      } CPU threads at a rate of ${priceHashMapOrDefault(
-                                                          provider,
-                                                          "golem.usage.cpu_sec"
-                                                      )} GLM per thread, plus an environment rate of ${priceHashMapOrDefault(
-                                                          provider,
-                                                          "golem.usage.duration_sec"
-                                                      )} GLM per hour, and a start price of ${
-                                                          provider.runtimes.vm?.properties?.[
-                                                              "golem.com.pricing.model.linear.coeffs"
-                                                          ]?.slice(-1)[0]
-                                                      } GLM. These costs are then converted to USD based on the current GLM price.`}
-                                                      className="break-words max-w-64 z-50"
-                                                  />
-                                              </p>
-                                              {provider.runtimes?.vm?.times_cheaper && (
-                                                  <p
-                                                      data-tooltip-id={`price-comparison-tooltip${provider.node_id}`}
-                                                      className="text-sm text-green-500 dark:text-gray-400"
-                                                  >
-                                                      -{RoundingFunction(provider.runtimes.vm?.times_cheaper)}%{" "}
-                                                      <RiArrowDownLine className="inline-block h-4 w-4 text-green-500" />
-                                                      <ReactTooltip
-                                                          id={`price-comparison-tooltip${provider.node_id}`}
-                                                          place="bottom"
-                                                          content={`Based on available data, this provider's pricing is approximately ${RoundingFunction(
-                                                              provider.runtimes.vm?.times_cheaper
-                                                          )}% cheaper than an AWS instance of similar specifications.`}
-                                                          className="break-words max-w-64 z-50"
-                                                      />
-                                                  </p>
-                                              )}
-                                              {provider.runtimes?.vm?.times_more_expensive && (
-                                                  <p
-                                                      data-tooltip-id={`price-comparison-tooltip${provider.node_id}`}
-                                                      className="text-sm text-red-500 dark:text-gray-400"
-                                                  >
-                                                      +{RoundingFunction(provider.runtimes.vm?.times_more_expensive)}%
-                                                      <RiArrowUpLine className="inline-block h-4 w-4 text-red-500" />
-                                                      <ReactTooltip
-                                                          id={`price-comparison-tooltip${provider.node_id}`}
-                                                          place="bottom"
-                                                          content={`Based on available data, this provider's pricing is approximately ${RoundingFunction(
-                                                              provider.runtimes.vm?.times_more_expensive
-                                                          )}% higher than an AWS instance of similar specifications.`}
-                                                          className="break-words max-w-64 z-50"
-                                                      />
-                                                  </p>
-                                              )}
-                                          </div>
-                                      </div>
-                                      <div className="lg:col-span-2 col-span-4 lg:flex hidden items-center gap-2">
-                                          <ReputationIndicator taskReputation={provider.taskReputation} />
-                                      </div>
-                                      <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
-                                          <UptimeDots uptime={provider.uptime} />
-                                      </div>
-                                  </Link>
-                              )
                           })}
                 </div>
 

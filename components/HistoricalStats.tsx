@@ -61,11 +61,8 @@ const NetworkStats = ({ metricData }) => {
         switch (timeFrame) {
             case "1d":
                 formatOptions = {
-                    month: "short",
-                    day: "numeric",
                     hour: "2-digit",
                     minute: "2-digit",
-                    hour12: false,
                 }
                 break
             case "7d":
@@ -89,7 +86,7 @@ const NetworkStats = ({ metricData }) => {
                 break
         }
 
-        return date.toLocaleString("en-US", formatOptions)
+        return date.toLocaleString(navigator.language, formatOptions)
     }
     const MetricCardSummary = ({ category, data, unit, color }) => {
         const latestDataPoint = latest1dData[category] || 0
