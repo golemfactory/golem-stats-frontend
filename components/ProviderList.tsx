@@ -9,8 +9,8 @@ import { Tooltip as ReactTooltip } from "react-tooltip"
 import { RiQuestionLine } from "@remixicon/react"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
-import ProviderVmRuntimeView from "./ProviderVmRuntimeView"
-import ProviderVmNvidiaRuntimeView from "./ProviderVMNvidiaRuntimeView"
+import ProviderVmRuntimeView from "@/components/ProviderVmRuntimeView"
+import ProviderVmNvidiaRuntimeView from "@/components/ProviderVMNvidiaRuntimeView"
 
 const ITEMS_PER_PAGE = 30
 
