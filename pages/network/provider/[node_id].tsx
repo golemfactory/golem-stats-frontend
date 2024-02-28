@@ -13,7 +13,7 @@ import { HealthCheckModal, OpenHealthCheckModalButton } from "@/components/Provi
 import { isUpdateNeeded } from "@/components/ProviderList"
 import { ProviderUptimeTrackerComponent } from "@/components/charts/ProviderUptimeTracker"
 import { Button, Card, Divider } from "@tremor/react"
-import { RiSearch2Line } from "@remixicon/react"
+import { RiSearch2Line, RiTeamLine } from "@remixicon/react"
 import PolygonScanIcon from "@/components/svg/Polygonsscan"
 import Link from "next/link"
 import HardwareBadge from "@/components/HardwareBadge"
@@ -134,8 +134,19 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 
     return (
         <div className="min-h-full z-10 relative">
+            <div className="fixed z-20 bottom-[70px] right-5">
+                <div className="flex justify-center">
+                    <Link href={`/network/providers/operator/${nodeData[0].wallet}`} className="golembutton group">
+                        <div className="button-content px-2 group-hover:gap-x-2">
+                            <RiTeamLine className="icon h-5 w-5 -ml-2" />
+                            <span className="text">Operator</span>
+                        </div>
+                    </Link>
+                </div>
+            </div>
             <div className="fixed z-20 bottom-5 right-5">
                 <OpenHealthCheckModalButton setOpen={setOpen} />
+
                 <HealthCheckModal open={open} setOpen={setOpen} node_id={node_id} online={nodeData[0].online} />
             </div>
             <div className="grid grid-cols-12 gap-4 mb-4">

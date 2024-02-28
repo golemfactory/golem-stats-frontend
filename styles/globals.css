@@ -3,7 +3,38 @@
 @tailwind utilities;
 
 .golembutton {
-    @apply text-white px-5 py-2 flex items-center bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue border border-golemblue;
+    @apply text-white px-5 py-2 flex items-center bg-golemblue transition duration-300 border border-golemblue;
+}
+
+/* Apply hover styles only to the button being hovered over */
+.golembutton:hover {
+    @apply hover:bg-white hover:text-tremor-brand-golemblue;
+}
+
+.golembutton .button-content {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.golembutton .button-content .icon {
+    @apply transition-all duration-300;
+}
+
+.golembutton .button-content .text {
+    @apply transition-all duration-300;
+    max-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    margin-left: -10px; /* Adjust as needed */
+}
+
+/* Apply hover styles only to the text of the button being hovered over */
+.golembutton:hover .button-content .text {
+    max-width: 200px; /* Adjust based on your text length */
+    opacity: 1;
+    visibility: visible;
+    margin-left: 0;
 }
 
 h1,

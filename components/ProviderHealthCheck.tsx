@@ -4,7 +4,8 @@ import { useSession } from "next-auth/react"
 import useSWR from "swr"
 import { AccountMenu } from "./metamask/AccountMenu"
 import { Dialog, DialogPanel } from "@tremor/react"
-import { RiCloseCircleLine } from "@remixicon/react"
+import { RiCloseCircleLine, RiHeartPulseLine } from "@remixicon/react"
+import PolygonScanIcon from "./svg/Polygonsscan"
 
 type HealthCheckModalProps = {
     open: boolean
@@ -48,9 +49,14 @@ const StatusIndicator = ({ status }: { status: string }) => {
 
 export const OpenHealthCheckModalButton: React.FC<OpenModalButtonProps> = ({ setOpen }) => {
     return (
-        <button type="button" className="golembutton" onClick={() => setOpen(true)}>
-            Healthcheck provider
-        </button>
+        <div className="flex justify-center">
+            <button className="golembutton group" onClick={() => setOpen(true)}>
+                <div className="button-content px-2 group-hover:gap-x-2">
+                    <RiHeartPulseLine className="icon h-5 w-5 -ml-2" />
+                    <span className="text">Healthcheck</span>
+                </div>
+            </button>
+        </div>
     )
 }
 
