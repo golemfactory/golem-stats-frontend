@@ -9,8 +9,8 @@ import { Tooltip as ReactTooltip } from "react-tooltip"
 import { RiQuestionLine } from "@remixicon/react"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
-import ProviderVmRuntimeView from "@/components/ProviderVmRuntimeView"
-import ProviderVmNvidiaRuntimeView from "@/components/ProviderVMNvidiaRuntimeView"
+import VmRuntimeView from "@/components/VmRuntimeView"
+import VmNvidiaRuntimeView from "./VmNvidiaRuntimeView"
 
 const ITEMS_PER_PAGE = 30
 
@@ -441,9 +441,9 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                           ))
                         : paginatedData?.map((provider) => {
                               if (filters.runtime === "vm-nvidia" || (filters.runtime === "all" && provider.runtimes["vm-nvidia"])) {
-                                  return <ProviderVmNvidiaRuntimeView provider={provider} key={provider.node_id} />
+                                  return <VmNvidiaRuntimeView provider={provider} key={provider.node_id} />
                               } else if (filters.runtime === "vm" || (filters.runtime === "all" && provider.runtimes["vm"])) {
-                                  return <ProviderVmRuntimeView provider={provider} key={provider.node_id} />
+                                  return <VmRuntimeView provider={provider} key={provider.node_id} />
                               } else {
                                   return null
                               }

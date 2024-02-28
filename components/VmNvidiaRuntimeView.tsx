@@ -9,7 +9,7 @@ import UptimeDots from "./UptimeDots"
 import Link from "next/link"
 import { GolemIcon } from "./svg/GolemIcon"
 
-const ProviderVmNvidiaRuntimeView = ({ provider }) => {
+const VmNvidiaRuntimeView = ({ provider }) => {
     const IconComponent = provider.runtimes.vm?.properties["golem.inf.cpu.vendor"] === "GenuineIntel" ? IntelIcon : AMDIcon
     const additionalClasses = provider.runtimes.vm?.properties["golem.inf.cpu.vendor"] === "AuthenticAMD" ? "fill-red-500" : ""
     return (
@@ -95,4 +95,4 @@ const ProviderVmNvidiaRuntimeView = ({ provider }) => {
     )
 }
 
-export default ProviderVmNvidiaRuntimeView
+export default VmNvidiaRuntimeView

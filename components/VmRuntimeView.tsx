@@ -1,5 +1,3 @@
-import { useMemo } from "react"
-import { CpuChipIcon } from "@heroicons/react/24/solid"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 const priceHashMapOrDefault = (provider, usage) => {
     const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
@@ -11,7 +9,6 @@ import { PriceHashmap } from "@/lib/PriceHashmap"
 import IntelIcon from "./svg/IntelIcon"
 import AMDIcon from "./svg/AMDIcon"
 import HardwareBadge from "./HardwareBadge"
-import NvidiaIcon from "./svg/NvidiaIcon"
 import ReputationIndicator from "./ReputationIndicator"
 import UptimeDots from "./UptimeDots"
 import { Tooltip as ReactTooltip } from "react-tooltip"
@@ -19,7 +16,7 @@ import { RiArrowDownLine, RiArrowUpLine } from "@remixicon/react"
 import Link from "next/link"
 import { GolemIcon } from "./svg/GolemIcon"
 
-const ProviderVmRuntimeView = ({ provider }) => {
+const VmRuntimeView = ({ provider }) => {
     const IconComponent = provider.runtimes.vm?.properties?.["golem.inf.cpu.vendor"] === "GenuineIntel" ? IntelIcon : AMDIcon
     const additionalClasses = provider.runtimes.vm?.properties?.["golem.inf.cpu.vendor"] === "AuthenticAMD" ? "fill-red-500" : ""
 
@@ -149,4 +146,4 @@ const ProviderVmRuntimeView = ({ provider }) => {
     )
 }
 
-export default ProviderVmRuntimeView
+export default VmRuntimeView
