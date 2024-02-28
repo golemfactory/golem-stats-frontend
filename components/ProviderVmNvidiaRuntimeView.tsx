@@ -1,12 +1,4 @@
-import { useMemo } from "react"
-import { CpuChipIcon } from "@heroicons/react/24/solid"
 import { RoundingFunction } from "@/lib/RoundingFunction"
-const priceHashMapOrDefault = (provider, usage) => {
-    const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
-    return PriceHashmap(runtime.properties, usage)
-}
-
-import { PriceHashmap } from "@/lib/PriceHashmap"
 
 import IntelIcon from "./svg/IntelIcon"
 import AMDIcon from "./svg/AMDIcon"
@@ -14,8 +6,6 @@ import HardwareBadge from "./HardwareBadge"
 import NvidiaIcon from "./svg/NvidiaIcon"
 import ReputationIndicator from "./ReputationIndicator"
 import UptimeDots from "./UptimeDots"
-import { Tooltip as ReactTooltip } from "react-tooltip"
-import { RiArrowDownLine, RiArrowUpLine, RiInformationLine } from "@remixicon/react"
 import Link from "next/link"
 import { GolemIcon } from "./svg/GolemIcon"
 

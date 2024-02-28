@@ -15,7 +15,7 @@ import NvidiaIcon from "./svg/NvidiaIcon"
 import ReputationIndicator from "./ReputationIndicator"
 import UptimeDots from "./UptimeDots"
 import { Tooltip as ReactTooltip } from "react-tooltip"
-import { RiArrowDownLine, RiArrowUpLine, RiInformationLine } from "@remixicon/react"
+import { RiArrowDownLine, RiArrowUpLine } from "@remixicon/react"
 import Link from "next/link"
 import { GolemIcon } from "./svg/GolemIcon"
 
