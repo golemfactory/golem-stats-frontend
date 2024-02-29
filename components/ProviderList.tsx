@@ -92,17 +92,20 @@ export const isUpdateNeeded = (updatedAt) => {
 
 export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
     const [pageNumber, setPageNumber] = useState(1)
-    const [totalPages, setTotalPages] = useState(0)
+    const [runtime, setRuntime] = useState("all")
     const [filters, setFilters] = useState({ showOffline: false, runtime: "all" })
+    const runtimeQueryParam = runtime !== "all" ? `&runtime=${runtime}` : ""
+    const swrKey = `${endpoint}?page=${pageNumber}&size=${ITEMS_PER_PAGE}${runtimeQueryParam}`
 
-    const { data, error } = useSWR(`${endpoint}?page=${pageNumber}&size=${ITEMS_PER_PAGE}`, fetcher, {
+    const { data, error } = useSWR(swrKey, fetcher, {
         refreshInterval: 60000,
         initialData,
-        onSuccess: (data) => {
-            setTotalPages(data.metadata.total_pages)
-        },
     })
 
+    const handleRuntimeChange = (value) => {
+        setRuntime(value)
+        setPageNumber(1) // Reset to page 1 whenever runtime changes
+    }
     useEffect(() => {
         setPage(1) // Reset to page 1 whenever filters change
     }, [filters])
@@ -189,6 +192,8 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
 
     const handleNext = () => setPageNumber(pageNumber < totalPages ? pageNumber + 1 : totalPages)
     const handlePrevious = () => setPageNumber(pageNumber > 1 ? pageNumber - 1 : 1)
+    const totalPages = data?.metadata?.total_pages || 0
+
     const visiblePages = displayPages(pageNumber, totalPages)
 
     return (
@@ -339,13 +344,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             >
                                 Runtime
                             </label>
-                            <Select
-                                id="runtime"
-                                name="runtime"
-                                defaultValue="all"
-                                className="z-40 mt-2"
-                                onValueChange={(value) => handleFilterChange("runtime", value)}
-                            >
+                            <Select id="runtime" name="runtime" defaultValue="all" onValueChange={handleRuntimeChange} className="mb-4">
                                 <SelectItem value="all">All</SelectItem>
                                 <SelectItem value="vm">VM</SelectItem>
                                 <SelectItem value="vm-nvidia">VM Nvidia</SelectItem>

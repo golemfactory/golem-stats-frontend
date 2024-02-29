@@ -21,15 +21,9 @@ const NavItem = ({
     }
     asComponent: ElementType
 }) => {
-    const router = useRouter()
-
-    const handleClick = () => {
-        router.push(item.href)
-    }
-
     return (
-        <div
-            onClick={handleClick}
+        <Link
+            href={item.href}
             className="group relative flex items-center gap-x-6  p-4 text-sm leading-6 hover:bg-golembackground dark:hover:bg-gray-700/80 hover:cursor-pointer transition duration-300"
         >
             <div className="flex h-11 w-11 flex-none items-center justify-center  bg-golemblue group-hover:bg-white group-hover:border-golemblue group-hover:border transition duration-300">
@@ -45,7 +39,7 @@ const NavItem = ({
                 </Popover.Button>
                 <p className="mt-1 text-gray-600 dark:text-gray-400">{item.description}</p>
             </div>
-        </div>
+        </Link>
     )
 }
 
