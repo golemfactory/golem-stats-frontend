@@ -1,7 +1,7 @@
 // @ts-nocheck
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useMemo, useCallback } from "react"
 import moment from "moment-timezone"
 import { TextInput, Select, SelectItem, Card } from "@tremor/react"
@@ -9,7 +9,7 @@ import { Tooltip as ReactTooltip } from "react-tooltip"
 import { RiQuestionLine } from "@remixicon/react"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
-import VmRuntimeView from "@/components/VmRuntimeView"
+import VmRuntimeView from "./VmRuntimeView"
 import VmNvidiaRuntimeView from "./VmNvidiaRuntimeView"
 
 const ITEMS_PER_PAGE = 30
@@ -91,24 +91,9 @@ export const isUpdateNeeded = (updatedAt) => {
 }
 
 export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
-    const [pageNumber, setPageNumber] = useState(1)
-    const [runtime, setRuntime] = useState("all")
+    const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 60000, initialData })
+
     const [filters, setFilters] = useState({ showOffline: false, runtime: "all" })
-    const runtimeQueryParam = runtime !== "all" ? `&runtime=${runtime}` : ""
-    const swrKey = `${endpoint}?page=${pageNumber}&size=${ITEMS_PER_PAGE}${runtimeQueryParam}`
-
-    const { data, error } = useSWR(swrKey, fetcher, {
-        refreshInterval: 60000,
-        initialData,
-    })
-
-    const handleRuntimeChange = (value) => {
-        setRuntime(value)
-        setPageNumber(1) // Reset to page 1 whenever runtime changes
-    }
-    useEffect(() => {
-        setPage(1) // Reset to page 1 whenever filters change
-    }, [filters])
 
     const handleFilterChange = useCallback((key, value) => {
         if (key === "showOffline") {
@@ -177,8 +162,8 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
     }, [])
 
     const filteredData = useMemo(() => {
-        return data
-            ? data.data.filter((provider) => {
+        return rawData
+            ? rawData.filter((provider) => {
                   const isProviderFiltered = filterProvider(provider, filters)
 
                   const hasRequiredRuntime = provider.runtimes && (filters.runtime === "all" || provider.runtimes[filters.runtime])
@@ -186,15 +171,13 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                   return isProviderFiltered && hasRequiredRuntime
               })
             : []
-    }, [data, filters, filterProvider])
+    }, [rawData, filters, filterProvider])
 
     const { page, data: paginatedData, lastPage, setPage } = useProviderPagination(filteredData, filters.sortBy)
 
-    const handleNext = () => setPageNumber(pageNumber < totalPages ? pageNumber + 1 : totalPages)
-    const handlePrevious = () => setPageNumber(pageNumber > 1 ? pageNumber - 1 : 1)
-    const totalPages = data?.metadata?.total_pages || 0
-
-    const visiblePages = displayPages(pageNumber, totalPages)
+    const handleNext = () => setPage(page < lastPage ? page + 1 : lastPage)
+    const handlePrevious = () => setPage(page > 1 ? page - 1 : 1)
+    const visiblePages = displayPages(page, lastPage)
 
     return (
         <div className="flex flex-col ">
@@ -344,7 +327,13 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                             >
                                 Runtime
                             </label>
-                            <Select id="runtime" name="runtime" defaultValue="all" onValueChange={handleRuntimeChange} className="mb-4">
+                            <Select
+                                id="runtime"
+                                name="runtime"
+                                defaultValue="all"
+                                className="z-40 mt-2"
+                                onValueChange={(value) => handleFilterChange("runtime", value)}
+                            >
                                 <SelectItem value="all">All</SelectItem>
                                 <SelectItem value="vm">VM</SelectItem>
                                 <SelectItem value="vm-nvidia">VM Nvidia</SelectItem>
@@ -432,7 +421,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     </div>
                 </div>
                 <div className="grid lg:grid-cols-5 gap-4 h-full grid-cols-12">
-                    {!data
+                    {!rawData
                         ? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
                               <div key={index} className="lg:col-span-5 col-span-12">
                                   <Skeleton height={100} />
@@ -452,33 +441,33 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                 <div className="flex justify-center mt-4 py-4 gap-2 flex-wrap">
                     <button
                         onClick={handlePrevious}
-                        disabled={pageNumber === 1}
+                        disabled={page === 1}
                         className={`px-5 py-2 ${
-                            pageNumber === 1
+                            page === 1
                                 ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed border border-gray-200"
                                 : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
                         }`}
                     >
                         Previous
                     </button>
-                    {visiblePages.map((p) => (
+                    {visiblePages.map((pageNumber) => (
                         <button
-                            key={p}
-                            onClick={() => setPageNumber(p)}
+                            key={pageNumber}
+                            onClick={() => setPage(pageNumber)}
                             className={`px-5 py-2  ${
-                                pageNumber === p
+                                page === pageNumber
                                     ? "text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue bg-white border border-golemblue"
                                     : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
                             }`}
                         >
-                            {p}
+                            {pageNumber}
                         </button>
                     ))}
                     <button
                         onClick={handleNext}
-                        disabled={pageNumber === totalPages}
+                        disabled={page === lastPage}
                         className={`px-5 py-2  ${
-                            pageNumber === totalPages
+                            page === lastPage
                                 ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed border border-gray-200"
                                 : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
                         }`}
