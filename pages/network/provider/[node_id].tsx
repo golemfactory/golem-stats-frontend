@@ -19,6 +19,7 @@ import Link from "next/link"
 import HardwareBadge from "@/components/HardwareBadge"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
+import TaskStatusChart from "@/components/charts/TaskStatusChart"
 
 const data = [
     {
@@ -271,6 +272,9 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                 <div className="lg:col-span-8 col-span-12">
                     <NodeActivityChart nodeId={nodeData[0].node_id.toLowerCase()} />
                 </div>
+                {/* <div className="lg:col-span-6 col-span-12">
+                    <TaskStatusChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                </div> */}
             </div>
             <SEO
                 title={`${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]} | Golem Network Stats`}

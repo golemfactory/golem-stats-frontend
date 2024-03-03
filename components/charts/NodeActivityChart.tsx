@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { AreaChart, Card } from "@tremor/react"
 import { fetcher } from "@/fetcher"
+import Skeleton from "react-loading-skeleton"
 
 const NodeActivityChart = ({ nodeId }) => {
     const { data, error } = useSWR(`v1/provider/node/${nodeId}/activity`, fetcher, {
@@ -26,7 +27,7 @@ const NodeActivityChart = ({ nodeId }) => {
 
     return (
         <Card className="h-full">
-            <h3 className="text-lg font-medium text-gray-900">Node Activity</h3>
+            <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Node Activity</h3>
             <AreaChart
                 data={chartData}
                 index="date"
