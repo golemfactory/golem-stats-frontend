@@ -20,7 +20,7 @@ const PricingStats = () => {
     if (!metricData || !data)
         return (
             <Card>
-                <div className="relative p-6">
+                <div className="relative px-6 mb-6">
                     <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Provider Pricing</h1>
                     <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
                         The median and average pricing for CPU, Env, and Start based upon the list of providers who received a task in the
