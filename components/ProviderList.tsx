@@ -117,13 +117,9 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
         if (filters.runtime !== "all" && !provider.runtimes?.[filters.runtime]) {
             return false
         }
-        if (filters.sortBy) {
-            return true
-        }
 
         return Object.entries(filters).every(([filterKey, filterValue]) => {
             if (filterValue === null) return true
-
             const properties = provider?.runtimes?.vm?.properties || {}
             let valueToCheck
 
@@ -135,26 +131,24 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     )
                 case "taskReputation":
                     valueToCheck = provider.taskReputation
-                    return valueToCheck >= parseFloat(filterValue)
+                    return valueToCheck !== null ? valueToCheck >= parseFloat(filterValue) : false
                 case "uptime":
                     valueToCheck = provider.uptime
-                    return valueToCheck >= parseFloat(filterValue)
+                    return valueToCheck !== null ? valueToCheck >= parseFloat(filterValue) : false
                 case "runtimes.vm.hourly_price_usd":
                     valueToCheck = provider.runtimes?.[filters.runtime]?.hourly_price_usd ?? provider.runtimes?.vm?.hourly_price_usd
-                    return valueToCheck <= parseFloat(filterValue)
+                    return valueToCheck ? valueToCheck <= parseFloat(filterValue) : false
                 case "golem.inf.cpu.threads":
                     valueToCheck = properties["golem.inf.cpu.threads"]
-                    return valueToCheck === parseInt(filterValue)
+                    return valueToCheck ? valueToCheck === parseInt(filterValue) : false
                 case "golem.inf.mem.gib":
                 case "golem.inf.storage.gib":
                     valueToCheck = parseFloat(properties[filterKey])
                     const tolerance = 0.5
-                    return Math.abs(valueToCheck - parseFloat(filterValue)) <= tolerance
+                    return valueToCheck ? Math.abs(valueToCheck - parseFloat(filterValue)) <= tolerance : false
                 case "network":
                     const isMainnet = properties["golem.com.payment.platform.erc20-mainnet-glm.address"] !== undefined
                     return (filterValue === "Mainnet" && isMainnet) || (filterValue === "Testnet" && !isMainnet)
-                case "showOffline":
-                    return true
                 default:
                     return true
             }
@@ -263,6 +257,8 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                     type="number"
                                     name="reputation"
                                     id="reputation"
+                                    max={100}
+                                    min={0}
                                     onValueChange={(value) => handleNameSearchChange(value, "taskReputation")}
                                     placeholder="Minimum reputation"
                                 />
@@ -280,6 +276,8 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                     type="number"
                                     name="uptime"
                                     id="uptime"
+                                    max={100}
+                                    min={0}
                                     onValueChange={(value) => handleNameSearchChange(value, "uptime")}
                                     placeholder="Minimum uptime percentage"
                                 />
