@@ -70,7 +70,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
             <PostHogProvider apiKey={process.env.NEXT_PUBLIC_POSTHOG_KEY}>
                 <GoogleAnalytics trackPageViews gaMeasurementId="GTM-5WPVB2J" />
                 <SessionProvider session={session} refetchInterval={5 * 58}>
-                    <NextNProgress color="#ffffff" />
+                    <NextNProgress color="#ffffff" showOnShallow={false} />
                     <Navbar />
                     <div className={`mx-auto px-4 sm:px-6 lg:px-8 pb-10 mt-5 `}>
                         <Component {...pageProps} />
