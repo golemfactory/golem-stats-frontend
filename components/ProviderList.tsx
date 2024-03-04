@@ -89,94 +89,11 @@ export const isUpdateNeeded = (updatedAt) => {
 
     return nowInCopenhagen.diff(updatedAtMoment) > twoHours
 }
-import { useEffect } from "react"
-import { useRouter } from "next/router"
+
 export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
     const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 60000, initialData })
-    const router = useRouter()
-    const [initialized, setInitialized] = useState(false)
 
-    const [filters, setFilters] = useState({
-        showOffline: false,
-        runtime: "all",
-        // ... other filter states
-    })
-
-    const updateUrlQuery = () => {
-        const query = {}
-
-        if (filters.showOffline && filters.showOffline.toString() !== router.query.showOffline) {
-            query.showOffline = filters.showOffline
-        }
-        if (filters.runtime && filters.runtime !== router.query.runtime) {
-            query.runtime = filters.runtime
-        }
-
-        if (filters.sortBy && filters.sortBy !== router.query.sortBy) {
-            query.sortBy = filters.sortBy
-        }
-
-        if (filters.nodeIdOrName && filters.nodeIdOrName !== router.query.nodeIdOrName) {
-            query.nodeIdOrName = filters.nodeIdOrName
-        }
-        if (filters.taskReputation && filters.taskReputation !== router.query.taskReputation) {
-            query.taskReputation = filters.taskReputation
-        }
-        if (filters.uptime && filters.uptime !== router.query.uptime) {
-            query.uptime = filters.uptime
-        }
-
-        if (filters.runtimes?.vm?.hourly_price_usd && filters.runtimes.vm.hourly_price_usd !== router.query.runtimes.vm.hourly_price_usd) {
-            query.runtimes.vm.hourly_price_usd = filters.runtimes.vm.hourly_price_usd
-        }
-        if (
-            filters.runtimes?.vm?.properties?.["golem.inf.cpu.threads"] &&
-            filters.runtimes.vm.properties["golem.inf.cpu.threads"] !== router.query.runtimes.vm.properties["golem.inf.cpu.threads"]
-        ) {
-            query.runtimes.vm.properties["golem.inf.cpu.threads"] = filters.runtimes.vm.properties["golem.inf.cpu.threads"]
-        }
-        if (
-            filters.runtimes?.vm?.properties?.["golem.inf.mem.gib"] &&
-            filters.runtimes.vm.properties["golem.inf.mem.gib"] !== router.query.runtimes.vm.properties["golem.inf.mem.gib"]
-        ) {
-            query.runtimes.vm.properties["golem.inf.mem.gib"] = filters.runtimes.vm.properties["golem.inf.mem.gib"]
-        }
-        if (
-            filters.runtimes?.vm?.properties?.["golem.inf.storage.gib"] &&
-            filters.runtimes.vm.properties["golem.inf.storage.gib"] !== router.query.runtimes.vm.properties["golem.inf.storage.gib"]
-        ) {
-            query.runtimes.vm.properties["golem.inf.storage.gib"] = filters.runtimes.vm.properties["golem.inf.storage.gib"]
-        }
-
-        if (Object.keys(query).length > 0) {
-            router.replace(
-                {
-                    pathname: router.pathname,
-                    query: { ...router.query, ...query },
-                },
-                undefined,
-                { shallow: true }
-            )
-        }
-    }
-
-    useEffect(() => {
-        if (router.isReady) {
-            setFilters({
-                showOffline: router.query.showOffline === "true" || false,
-                runtime: router.query.runtime || "all",
-                // ... update other filters based on router.query
-            })
-            setInitialized(true)
-        }
-    }, [router.isReady, router.query])
-
-    // Update URL when filters change
-    useEffect(() => {
-        if (initialized) {
-            updateUrlQuery()
-        }
-    }, [filters, initialized])
+    const [filters, setFilters] = useState({ showOffline: false, runtime: "all" })
 
     const handleFilterChange = useCallback((key, value) => {
         if (key === "showOffline") {
@@ -475,7 +392,10 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         <ReactTooltip
                             id="price-tooltip"
                             place="bottom"
-                            content="This shows the hourly price for the provider at full utilization. Hover over the price for a detailed explanation. The percentage reflects cost comparison to an AWS instance with similar specs: green means cheaper, red means more expensive. Note: No comparison data for GPU providers is available yet."
+                            content="The price of the provider per hour assuming 100% utilization.
+
+
+                            The percentage indicates how much cheaper or more expensive the provider is compared to an AWS instance of similar specs. Green indicates cheaper, red indicates more expensive."
                             className="break-words max-w-64 z-50"
                         />
                     </div>
@@ -485,7 +405,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         <ReactTooltip
                             id="reputation-tooltip"
                             place="bottom"
-                            content="The reputation score measures how well a provider completes tasks when being checked by the reputation system. A score of 100% means the provider did all tasks successfully during this time. A score of 0% shows that the provider didn't complete any tasks successfully. If the score is 'N/A', it usually means the provider hasn't been checked yet, which might be because it's too expensive to do the test."
+                            content="The reputation score assesses if tasks were completed successfully or not while the provider was under evaluation by the reputation system. A score of 1.0 indicates a 100% success rate in task completion during this period, while a score of 0.0 is the lowest possible, reflecting complete failure in task completion. If the score is marked as N/A, it likely means that the provider hasn't been tested, possibly due to the high costs associated with conducting the test."
                             className="break-words max-w-64 z-50"
                         />
                     </div>
@@ -495,7 +415,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         <ReactTooltip
                             id="uptime-tooltip"
                             place="bottom"
-                            content="This shows the provider's total uptime percentage since it was first seen on the network, with ten squares representing the complete time frame. Green squares indicate uptime, while gray squares indicate downtime."
+                            content="The uptime of the provider since it was first seen on the network."
                             className="break-words max-w-64 z-50"
                         />
                     </div>
