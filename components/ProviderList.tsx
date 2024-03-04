@@ -392,10 +392,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         <ReactTooltip
                             id="price-tooltip"
                             place="bottom"
-                            content="The price of the provider per hour assuming 100% utilization.
-
-
-                            The percentage indicates how much cheaper or more expensive the provider is compared to an AWS instance of similar specs. Green indicates cheaper, red indicates more expensive."
+                            content="This shows the hourly price for the provider at full utilization. Hover over the price for a detailed explanation. The percentage reflects cost comparison to an AWS instance with similar specs: green means cheaper, red means more expensive. Note: No comparison data for GPU providers is available yet."
                             className="break-words max-w-64 z-50"
                         />
                     </div>
@@ -405,7 +402,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         <ReactTooltip
                             id="reputation-tooltip"
                             place="bottom"
-                            content="The reputation score assesses if tasks were completed successfully or not while the provider was under evaluation by the reputation system. A score of 1.0 indicates a 100% success rate in task completion during this period, while a score of 0.0 is the lowest possible, reflecting complete failure in task completion. If the score is marked as N/A, it likely means that the provider hasn't been tested, possibly due to the high costs associated with conducting the test."
+                            content="The reputation score measures how well a provider completes tasks when being checked by the reputation system. A score of 100% means the provider did all tasks successfully during this time. A score of 0% shows that the provider didn't complete any tasks successfully. If the score is 'N/A', it usually means the provider hasn't been checked yet, which might be because it's too expensive to do the test."
                             className="break-words max-w-64 z-50"
                         />
                     </div>
@@ -415,7 +412,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         <ReactTooltip
                             id="uptime-tooltip"
                             place="bottom"
-                            content="The uptime of the provider since it was first seen on the network."
+                            content="This shows the provider's total uptime percentage since it was first seen on the network, with ten squares representing the complete time frame. Green squares indicate uptime, while gray squares indicate downtime."
                             className="break-words max-w-64 z-50"
                         />
                     </div>
