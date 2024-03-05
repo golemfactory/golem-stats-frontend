@@ -6,12 +6,14 @@ import { useMemo, useCallback } from "react"
 import moment from "moment-timezone"
 import { TextInput, Select, SelectItem, Card } from "@tremor/react"
 import { Tooltip as ReactTooltip } from "react-tooltip"
-import { RiQuestionLine } from "@remixicon/react"
+import { RiFilterLine, RiQuestionLine, RiTeamLine } from "@remixicon/react"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 import VmRuntimeView from "./VmRuntimeView"
 import VmNvidiaRuntimeView from "./VmNvidiaRuntimeView"
-
+import { Accordion, AccordionBody, AccordionHeader, AccordionList } from "@tremor/react"
+import HardwareFilterModal from "./HardwareFilterModal"
+import FilterDialog from "./FilterDialog"
 const ITEMS_PER_PAGE = 30
 
 const displayPages = (currentPage: number, lastPage: number) => {
@@ -95,21 +97,6 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
 
     const [filters, setFilters] = useState({ showOffline: false, runtime: "all" })
 
-    const handleFilterChange = useCallback((key, value) => {
-        if (key === "showOffline") {
-            value = value === "True"
-        } else if (["sortBy", "runtime"].includes(key)) {
-        } else if (value === "") {
-            value = null
-        }
-        setFilters((prevFilters) => ({ ...prevFilters, [key]: value }))
-        setPage(1)
-    }, [])
-
-    const handleNameSearchChange = (value, filterKey) => {
-        handleFilterChange(filterKey, value)
-    }
-
     const filterProvider = useCallback((provider, filters) => {
         if (!filters.showOffline && !provider.online) {
             return false
@@ -118,17 +105,37 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
             return false
         }
 
+        if (filters.hardware && filters.hardware.length) {
+            const hardwareMatched = filters.hardware.some((hardware) => {
+                const hasHardwareInVm = provider.runtimes?.vm?.properties["golem.inf.cpu.brand"] === hardware
+                const hasHardwareInVmNvidia =
+                    provider.runtimes?.["vm-nvidia"]?.properties["golem.!exp.gap-35.v1.inf.gpu.model"] === hardware
+                return hasHardwareInVm || hasHardwareInVmNvidia
+            })
+            if (!hardwareMatched) return false
+        }
+
         return Object.entries(filters).every(([filterKey, filterValue]) => {
+            if (filterKey === "hardware") return true // Skip hardware as it's already handled
             if (filterValue === null) return true
             const properties = provider?.runtimes?.vm?.properties || {}
             let valueToCheck
 
             switch (filterKey) {
-                case "nodeIdOrName":
-                    return (
-                        provider.node_id.toString().toLowerCase().includes(filterValue.toLowerCase()) ||
-                        properties["golem.node.id.name"]?.toLowerCase().includes(filterValue.toLowerCase())
-                    )
+                case "nodeName":
+                    return properties["golem.node.id.name"]?.toLowerCase().includes(filterValue.toLowerCase())
+                case "providerId":
+                    return provider.node_id.toString().toLowerCase().includes(filterValue.toLowerCase())
+                case "price":
+                    valueToCheck =
+                        filters.runtime === "all"
+                            ? Math.min(
+                                  provider.runtimes?.vm?.hourly_price_usd ?? Infinity,
+                                  provider.runtimes?.["vm-nvidia"]?.hourly_price_usd ?? Infinity
+                              )
+                            : provider.runtimes?.[filters.runtime]?.hourly_price_usd
+                    return valueToCheck !== Infinity ? valueToCheck <= parseFloat(filterValue) : false
+
                 case "taskReputation":
                     valueToCheck = provider.taskReputation
                     return valueToCheck !== null ? valueToCheck >= parseFloat(filterValue) : false
@@ -149,6 +156,8 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                 case "network":
                     const isMainnet = properties["golem.com.payment.platform.erc20-mainnet-glm.address"] !== undefined
                     return (filterValue === "Mainnet" && isMainnet) || (filterValue === "Testnet" && !isMainnet)
+                case "walletAddress":
+                    return provider.wallet.toLowerCase().includes(filterValue.toLowerCase())
                 default:
                     return true
             }
@@ -172,197 +181,31 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
     const handleNext = () => setPage(page < lastPage ? page + 1 : lastPage)
     const handlePrevious = () => setPage(page > 1 ? page - 1 : 1)
     const visiblePages = displayPages(page, lastPage)
+    const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
 
     return (
-        <div className="flex flex-col ">
-            <Card className="pb-9">
-                <h2 className="text-xl mb-2 font-medium  dark:text-gray-300">Filters</h2>
-                <div className="grid grid-cols-1 gap-4">
-                    <div className="flex flex-wrap gap-4 ">
-                        <div>
-                            <label
-                                htmlFor="providerNameOrId"
-                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
-                            >
-                                Node Name or ID
-                            </label>
-                            <div className="mt-2">
-                                <TextInput
-                                    type="text"
-                                    name="providerNameOrId"
-                                    id="providerNameOrId"
-                                    onValueChange={(value) => handleNameSearchChange(value, "nodeIdOrName")}
-                                    placeholder="Search by Name or ID"
-                                />
+        <Card className="flex flex-col ">
+            <div>
+                <div className="fixed z-[99999] bottom-5 right-5">
+                    <div className="flex justify-center">
+                        <button className="golembutton group" onClick={() => setIsFilterDialogOpen(true)}>
+                            <div className="button-content px-2 group-hover:gap-x-2">
+                                <RiFilterLine className="icon h-5 w-5 -ml-2" />
+                                <span className="text">Filter</span>
                             </div>
-                        </div>
-                        <div>
-                            <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter">
-                                Cores
-                            </label>
-                            <div className="mt-2">
-                                <TextInput
-                                    type="number"
-                                    name="cores"
-                                    id="cores"
-                                    onValueChange={(value) => handleNameSearchChange(value, "golem.inf.cpu.threads")}
-                                    placeholder="Number of Cores"
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="memory"
-                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
-                            >
-                                Memory <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
-                            </label>
-
-                            <div className="mt-2">
-                                <TextInput
-                                    type="number"
-                                    name="memory"
-                                    id="memory"
-                                    onValueChange={(value) => handleNameSearchChange(value, "golem.inf.mem.gib")}
-                                    placeholder="Memory in GB"
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label htmlFor="disk" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter">
-                                Disk <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
-                            </label>
-
-                            <div className="mt-2">
-                                <TextInput
-                                    type="number"
-                                    name="disk"
-                                    id="disk"
-                                    onValueChange={(value) => handleNameSearchChange(value, "golem.inf.storage.gib")}
-                                    placeholder="Disk in GB"
-                                />
-                            </div>
-                        </div>
+                        </button>
                     </div>
-                    <div className="flex flex-wrap gap-4">
-                        <div>
-                            <label
-                                htmlFor="reputation"
-                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
-                            >
-                                Reputation
-                            </label>
-                            <div className="mt-2">
-                                <TextInput
-                                    type="number"
-                                    name="reputation"
-                                    id="reputation"
-                                    max={100}
-                                    min={0}
-                                    onValueChange={(value) => handleNameSearchChange(value, "taskReputation")}
-                                    placeholder="Minimum reputation"
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="uptime"
-                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
-                            >
-                                Uptime
-                            </label>
-                            <div className="mt-2">
-                                <TextInput
-                                    type="number"
-                                    name="uptime"
-                                    id="uptime"
-                                    max={100}
-                                    min={0}
-                                    onValueChange={(value) => handleNameSearchChange(value, "uptime")}
-                                    placeholder="Minimum uptime percentage"
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter">
-                                Price ($/Hour)
-                            </label>
-                            <div className="mt-2">
-                                <TextInput
-                                    type="number"
-                                    name="price"
-                                    id="price"
-                                    onValueChange={(value) => handleNameSearchChange(value, "runtimes.vm.hourly_price_usd")}
-                                    placeholder="Maximum price per hour"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label
-                                htmlFor="network"
-                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
-                            >
-                                Network
-                            </label>
-                            <Select
-                                defaultValue="Mainnet"
-                                id="network"
-                                name="network"
-                                className="z-40 mt-2"
-                                onValueChange={(value) => handleNameSearchChange(value, "network")}
-                            >
-                                <SelectItem value="Mainnet">Mainnet</SelectItem>
-                                <SelectItem value="Testnet">Testnet</SelectItem>
-                            </Select>
-                        </div>
-                    </div>
-                    <div className="flex flex-wrap gap-4">
-                        <div>
-                            <label
-                                htmlFor="runtime"
-                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
-                            >
-                                Runtime
-                            </label>
-                            <Select
-                                id="runtime"
-                                name="runtime"
-                                defaultValue="all"
-                                className="z-40 mt-2"
-                                onValueChange={(value) => handleFilterChange("runtime", value)}
-                            >
-                                <SelectItem value="all">All</SelectItem>
-                                <SelectItem value="vm">VM</SelectItem>
-                                <SelectItem value="vm-nvidia">VM Nvidia</SelectItem>
-                            </Select>
-                        </div>
-                    </div>
-
-                    {enableShowingOfflineNodes && (
-                        <div className="flex flex-wrap gap-4">
-                            <div>
-                                <label
-                                    htmlFor="network"
-                                    className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
-                                >
-                                    Show offline nodes
-                                </label>
-                                <Select
-                                    id="showOffline"
-                                    name="showOffline"
-                                    className="z-40 mt-2"
-                                    onValueChange={(value) => handleFilterChange("showOffline", value)}
-                                >
-                                    <SelectItem value="False">False</SelectItem>
-                                    <SelectItem value="True">True</SelectItem>
-                                </Select>
-                            </div>
-                        </div>
-                    )}
                 </div>
-            </Card>
-            <Card>
+                {/* Existing components */}
+                <FilterDialog
+                    isOpen={isFilterDialogOpen}
+                    onClose={() => setIsFilterDialogOpen(false)}
+                    filters={filters}
+                    setFilters={setFilters}
+                    data={rawData}
+                />
+            </div>
+            <div>
                 <div className="grid grid-cols-12 gap-4 px-4 bg-golemblue text-white py-4 my-4 font-medium">
                     <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
                         <p className="font-inter">Provider</p>
@@ -470,7 +313,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         Next
                     </button>
                 </div>
-            </Card>
-        </div>
+            </div>
+        </Card>
     )
 }

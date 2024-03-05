@@ -45,7 +45,7 @@ const customTooltip = ({ active, payload, label }) => {
 }
 
 const NetworkStats = ({ metricData }) => {
-    const [selectedTimeFrame, setSelectedTimeFrame] = useState("1d")
+    const [selectedTimeFrame, setSelectedTimeFrame] = useState("1y")
     const tabs = [
         { name: "Providers", metric: "online", unit: "Providers" },
         { name: "Cores", metric: "cores", unit: "Cores" },
@@ -138,7 +138,7 @@ const NetworkStats = ({ metricData }) => {
                                     color={tab.color}
                                 />
                                 <div className="order-1 md:order-2 pb-8  pt-4">
-                                    <TabGroup>
+                                    <TabGroup defaultIndex={3}>
                                         <TabList variant="solid" className="w-full md:w-fit">
                                             {timeFrames.map((frame) => (
                                                 <Tab
