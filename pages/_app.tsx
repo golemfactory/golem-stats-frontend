@@ -61,7 +61,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
         }
     }, [])
     return (
-        <div>
+        <div className={`${robotoMono.variable} ${inter.variable}`}>
             {!askedForConsent ? (
                 <>
                     <AnalyticsBanner posthog={posthog} setPreviousConsent={setPreviousConsent} setAskedForConsent={setAskedForConsent} />
