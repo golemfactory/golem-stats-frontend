@@ -5,6 +5,9 @@
 .golembutton {
     @apply text-white px-5 py-2 flex items-center bg-golemblue transition duration-300 border border-golemblue;
 }
+.golembutton-noflex {
+    @apply text-white px-5 py-2 bg-golemblue transition duration-300 border border-golemblue;
+}
 
 /* Apply hover styles only to the button being hovered over */
 .golembutton:hover {

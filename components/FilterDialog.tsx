@@ -1,4 +1,4 @@
-import { Dialog, DialogPanel, TextInput, Divider } from "@tremor/react"
+import { Dialog, DialogPanel, TextInput, Divider, Select, SelectItem } from "@tremor/react"
 import { RadioGroup } from "@headlessui/react"
 import { RiCloseLine, RiCheckboxCircleFill } from "@remixicon/react"
 import { useState, useCallback, useEffect, useMemo } from "react"
@@ -127,59 +127,80 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
                             <Divider></Divider>
                             <div className="grid grid-cols-1 gap-4">
                                 {activePreset && (
-                                    <button type="button" className="golembutton w-full" onClick={updatePreset}>
+                                    <button type="button" className="golembutton-noflex w-full" onClick={updatePreset}>
                                         Update preset
                                     </button>
                                 )}
-                                <button onClick={createPreset} className="golembutton w-full">
+                                <button onClick={createPreset} className="golembutton-noflex w-full">
                                     Create New Preset
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div className="flex-1 space-y-6 p-6 md:px-6  md:pt-6">
-                        <div>
-                            <label
-                                htmlFor="nodeName"
-                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
-                            >
-                                Node Name
-                            </label>
-                            <TextInput
-                                name="nodeName"
-                                type="text"
-                                placeholder="random-lurker"
-                                onChange={(e) => handleFilterChange("nodeName", e)}
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    htmlFor="nodeName"
+                                    className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                                >
+                                    Node Name
+                                </label>
+                                <TextInput
+                                    name="nodeName"
+                                    type="text"
+                                    placeholder="random-lurker"
+                                    onChange={(e) => handleFilterChange("nodeName", e)}
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor="providerId"
+                                    className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                                >
+                                    Provider ID
+                                </label>
+                                <TextInput
+                                    name="providerId"
+                                    type="text"
+                                    placeholder="0x.."
+                                    onChange={(e) => handleFilterChange("providerId", e)}
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor="walletAddress"
+                                    className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                                >
+                                    Wallet Address
+                                </label>
+                                <TextInput
+                                    name="walletAddress"
+                                    type="text"
+                                    placeholder="0x.."
+                                    onChange={(e) => handleFilterChange("walletAddress", e)}
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor="network"
+                                    className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
+                                >
+                                    Network
+                                </label>
+                                <Select
+                                    defaultValue="Mainnet"
+                                    id="network"
+                                    name="network"
+                                    className="z-40"
+                                    onValueChange={(e) => handleFilterChange("network", e)}
+                                >
+                                    <SelectItem value="Mainnet">Mainnet</SelectItem>
+                                    <SelectItem value="Testnet">Testnet</SelectItem>
+                                </Select>
+                            </div>
                         </div>
-                        <div>
-                            <label
-                                htmlFor="providerId"
-                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
-                            >
-                                Provider ID
-                            </label>
-                            <TextInput
-                                name="providerId"
-                                type="text"
-                                placeholder="0x.."
-                                onChange={(e) => handleFilterChange("providerId", e)}
-                            />
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="walletAddress"
-                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
-                            >
-                                Wallet Address
-                            </label>
-                            <TextInput
-                                name="walletAddress"
-                                type="text"
-                                placeholder="0x.."
-                                onChange={(e) => handleFilterChange("walletAddress", e)}
-                            />
-                        </div>
+
                         <Divider>Price</Divider>
                         <div className="grid grid-cols-1">
                             <div>
