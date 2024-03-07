@@ -8,26 +8,26 @@ interface NodeOperatorProps {
     initialData: any
 }
 
-export async function getStaticProps({ params }: { params: { wallet_id: string } }) {
-    try {
-        const initialData = await fetcher(`v2/provider/wallet/${params.wallet_id}`)
-        return { props: { wallet_id: params.wallet_id, initialData: initialData }, revalidate: 14400 }
-    } catch (e) {
-        return { props: { wallet_id: params.wallet_id, initialData: {} }, revalidate: 14400 }
-    }
-}
+// export async function getStaticProps({ params }: { params: { wallet_id: string } }) {
+//     try {
+//         const initialData = await fetcher(`v2/provider/wallet/${params.wallet_id}`)
+//         return { props: { wallet_id: params.wallet_id, initialData: initialData }, revalidate: 14400 }
+//     } catch (e) {
+//         return { props: { wallet_id: params.wallet_id, initialData: {} }, revalidate: 14400 }
+//     }
+// }
 
-export async function getStaticPaths() {
-    const nodes: any = await fetcher("v2/network/online") // endpoint to get all wallet_ids
+// export async function getStaticPaths() {
+//     const nodes: any = await fetcher("v2/network/online") // endpoint to get all wallet_ids
 
-    const paths = nodes
-        .filter((node: any) => node.runtimes.vm?.properties && node.runtimes.vm.properties["wallet"] !== undefined) // filter nodes that have both properties object and the wallet property defined
-        .map((node: any) => ({
-            params: { wallet_id: node.runtimes.vm.properties["wallet"].toString() },
-        }))
+//     const paths = nodes
+//         .filter((node: any) => node.runtimes.vm?.properties && node.runtimes.vm.properties["wallet"] !== undefined) // filter nodes that have both properties object and the wallet property defined
+//         .map((node: any) => ({
+//             params: { wallet_id: node.runtimes.vm.properties["wallet"].toString() },
+//         }))
 
-    return { paths, fallback: true }
-}
+//     return { paths, fallback: true }
+// }
 
 const NodeOperator: NextPage<NodeOperatorProps> = ({ wallet_id, initialData }) => {
     return (
