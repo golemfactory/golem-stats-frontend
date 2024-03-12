@@ -84,8 +84,8 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
     }, [activePreset, presets, setFilters])
 
     return (
-        <Dialog open={isOpen} onClose={onClose} className="z-[100]">
-            <DialogPanel className="overflow-visible p-0 sm:max-w-6xl">
+        <Dialog open={isOpen} onClose={onClose} className="z-[100] ">
+            <DialogPanel className="overflow-visible p-0 sm:max-w-6xl bg-transparent ring-none ring-0">
                 <div className="absolute right-0 top-0 pr-3 pt-3">
                     <button
                         type="button"
@@ -96,55 +96,66 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
                         <RiCloseLine className="h-5 w-5" aria-hidden={true} />
                     </button>
                 </div>
-                <div className="flex flex-col md:flex-row">
-                    <div className="md:w-80 md:border-r md:border-tremor-border md:dark:border-dark-tremor-border">
-                        <div className="p-6">
-                            <h3 className="font-medium text-tremor-content-strong text-tremor-title">Filter providers</h3>
-                            <p className="text-tremor-content">Filter nodes by name, provider ID, or wallet address.</p>
-                            <Divider>Presets</Divider>
+                <div className="flex  ">
+                    <div className="md:w-96 md:border-r md:border-t md:border-tremor-border md:dark:border-dark-tremor-border bg-white">
+                        <div className="flex flex-col h-full p-6 justify-between">
+                            <div>
+                                <h3 className="font-medium text-tremor-content-strong text-tremor-title mb-2">Filter Providers</h3>
+                                <p className="text-tremor-content text-sm">
+                                    Customize your search with filters for Provider name, wallet addressses hardware requirements and much
+                                    more. Save these settings as presets for future use.
+                                </p>
 
-                            <div className="gap-2 flex flex-wrap">
-                                {presets.map((preset, idx) => (
-                                    <button
-                                        key={idx}
-                                        value={idx}
-                                        onClick={() => applyPreset(presets[idx])}
-                                        className={`inline-flex items-center gap-2.5 rounded-tremor-default px-2.5 py-1.5 font-medium ${
-                                            activePreset === presets[idx]
-                                                ? "bg-golemblue text-white"
-                                                : "bg-tremor-background-subtle text-tremor-content-strong dark:bg-dark-tremor-background-subtle dark:text-dark-tremor-content-strong"
-                                        }`}
-                                    >
-                                        {preset.name}
+                                <Divider>Presets</Divider>
 
-                                        <RiCloseLine className="h-5 w-5 ml-2" onClick={removeActivePreset} />
-                                    </button>
-                                ))}
+                                <div className="gap-2 flex flex-wrap">
+                                    {presets.map((preset, idx) => (
+                                        <button
+                                            key={idx}
+                                            value={idx}
+                                            onClick={() => applyPreset(presets[idx])}
+                                            className={`inline-flex items-center gap-2.5 rounded-tremor-default px-2.5 py-1.5 font-medium ${
+                                                activePreset === presets[idx]
+                                                    ? "bg-golemblue text-white"
+                                                    : "bg-tremor-background-subtle text-tremor-content-strong dark:bg-dark-tremor-background-subtle dark:text-dark-tremor-content-strong"
+                                            }`}
+                                        >
+                                            {preset.name}
+
+                                            <RiCloseLine className="h-5 w-5 ml-2" onClick={removeActivePreset} />
+                                        </button>
+                                    ))}
+                                    {presets.length === 0 && (
+                                        <p className="text-tremor-content text-sm text-center block w-full mt-[50%]">
+                                            No presets available
+                                        </p>
+                                    )}
+                                </div>
                             </div>
-                            {/* Delete active preset */}
 
-                            {/* Reset filters */}
-                            <Divider></Divider>
-                            <div className="grid grid-cols-1 gap-4">
-                                {activePreset && (
-                                    <button type="button" className="golembutton-noflex w-full" onClick={updatePreset}>
-                                        Update preset
+                            <div>
+                                <Divider></Divider>
+                                <div className="grid grid-cols-1 gap-4">
+                                    {activePreset && (
+                                        <button type="button" className="inverted-golembutton-noflex w-full" onClick={updatePreset}>
+                                            Update Preset
+                                        </button>
+                                    )}
+                                    <button onClick={createPreset} className="golembutton-noflex w-full">
+                                        Save Preset
                                     </button>
-                                )}
-                                <button onClick={createPreset} className="golembutton-noflex w-full">
-                                    Create New Preset
-                                </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className="flex-1 space-y-6 p-6 md:px-6  md:pt-6">
+                    <div className="flex-1 space-y-6 p-6 md:px-6  md:pt-6 bg-white">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label
                                     htmlFor="nodeName"
                                     className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
                                 >
-                                    Node Name
+                                    Provider Name
                                 </label>
                                 <TextInput
                                     name="nodeName"
@@ -229,7 +240,7 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
                                             active
                                                 ? "border-tremor-brand-subtle ring-2 ring-tremor-brand-muted dark:border-dark-tremor-brand-subtle dark:ring-dark-tremor-brand-muted"
                                                 : "border-tremor-border dark:border-dark-tremor-border"
-                                        } bg-tremor-background p-4 transition dark:bg-dark-tremor-background`
+                                        } bg-tremor-background p-2 transition dark:bg-dark-tremor-background`
                                     }
                                 >
                                     {({ checked }) => (
@@ -258,7 +269,7 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
                                             active
                                                 ? "border-tremor-brand-subtle ring-2 ring-tremor-brand-muted dark:border-dark-tremor-brand-subtle dark:ring-dark-tremor-brand-muted"
                                                 : "border-tremor-border dark:border-dark-tremor-border"
-                                        } bg-tremor-background p-4 transition dark:bg-dark-tremor-background`
+                                        } bg-tremor-background p-2 transition dark:bg-dark-tremor-background`
                                     }
                                 >
                                     {({ checked }) => (
@@ -287,7 +298,7 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
                                             active
                                                 ? "border-tremor-brand-subtle ring-2 ring-tremor-brand-muted dark:border-dark-tremor-brand-subtle dark:ring-dark-tremor-brand-muted"
                                                 : "border-tremor-border dark:border-dark-tremor-border"
-                                        } bg-tremor-background p-4 transition dark:bg-dark-tremor-background`
+                                        } bg-tremor-background p-2 transition dark:bg-dark-tremor-background`
                                     }
                                 >
                                     {({ checked }) => (

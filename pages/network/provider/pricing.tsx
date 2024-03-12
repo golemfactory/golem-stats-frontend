@@ -3,6 +3,7 @@ import HistoricalPriceChart from "@/components/charts/HistoricalPrice"
 import { useState } from "react"
 import { SEO } from "@/components/SEO"
 import PricingStats from "@/components/charts/PricingStats"
+import TaskPricingTable from "@/components/charts/TaskPricingTable"
 export default function Home() {
     const [showAnnotations, setShowAnnotations] = useState(false)
 
@@ -24,6 +25,7 @@ export default function Home() {
             />
 
             <PricingStats />
+            <TaskPricingTable />
         </div>
     )
 }

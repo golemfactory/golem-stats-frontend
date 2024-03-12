@@ -2,15 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
+input {
+    @apply bg-tremor-background-graygolem !important;
+}
+
 .golembutton {
-    @apply text-white px-5 py-2 flex items-center bg-golemblue transition duration-300 border border-golemblue;
+    @apply text-white px-5 py-3 flex items-center bg-golemblue transition duration-300 border border-golemblue;
+    @apply font-inter uppercase text-xs;
+    letter-spacing: 0.2em;
+    leading-trim: both;
+    font-weight: 600;
+    text-edge: cap;
 }
 .golembutton-noflex {
-    @apply text-white px-5 py-2 bg-golemblue transition duration-300 border border-golemblue;
+    @apply text-white px-5 py-3 bg-golemblue transition duration-300 border border-golemblue;
+    @apply font-inter uppercase text-xs;
+    letter-spacing: 0.2em;
+    leading-trim: both;
+    font-weight: 600;
+    text-edge: cap;
+}
+
+.inverted-golembutton {
+    @apply text-golemblue px-5 py-3 flex items-center bg-white transition duration-300 border border-golemblue;
+    @apply font-inter uppercase text-xs;
+    letter-spacing: 0.2em;
+    leading-trim: both;
+    font-weight: 600;
+    text-edge: cap;
+}
+
+.inverted-golembutton-noflex {
+    @apply text-golemblue px-5 py-3 bg-white transition duration-300 border border-golemblue;
+    @apply font-inter uppercase text-xs;
+    letter-spacing: 0.2em;
+    leading-trim: both;
+    font-weight: 600;
+    text-edge: cap;
+}
+
+.inverted-golembutton:hover,
+.inverted-golembutton-noflex:hover {
+    @apply hover:bg-golemblue hover:text-white;
 }
 
 /* Apply hover styles only to the button being hovered over */
-.golembutton:hover {
+.golembutton:hover,
+.golembutton-noflex:hover {
     @apply hover:bg-white hover:text-tremor-brand-golemblue;
 }
 
@@ -45,9 +83,18 @@ h2,
 h3,
 h4,
 h5,
-h6,
-button {
+h6 {
     font-family: var(--font-inter) !important;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 130%;
+    /* or 42px */
+    /* leading-trim and text-edge are draft CSS properties.
+
+Read more: https://drafts.csswg.org/css-inline-3/#leading-trim
+*/
+    leading-trim: both;
+    text-edge: cap;
 }
 
 p,

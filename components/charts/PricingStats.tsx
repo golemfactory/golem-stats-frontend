@@ -17,6 +17,10 @@ const PricingStats = () => {
     const [selectedMetric, setSelectedMetric] = useState("Median")
     const tabs = [{ name: "Median" }, { name: "Average" }]
 
+    const isDataValid = (data) => {
+        return !(isNaN(data) || data === null)
+    }
+
     if (!metricData || !data)
         return (
             <Card>
@@ -56,31 +60,36 @@ const PricingStats = () => {
                 <div>
                     <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">The past hour</h3>
                     <div className="flex gap-4">
-                        <div className="flex items-baseline space-x-2">
-                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
-                                {RoundingFunction(data[network][`cpu_${unit.toLowerCase()}`], 3)}
-                            </span>
-                            <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
-                                CPU/h
-                            </span>
-                        </div>
-
-                        <div className="flex items-baseline space-x-2">
-                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
-                                {RoundingFunction(data[network][`env_${unit.toLowerCase()}`], 3)}
-                            </span>
-                            <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
-                                Env/h
-                            </span>
-                        </div>
-                        <div className="flex items-baseline space-x-2">
-                            <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
-                                {RoundingFunction(data[network][`start_${unit.toLowerCase()}`], 3)}
-                            </span>
-                            <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
-                                Start Price
-                            </span>
-                        </div>
+                        {isDataValid(cpuValue) && (
+                            <div className="flex items-baseline space-x-2">
+                                <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
+                                    {RoundingFunction(cpuValue, 3)}
+                                </span>
+                                <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                                    CPU/h
+                                </span>
+                            </div>
+                        )}
+                        {isDataValid(envValue) && (
+                            <div className="flex items-baseline space-x-2">
+                                <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
+                                    {RoundingFunction(envValue, 3)}
+                                </span>
+                                <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                                    Env/h
+                                </span>
+                            </div>
+                        )}
+                        {isDataValid(startValue) && (
+                            <div className="flex items-baseline space-x-2">
+                                <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
+                                    {RoundingFunction(startValue, 3)}
+                                </span>
+                                <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                                    Start Price
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

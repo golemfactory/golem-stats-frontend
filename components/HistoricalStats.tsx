@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { AreaChart, Card, Tab, TabGroup, TabList, TabPanel, TabPanels, Select } from "@tremor/react"
+import { AreaChart, Card, Tab, TabGroup, TabList, TabPanel, TabPanels, Select, SelectItem } from "@tremor/react"
 import { GolemIcon } from "./svg/GolemIcon"
 
 const customTooltip = ({ active, payload, label }) => {
@@ -45,15 +45,17 @@ const customTooltip = ({ active, payload, label }) => {
 }
 
 const NetworkStats = ({ metricData }) => {
+    const [selectedRuntime, setSelectedRuntime] = useState(Object.keys(metricData)[0])
     const [selectedTimeFrame, setSelectedTimeFrame] = useState("1y")
     const tabs = [
         { name: "Providers", metric: "online", unit: "Providers" },
         { name: "Cores", metric: "cores", unit: "Cores" },
         { name: "Memory", metric: "memory", unit: "Terabytes" },
         { name: "Disk", metric: "disk", unit: "Terabytes" },
+        { name: "GPU", metric: "gpus", unit: "GPUs" }, // Added GPUs tab
     ]
-    const timeFrames = Object.keys(metricData)
-    const latest1dData = metricData["1d"][metricData["1d"].length - 1] || {}
+    const timeFrames = Object.keys(metricData[selectedRuntime])
+    const latest1dData = metricData[selectedRuntime]["1d"][metricData[selectedRuntime]["1d"].length - 1] || {}
     const formatDate = (dateString, timeFrame) => {
         const date = new Date(dateString * 1000)
         let formatOptions = {}
@@ -88,7 +90,7 @@ const NetworkStats = ({ metricData }) => {
 
         return date.toLocaleString(navigator.language, formatOptions)
     }
-    const MetricCardSummary = ({ category, data, unit, color }) => {
+    const MetricCardSummary = ({ category, unit }) => {
         const latestDataPoint = latest1dData[category] || 0
         const total = `${Intl.NumberFormat("us").format(latestDataPoint)}`
         return (
@@ -115,6 +117,15 @@ const NetworkStats = ({ metricData }) => {
                     available.
                 </p>
             </div>
+            <div className="px-6 mb-4">
+                <Select value={selectedRuntime} onValueChange={setSelectedRuntime}>
+                    {Object.keys(metricData).map((runtime) => (
+                        <SelectItem key={runtime} value={runtime}>
+                            {runtime}
+                        </SelectItem>
+                    ))}
+                </Select>
+            </div>
 
             <TabGroup>
                 <TabList className="px-6">
@@ -130,31 +141,24 @@ const NetworkStats = ({ metricData }) => {
                 <TabPanels>
                     {tabs.map((tab, index) => (
                         <TabPanel key={index} className="px-6 py-4">
-                            <div className="grid md:flex md:items-start md:justify-between">
-                                <MetricCardSummary
-                                    category={tab.metric}
-                                    data={metricData[selectedTimeFrame]}
-                                    unit={tab.unit}
-                                    color={tab.color}
-                                />
-                                <div className="order-1 md:order-2 pb-8  pt-4">
-                                    <TabGroup defaultIndex={3}>
-                                        <TabList variant="solid" className="w-full md:w-fit">
-                                            {timeFrames.map((frame) => (
-                                                <Tab
-                                                    key={frame}
-                                                    onClick={() => setSelectedTimeFrame(frame)}
-                                                    className="w-full justify-center py-1 ui-selected:text-tremor-content-strong ui-selected:dark:text-dark-tremor-content-strong md:w-fit md:justify-start"
-                                                >
-                                                    {frame}
-                                                </Tab>
-                                            ))}
-                                        </TabList>
-                                    </TabGroup>
-                                </div>
+                            <MetricCardSummary category={tab.metric} unit={tab.unit} />
+                            <div className="order-1 md:order-2 pb-8 pt-4">
+                                <TabGroup defaultIndex={3}>
+                                    <TabList variant="solid" className="w-full md:w-fit">
+                                        {timeFrames.map((frame) => (
+                                            <Tab
+                                                key={frame}
+                                                onClick={() => setSelectedTimeFrame(frame)}
+                                                className="w-full justify-center py-1 ui-selected:text-tremor-content-strong ui-selected:dark:text-dark-tremor-content-strong md:w-fit md:justify-start"
+                                            >
+                                                {frame}
+                                            </Tab>
+                                        ))}
+                                    </TabList>
+                                </TabGroup>
                             </div>
                             <AreaChart
-                                data={metricData[selectedTimeFrame].map((item) => ({
+                                data={metricData[selectedRuntime][selectedTimeFrame].map((item) => ({
                                     ...item,
                                     date: formatDate(item.date, selectedTimeFrame),
                                 }))}
@@ -163,10 +167,11 @@ const NetworkStats = ({ metricData }) => {
                                 showLegend={false}
                                 showGradient={false}
                                 showAnimation={true}
-                                yAxisWidth={38}
-                                valueFormatter={(number) => `${Intl.NumberFormat("us").format(number)}`}
-                                className="h-72"
+                                showTooltip={true}
                                 customTooltip={customTooltip}
+                                yAxisWidth={38}
+                                valueFormatter={(number) => Intl.NumberFormat("us").format(number)}
+                                className="h-72"
                             />
                         </TabPanel>
                     ))}

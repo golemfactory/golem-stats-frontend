@@ -7,6 +7,7 @@ import { fetcher } from "@/fetcher"
 import EarningsCard from "@/components/Earnings"
 import EC2vsGolemPricing from "@/components/cards/EC2ComparePricing"
 import Skeleton from "react-loading-skeleton"
+import ProviderUptimeDonut from "@/components/charts/NetworkProviderUptimeDonut"
 
 export default function Index() {
     const { data: metricsData, error } = useSWR("v2/network/historical/stats", fetcher, {
@@ -30,17 +31,13 @@ export default function Index() {
         <div className="grid gap-y-4">
             {/* New parent grid for NetworkActivity and NetworkStats */}
             <div className="grid grid-cols-12 gap-4 ">
-                <div className="lg:col-span-7 col-span-12 lg:order-none order-2">
+                <div className="lg:col-span-4 col-span-12 lg:order-none order-2">
                     <NetworkActivity />
                 </div>
 
-                <div className="lg:col-span-5 col-span-12 lg:order-none order-1">
+                <div className="lg:col-span-4 col-span-12 lg:order-none order-1">
                     {metricsData ? <NetworkStats metricData={metricsData} /> : <Skeleton height={580} />}
                 </div>
-            </div>
-
-            {/* Remaining components in the layout */}
-            <div className="grid grid-cols-12 gap-4">
                 <div className="lg:col-span-4 col-span-12">
                     {networkEarnings ? (
                         <EarningsCard
@@ -53,6 +50,10 @@ export default function Index() {
                         <Skeleton height={500} />
                     )}
                 </div>
+            </div>
+
+            {/* Remaining components in the layout */}
+            <div className="grid grid-cols-12 gap-4">
                 <div className="lg:col-span-8 col-span-12">
                     {overview ? <EC2vsGolemPricing data={overview} /> : <Skeleton height={500} />}
                 </div>

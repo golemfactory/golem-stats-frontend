@@ -31,6 +31,7 @@ module.exports = {
                         muted: colors.gray[50],
                         subtle: colors.gray[100],
                         DEFAULT: colors.white,
+                        graygolem: "#FAFAFA",
                         emphasis: colors.gray[700],
                     },
                     border: {
@@ -40,7 +41,7 @@ module.exports = {
                         DEFAULT: colors.gray[200],
                     },
                     content: {
-                        subtle: colors.gray[400],
+                        subtle: colors.black,
                         DEFAULT: colors.gray[500],
                         emphasis: colors.gray[700],
                         strong: colors.gray[900],
@@ -102,6 +103,7 @@ module.exports = {
                 "tremor-default": ["0.875rem", { lineHeight: "1.25rem" }],
                 "tremor-title": ["1.125rem", { lineHeight: "1.75rem" }],
                 "tremor-metric": ["1.875rem", { lineHeight: "2.25rem" }],
+                
             },
             fontFamily: {
                 heading: ["Inter", "sans-serif"],

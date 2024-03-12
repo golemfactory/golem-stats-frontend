@@ -47,11 +47,11 @@ const useProviderPagination = (data, sortBy) => {
             if (bHasNvidia && !aHasNvidia) return 1
 
             // Then handle null values in taskReputation by pushing them to the bottom
-            if (a.taskReputation === null) return 1
-            if (b.taskReputation === null) return -1
+            if (a.reputation.taskReputation === null) return 1
+            if (b.reputation.taskReputation === null) return -1
 
             // Finally, sort in descending order by taskReputation
-            return b.taskReputation - a.taskReputation
+            return b.reputation.taskReputation - a.reputation.taskReputation
         })
 
         if (sortBy) {
@@ -59,7 +59,7 @@ const useProviderPagination = (data, sortBy) => {
                 case "price":
                     return sorted.sort((a, b) => a.runtimes.vm?.hourly_price_usd - b.runtimes.vm?.hourly_price_usd)
                 case "reputation":
-                    return sorted.sort((a, b) => b.taskReputation - a.taskReputation)
+                    return sorted.sort((a, b) => b.reputation.taskReputation - a.reputation.taskReputation)
                 case "uptime":
                     return sorted.sort((a, b) => b.uptime - a.uptime)
                 default:
@@ -137,7 +137,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     return valueToCheck !== Infinity ? valueToCheck <= parseFloat(filterValue) : false
 
                 case "taskReputation":
-                    valueToCheck = provider.taskReputation
+                    valueToCheck = provider.reputation.taskReputation
                     return valueToCheck !== null ? valueToCheck >= parseFloat(filterValue) : false
                 case "uptime":
                     valueToCheck = provider.uptime
@@ -184,7 +184,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
     const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
 
     return (
-        <Card className="flex flex-col ">
+        <div className="flex flex-col ">
             <div>
                 <div className="fixed z-[99999] bottom-5 right-5">
                     <div className="flex justify-center">
@@ -314,6 +314,6 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     </button>
                 </div>
             </div>
-        </Card>
+        </div>
     )
 }

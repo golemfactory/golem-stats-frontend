@@ -19,7 +19,7 @@ const VmNvidiaRuntimeView = ({ provider }) => {
                 query: { node_id: provider.node_id },
             }}
             key={provider.id}
-            className="lg:col-span-5 col-span-12 grid grid-cols-12 gap-4 items-center bg-golembackground dark:bg-transparent dark:hover:bg-gray-800 py-4 px-4 hover:bg-gray-200 hover:cursor-pointer dark:border-dark-tremor-border dark:border"
+            className="lg:col-span-5 col-span-12 grid grid-cols-12 gap-4 items-center bg-white dark:bg-transparent dark:hover:bg-gray-800 py-4 px-4 hover:bg-tremor-background-graygolem hover:cursor-pointer dark:border-dark-tremor-border dark:border"
         >
             <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
                 <div className="flex items-center">
@@ -86,7 +86,7 @@ const VmNvidiaRuntimeView = ({ provider }) => {
                 </div>
             </div>
             <div className="lg:col-span-2 col-span-4 lg:flex hidden items-center gap-2">
-                <ReputationIndicator taskReputation={provider.taskReputation} />
+                <ReputationIndicator taskReputation={provider.reputation.taskReputation} />
             </div>
             <div className="lg:col-span-2 col-span-4 flex items-center gap-2">
                 <UptimeDots uptime={provider.uptime} />

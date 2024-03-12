@@ -3,6 +3,7 @@ import IntelIcon from "./svg/IntelIcon"
 import AMDIcon from "./svg/AMDIcon"
 import { CpuChipIcon } from "@heroicons/react/24/solid"
 import { RiCloseLine } from "@remixicon/react"
+import NvidiaIcon from "./svg/NvidiaIcon"
 
 interface HardwareBadgeProps {
     title: string
@@ -22,10 +23,14 @@ const HardwareBadge: React.FC<HardwareBadgeProps> = ({ title, value, icon, showC
             case "AuthenticAMD":
                 icon = <AMDIcon className="h-4 w-4 fill-red-500" />
                 break
+            case "Nvidia":
+                icon = <NvidiaIcon className="h-4 w-4" />
+                break
             default:
                 icon = <CpuChipIcon className="h-4 w-4" />
         }
     }
+    console.log(cpuVendor)
 
     return (
         <div className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-1 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
@@ -42,7 +47,7 @@ const HardwareBadge: React.FC<HardwareBadgeProps> = ({ title, value, icon, showC
             {onClose && (
                 <button
                     onClick={onClose}
-                    className="ml-auto -mr-1.5 flex h-5 w-5 items-center justify-center rounded-full text-tremor-content hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis"
+                    className="ml-auto  flex h-5 w-5 items-center justify-center  text-tremor-content hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis"
                     aria-label="Remove"
                 >
                     <RiCloseLine className="h-4 w-4" />
