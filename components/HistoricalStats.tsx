@@ -2,6 +2,16 @@ import { useState } from "react"
 import { AreaChart, Card, Tab, TabGroup, TabList, TabPanel, TabPanels, Select, SelectItem } from "@tremor/react"
 import { GolemIcon } from "./svg/GolemIcon"
 
+function getProviderType(name: string): string {
+    if (name === "vm-nvidia") {
+        return "GPU"
+    } else if (name === "vm") {
+        return "CPU"
+    } else {
+        return name
+    }
+}
+
 const customTooltip = ({ active, payload, label }) => {
     if (!active || !payload) return null
     const categoryPayload = payload[0]
@@ -45,7 +55,7 @@ const customTooltip = ({ active, payload, label }) => {
 }
 
 const NetworkStats = ({ metricData }) => {
-    const [selectedRuntime, setSelectedRuntime] = useState(Object.keys(metricData)[0])
+    const [selectedRuntime, setSelectedRuntime] = useState(Object.keys(metricData)[2])
     const [selectedTimeFrame, setSelectedTimeFrame] = useState("1y")
     const tabs = [
         { name: "Providers", metric: "online", unit: "Providers" },
@@ -84,6 +94,8 @@ const NetworkStats = ({ metricData }) => {
             case "All":
                 formatOptions = {
                     year: "numeric",
+                    month: "short",
+                    day: "numeric",
                 }
                 break
         }
@@ -110,53 +122,66 @@ const NetworkStats = ({ metricData }) => {
 
     return (
         <Card>
-            <div className="px-6 mb-6">
-                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network Statistics</h1>
-                <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                    Overview of Golem Network's capacity, with real-time and trend data for providers online, cores, memory, and disk space
-                    available.
-                </p>
-            </div>
-            <div className="px-6 mb-4">
-                <Select value={selectedRuntime} onValueChange={setSelectedRuntime}>
-                    {Object.keys(metricData).map((runtime) => (
-                        <SelectItem key={runtime} value={runtime}>
-                            {runtime}
-                        </SelectItem>
-                    ))}
-                </Select>
+            <div className="flex flex-col md:flex-row justify-between items-start">
+                <div className="px-6 mb-6">
+                    <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network Statistics</h1>
+                    <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                        Overview of Golem Network's capacity per provider type, with real-time and trend data for providers online, cores,
+                        memory, disk space and GPU's available.
+                    </p>
+                </div>
+                <div className="px-6 mb-4">
+                    <label htmlFor="runtime" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter">
+                        Runtime
+                    </label>
+                    <Select value={selectedRuntime} onValueChange={setSelectedRuntime}>
+                        {Object.keys(metricData)
+                            .sort((a, b) => getProviderType(a).localeCompare(getProviderType(b)))
+                            .map((runtime) => (
+                                <SelectItem key={runtime} value={runtime}>
+                                    {getProviderType(runtime)}
+                                </SelectItem>
+                            ))}
+                    </Select>
+                </div>
             </div>
 
             <TabGroup>
                 <TabList className="px-6">
-                    {tabs.map((tab, index) => (
-                        <Tab
-                            key={index}
-                            className="font-medium hover:border-tremor-content-subtle dark:hover:border-dark-tremor-content-subtle dark:hover:text-dark-tremor-content"
-                        >
-                            {tab.name}
-                        </Tab>
-                    ))}
+                    {tabs
+                        .filter((tab) => selectedRuntime === "vm-nvidia" || tab.name !== "GPU")
+                        .map((tab, index) => (
+                            <Tab
+                                key={index}
+                                className="font-medium hover:border-tremor-content-subtle dark:hover:border-dark-tremor-content-subtle dark:hover:text-dark-tremor-content"
+                            >
+                                {tab.name}
+                            </Tab>
+                        ))}
                 </TabList>
+
                 <TabPanels>
                     {tabs.map((tab, index) => (
-                        <TabPanel key={index} className="px-6 py-4">
-                            <MetricCardSummary category={tab.metric} unit={tab.unit} />
-                            <div className="order-1 md:order-2 pb-8 pt-4">
-                                <TabGroup defaultIndex={3}>
-                                    <TabList variant="solid" className="w-full md:w-fit">
-                                        {timeFrames.map((frame) => (
-                                            <Tab
-                                                key={frame}
-                                                onClick={() => setSelectedTimeFrame(frame)}
-                                                className="w-full justify-center py-1 ui-selected:text-tremor-content-strong ui-selected:dark:text-dark-tremor-content-strong md:w-fit md:justify-start"
-                                            >
-                                                {frame}
-                                            </Tab>
-                                        ))}
-                                    </TabList>
-                                </TabGroup>
+                        <TabPanel key={index}>
+                            <div className="grid md:flex md:items-start md:justify-between px-6 py-4">
+                                <MetricCardSummary category={tab.metric} unit={tab.unit} />
+                                <div className="order-1 md:order-2 pb-8 pt-4">
+                                    <TabGroup defaultIndex={3}>
+                                        <TabList variant="solid" className="w-full md:w-fit">
+                                            {timeFrames.map((frame) => (
+                                                <Tab
+                                                    key={frame}
+                                                    onClick={() => setSelectedTimeFrame(frame)}
+                                                    className="w-full justify-center py-1 ui-selected:text-tremor-content-strong ui-selected:dark:text-dark-tremor-content-strong md:w-fit md:justify-start"
+                                                >
+                                                    {frame}
+                                                </Tab>
+                                            ))}
+                                        </TabList>
+                                    </TabGroup>
+                                </div>
                             </div>
+
                             <AreaChart
                                 data={metricData[selectedRuntime][selectedTimeFrame].map((item) => ({
                                     ...item,

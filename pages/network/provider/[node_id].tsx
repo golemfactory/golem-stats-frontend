@@ -474,7 +474,7 @@ export async function getStaticProps({ params }: { params: { node_id: string } }
 }
 
 export async function getStaticPaths() {
-    const nodes: any = await fetcher("v1/network/online") // endpoint to get all node_ids
+    const nodes: any = await fetcher("v2/network/online") // endpoint to get all node_ids
     const paths = nodes.map((node: any) => ({
         params: { node_id: node.node_id.toString().toLowerCase() },
     }))
