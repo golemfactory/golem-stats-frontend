@@ -72,6 +72,8 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
         runtimes: {
             vm?: any
             wasmtime?: any
+            automatic?: any
+            "vm-nvidia"?: any
         }
     }
 
@@ -79,7 +81,10 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 
     // Assuming PriceHashmap returns a specific type, replace 'any' with that type
     function priceHashMapOrDefault(provider: Provider, usage: Usage): any {
-        const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
+        const runtime = provider.runtimes.vm || provider.runtimes.wasmtime || provider.runtimes.automatic || provider.runtimes["vm-nvidia"]
+        if (!runtime) {
+            return "N/A"
+        }
         return PriceHashmap(runtime.properties, usage)
     }
 
@@ -525,7 +530,7 @@ export async function getStaticProps({ params }: { params: { node_id: string } }
 }
 
 export async function getStaticPaths() {
-    const nodes: any = await fetcher("v1/network/online") // endpoint to get all node_ids
+    const nodes: any = await fetcher("v2/network/online") // endpoint to get all node_ids
     const paths = nodes.map((node: any) => ({
         params: { node_id: node.node_id.toString().toLowerCase() },
     }))
