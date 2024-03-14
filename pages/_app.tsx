@@ -62,7 +62,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                     <div className="mx-auto px-4 sm:px-6 lg:px-8 pb-10 mt-5 ">
                         <Component {...pageProps} />
 
-                        {/* <Banner title="We are currently updating our infrastructure responsible for collecting metrics. This can cause instability on the stats page." /> */}
+                        <Banner title="Service on our stats page is currently degraded. We are working on a fix. Thank you for your patience." />
                     </div>
                 </SessionProvider>
             </PostHogProvider>
