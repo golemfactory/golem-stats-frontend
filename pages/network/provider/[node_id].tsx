@@ -122,6 +122,8 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
         runtimes: {
             vm?: any
             wasmtime?: any
+            automatic?: any
+            "vm-nvidia"?: any
         }
     }
 
@@ -129,7 +131,9 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 
     // Assuming PriceHashmap returns a specific type, replace 'any' with that type
     function priceHashMapOrDefault(provider: Provider, usage: Usage): any {
-        const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
+        console.log(provider)
+        const runtime = provider.runtimes.vm || provider.runtimes.wasmtime || provider.runtimes.automatic || provider.runtimes["vm-nvidia"]
+        if (!runtime) return "N/A"
         return PriceHashmap(runtime.properties, usage)
     }
 
