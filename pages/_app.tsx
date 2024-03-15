@@ -62,7 +62,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                     <div className="mx-auto px-4 sm:px-6 lg:px-8 pb-10 mt-5 ">
                         <Component {...pageProps} />
 
-                        <Banner title="Service on our stats page is currently degraded. We are working on a fix. Thank you for your patience." />
+                        <Banner title="Stats page maintenance at 11:00 CET; stats will be unavailable for up to 6 hours. Network remains operational." />
                     </div>
                 </SessionProvider>
             </PostHogProvider>
