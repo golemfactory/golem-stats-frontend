@@ -15,7 +15,7 @@ type Series = { data: number[][]; name: string }
 
 const NodeActivityChart = ({ nodeId }: { nodeId: string }) => {
     const { data, error } = useSWR(`v1/provider/node/${nodeId}/activity`, fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 30000,
     })
     const [series, setSeries] = useState<Series[]>([])
 
