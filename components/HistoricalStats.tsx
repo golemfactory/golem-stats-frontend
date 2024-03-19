@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AreaChart, Card, Tab, TabGroup, TabList, TabPanel, TabPanels, Select, SelectItem } from "@tremor/react"
 import { GolemIcon } from "./svg/GolemIcon"
 
@@ -55,17 +55,19 @@ const customTooltip = ({ active, payload, label }) => {
 }
 
 const NetworkStats = ({ metricData }) => {
-    const [selectedRuntime, setSelectedRuntime] = useState(Object.keys(metricData)[2])
+    const [selectedRuntime, setSelectedRuntime] = useState("vm" in metricData ? "vm" : Object.keys(metricData)[0])
     const [selectedTimeFrame, setSelectedTimeFrame] = useState("1y")
+    const [colorClass, setColorClass] = useState("")
     const tabs = [
         { name: "Providers", metric: "online", unit: "Providers" },
         { name: "Cores", metric: "cores", unit: "Cores" },
         { name: "Memory", metric: "memory", unit: "Terabytes" },
         { name: "Disk", metric: "disk", unit: "Terabytes" },
-        { name: "GPU", metric: "gpus", unit: "GPUs" }, // Added GPUs tab
+        { name: "GPU", metric: "gpus", unit: "GPUs" },
     ]
     const timeFrames = Object.keys(metricData[selectedRuntime])
     const latest1dData = metricData[selectedRuntime]["1d"][metricData[selectedRuntime]["1d"].length - 1] || {}
+    const previousData = metricData[selectedRuntime]["1d"][metricData[selectedRuntime]["1d"].length - 2] || {}
     const formatDate = (dateString, timeFrame) => {
         const date = new Date(dateString * 1000)
         let formatOptions = {}
@@ -102,15 +104,30 @@ const NetworkStats = ({ metricData }) => {
 
         return date.toLocaleString(navigator.language, formatOptions)
     }
+    useEffect(() => {
+        const latestValue = latest1dData[tabs[0].metric] || 0
+        const previousValue = previousData[tabs[0].metric] || 0
+
+        if (latestValue > previousValue) {
+            setColorClass("text-green-500")
+        } else if (latestValue < previousValue) {
+            setColorClass("text-red-500")
+        }
+
+        const timer = setTimeout(() => setColorClass("dark:text-dark-tremor-content-metric"), 700) // Revert back after 1 second
+
+        return () => clearTimeout(timer)
+    }, [latest1dData, previousData])
+
     const MetricCardSummary = ({ category, unit }) => {
         const latestDataPoint = latest1dData[category] || 0
         const total = `${Intl.NumberFormat("us").format(latestDataPoint)}`
         return (
-            <div className="flex justify-between">
+            <div className={`flex justify-between ${colorClass}`}>
                 <div>
                     <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">Right now</h3>
                     <div className="flex items-baseline space-x-2">
-                        <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">{total}</span>
+                        <span className={`text-tremor-metric font-semibold ${colorClass}`}>{total}</span>
                         <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
                             {unit}
                         </span>

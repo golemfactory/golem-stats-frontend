@@ -8,10 +8,14 @@ import EarningsCard from "@/components/Earnings"
 import EC2vsGolemPricing from "@/components/cards/EC2ComparePricing"
 import Skeleton from "react-loading-skeleton"
 import ProviderUptimeDonut from "@/components/charts/NetworkProviderUptimeDonut"
+import OnlineStats from "@/components/charts/OnlineStats"
+import { NetworkVersionAdoption } from "@/components/charts/NetworkVersions"
+import { NetworkCpuArchitectureChart } from "@/components/charts/NetworkCPUArchitecture"
+import { NetworkCPUVendorDistribution } from "@/components/charts/VendorChart"
 
 export default function Index() {
     const { data: metricsData, error } = useSWR("v2/network/historical/stats", fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 1000,
     })
     const { data: networkEarnings, error: networkEarningsError } = useSWR("v1/network/earnings/overview", fetcher, {
         refreshInterval: 10000,
@@ -29,14 +33,26 @@ export default function Index() {
     ]
     return (
         <div className="grid gap-y-4">
+            {/* <div className="grid grid-cols-4">
+                <OnlineStats />
+            </div> */}
             {/* New parent grid for NetworkActivity and NetworkStats */}
             <div className="grid grid-cols-12 gap-4 ">
-                <div className="lg:col-span-4 col-span-12 lg:order-none order-2">
+                <div className="lg:col-span-7 col-span-12 lg:order-none order-2">
                     <NetworkActivity />
                 </div>
 
-                <div className="lg:col-span-4 col-span-12 lg:order-none order-1">
+                <div className="lg:col-span-5 col-span-12 lg:order-none order-1">
                     {metricsData ? <NetworkStats metricData={metricsData} /> : <Skeleton height={580} />}
+                </div>
+                <div className="col-span-12">
+                    <NetworkVersionAdoption />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <NetworkCpuArchitectureChart />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <NetworkCPUVendorDistribution />
                 </div>
                 <div className="lg:col-span-4 col-span-12">
                     {networkEarnings ? (

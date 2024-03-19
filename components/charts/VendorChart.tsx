@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import useSWR from "swr"
 import { Card, Divider, DonutChart, List, ListItem, Color } from "@tremor/react"
 import { fetcher } from "@/fetcher"
@@ -6,40 +6,15 @@ import { fetcher } from "@/fetcher"
 const valueFormatter = (number) => number.toString()
 
 export const NetworkCPUVendorDistribution: React.FC = () => {
-    const { data: apiResponse } = useSWR("v2/network/online", fetcher, {
+    const { data: apiResponse } = useSWR("v2/network/stats/cpuvendor", fetcher, {
         refreshInterval: 10000,
     })
 
-    const [chartData, setChartData] = useState([
-        { name: "Intel", amount: 0, color: "#0000F9" as Color },
-        { name: "AMD", amount: 0, color: "rgb(234, 53, 70)" as Color },
-        { name: "Other", amount: 0, color: "#8b07cd" as Color },
-    ])
-
-    useEffect(() => {
-        let intelCount = 0
-        let amdCount = 0
-        let thirdTypeCpu = 0
-
-        apiResponse?.forEach((obj) => {
-            const vendor = obj.runtimes?.vm?.properties["golem.inf.cpu.vendor"]
-            if (vendor) {
-                if (vendor === "GenuineIntel") {
-                    intelCount++
-                } else if (vendor === "AuthenticAMD") {
-                    amdCount++
-                } else {
-                    thirdTypeCpu++
-                }
-            }
-        })
-
-        setChartData([
-            { name: "Intel", amount: intelCount, color: "#0000F9" as Color },
-            { name: "AMD", amount: amdCount, color: "rgb(234, 53, 70)" as Color },
-            { name: "Other", amount: thirdTypeCpu, color: "#8b07cd" as Color },
-        ])
-    }, [apiResponse])
+    const chartData = Object.entries(apiResponse || {}).map(([name, amount]) => ({
+        name: name === "GenuineIntel" ? "Intel" : name === "AuthenticAMD" ? "AMD" : "Other",
+        amount,
+        color: name === "GenuineIntel" ? "#0000F9" : name === "AuthenticAMD" ? "rgb(234, 53, 70)" : "#8b07cd",
+    }))
 
     return (
         <Card className="h-full">
@@ -52,10 +27,10 @@ export const NetworkCPUVendorDistribution: React.FC = () => {
             <Divider />
             <DonutChart
                 className="mt-8"
-                data={chartData.map((item) => ({ ...item, amount: item.amount }))}
+                data={chartData}
                 category="amount"
                 index="name"
-                colors={["blue", "red", "indigo"]}
+                colors={["blue-700", "red-600", "indigo"]}
                 showAnimation={true}
                 valueFormatter={valueFormatter}
                 showTooltip={true}

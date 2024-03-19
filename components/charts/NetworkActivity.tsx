@@ -9,6 +9,7 @@ import "react-loading-skeleton/dist/skeleton.css"
 export const NetworkActivity: React.FC = () => {
     const [data, setData] = useState([])
     const [loaded, setLoaded] = useState<boolean>(false)
+    const [colorClass, setColorClass] = useState("dark:text-dark-tremor-content-metric")
 
     const response = useSWR("v1/network/utilization", fetcher, {
         refreshInterval: 10000,
@@ -27,7 +28,19 @@ export const NetworkActivity: React.FC = () => {
 
     useEffect(() => {
         if (response.data) {
-            setData(extractChartData(response.data))
+            const newData = extractChartData(response.data)
+            if (data.length > 0 && newData.length > 0) {
+                const latestValue = newData[newData.length - 1]["Providers computing"]
+                const previousValue = data[data.length - 1]["Providers computing"]
+                setColorClass("dark:text-dark-tremor-content-metric") // Reset to default first
+                if (latestValue > previousValue) {
+                    setColorClass("text-green-500")
+                } else if (latestValue < previousValue) {
+                    setColorClass("text-red-500")
+                }
+                setTimeout(() => setColorClass("dark:text-dark-tremor-content-metric"), 1000) // Revert after 1 sec
+            }
+            setData(newData)
             setLoaded(true)
         }
     }, [response.data])
@@ -52,7 +65,7 @@ export const NetworkActivity: React.FC = () => {
                                     Right now
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
+                                    <span className={`text-tremor-metric font-semibold font-inter ${colorClass}`}>
                                         {loaded ? data[data.length - 1]["Providers computing"] : <Skeleton width={40} height={30} />}
                                     </span>
                                     <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
