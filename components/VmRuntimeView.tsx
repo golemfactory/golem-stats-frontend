@@ -23,7 +23,7 @@ const VmRuntimeView = ({ provider }) => {
     return (
         <Link
             href={{
-                pathname: "/network/provider/[node_id]",
+                pathname: `/network/provider/${provider.node_id}`,
                 query: { node_id: provider.node_id },
             }}
             key={provider.id}

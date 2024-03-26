@@ -26,59 +26,24 @@ import MemoryRandMultiChart from "@/components/charts/MemoryRandMultiChart"
 import DiskFileIoSeqChart from "@/components/charts/DiskFileIoSeqChart"
 import DiskFileIoRandChart from "@/components/charts/DiskFileIoRandChart"
 import NetworkPerformanceChart from "@/components/charts/NetworkPerformanceChart"
-
-const data = [
-    {
-        name: "Total Earnings",
-        stat: "156.384",
-        activities: [
-            {
-                type: "Today",
-                share: "25.5%",
-                zone: "0.01238",
-                href: "#",
-            },
-            {
-                type: "7 Days",
-                share: "35.3%",
-                zone: "2.384",
-                href: "#",
-            },
-            {
-                type: "30 Days",
-                share: "14.2%",
-                zone: "5.283",
-                href: "#",
-            },
-            {
-                type: "90 Days",
-                share: "25.0%",
-                zone: "100.328",
-                href: "#",
-            },
-        ],
-    },
-]
+import TaskParticipationTable from "@/components/TaskParticipationTable"
 
 export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: object; initialIncome: object }) => {
     const router = useRouter()
-    let { node_id } = router.query
+    let node_id = router.query.node_id as string
+
+    if (!node_id) {
+        return <div>Provider not found</div>
+    }
+
+    node_id = node_id.toLowerCase()
     const { data: session } = useSession()
     const [open, setOpen] = useState(false)
 
-    // if node_id is an array, use the first value
-    if (Array.isArray(node_id)) {
-        node_id = node_id[0].toLowerCase()
-    }
-
-    const { data: nodeData = initialData, error: nodeError } = useSWR(
-        node_id ? `v2/provider/node/${node_id.toLowerCase()}` : null,
-        fetcher,
-        {
-            initialData: initialData,
-            refreshInterval: 10000,
-        }
-    )
+    const { data: nodeData = initialData, error: nodeError } = useSWR(node_id ? `v2/provider/node/${node_id}` : null, fetcher, {
+        initialData: initialData,
+        refreshInterval: 10000,
+    })
 
     type Provider = {
         runtimes: {
@@ -199,28 +164,31 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                     </div>
                 </Card>
                 <div className="lg:col-span-8 col-span-12">
-                    <NodeActivityChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                    <NodeActivityChart nodeId={node_id} />
                 </div>
                 <div className="lg:col-span-6 col-span-12">
-                    <CPUPerformanceChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                    <CPUPerformanceChart nodeId={node_id} />
                 </div>
                 <div className="lg:col-span-6 col-span-12">
-                    <MemorySeqChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                    <MemorySeqChart nodeId={node_id} />
                 </div>
                 <div className="lg:col-span-6 col-span-12">
-                    <MemoryRandMultiChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                    <MemoryRandMultiChart nodeId={node_id} />
                 </div>
                 <div className="lg:col-span-6 col-span-12">
-                    <DiskFileIoSeqChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                    <DiskFileIoSeqChart nodeId={node_id} />
                 </div>
                 <div className="lg:col-span-6 col-span-12">
-                    <DiskFileIoRandChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                    <DiskFileIoRandChart nodeId={node_id} />
                 </div>
                 <div className="lg:col-span-6 col-span-12">
-                    <NetworkPerformanceChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                    <NetworkPerformanceChart nodeId={node_id} />
+                </div>
+                <div className="col-span-8">
+                    <TaskParticipationTable nodeId={node_id} />
                 </div>
                 {/* <div className="lg:col-span-6 col-span-12">
-                    <TaskStatusChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                    <TaskStatusChart nodeId={node_id} />
                 </div> */}
             </div>
             <SEO
