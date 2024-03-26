@@ -12,7 +12,7 @@ export const NetworkActivity: React.FC = () => {
     const [colorClass, setColorClass] = useState("dark:text-dark-tremor-content-metric")
 
     const response = useSWR("v1/network/utilization", fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 1000,
     })
 
     const extractChartData = (apiData) => {

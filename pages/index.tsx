@@ -12,6 +12,10 @@ import OnlineStats from "@/components/charts/OnlineStats"
 import { NetworkVersionAdoption } from "@/components/charts/NetworkVersions"
 import { NetworkCpuArchitectureChart } from "@/components/charts/NetworkCPUArchitecture"
 import { NetworkCPUVendorDistribution } from "@/components/charts/VendorChart"
+import { TxAnalysis } from "@/components/charts/PaymentsOnVsOffGolem"
+import { TxVolumeAnalysis } from "@/components/charts/TransactionVolume"
+import { TxTypeCountAnalysis } from "@/components/charts/TxSingleVSBatched"
+import { TxAverageValueAnalysis } from "@/components/charts/TxAverageValue"
 
 export default function Index() {
     const { data: metricsData, error } = useSWR("v2/network/historical/stats", fetcher, {
@@ -65,6 +69,18 @@ export default function Index() {
                     ) : (
                         <Skeleton height={500} />
                     )}
+                </div>
+                <div className="col-span-12">
+                    <TxAnalysis />
+                </div>
+                <div className="col-span-12">
+                    <TxVolumeAnalysis />
+                </div>
+                <div className="col-span-12">
+                    <TxTypeCountAnalysis />
+                </div>
+                <div className="col-span-12">
+                    <TxAverageValueAnalysis />
                 </div>
             </div>
 

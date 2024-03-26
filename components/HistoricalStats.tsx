@@ -7,6 +7,8 @@ function getProviderType(name: string): string {
         return "GPU"
     } else if (name === "vm") {
         return "CPU"
+    } else if (name === "automatic") {
+        return "AI Provider"
     } else {
         return name
     }

@@ -30,7 +30,6 @@ const HardwareBadge: React.FC<HardwareBadgeProps> = ({ title, value, icon, showC
                 icon = <CpuChipIcon className="h-4 w-4" />
         }
     }
-    console.log(cpuVendor)
 
     return (
         <div className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-1 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">

@@ -14,12 +14,18 @@ import { isUpdateNeeded } from "@/components/ProviderList"
 import { ProviderUptimeTrackerComponent } from "@/components/charts/ProviderUptimeTracker"
 import { Button, Card, Divider } from "@tremor/react"
 import { RiSearch2Line, RiTeamLine } from "@remixicon/react"
-import PolygonScanIcon from "@/components/svg/Polygonsscan"
 import Link from "next/link"
 import HardwareBadge from "@/components/HardwareBadge"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 import TaskStatusChart from "@/components/charts/TaskStatusChart"
+import EarningsBlock from "@/components/cards/EarningsBlock"
+import CPUPerformanceChart from "@/components/charts/CPUPerformanceChart"
+import MemorySeqChart from "@/components/charts/MemorySeqChart"
+import MemoryRandMultiChart from "@/components/charts/MemoryRandMultiChart"
+import DiskFileIoSeqChart from "@/components/charts/DiskFileIoSeqChart"
+import DiskFileIoRandChart from "@/components/charts/DiskFileIoRandChart"
+import NetworkPerformanceChart from "@/components/charts/NetworkPerformanceChart"
 
 const data = [
     {
@@ -54,45 +60,6 @@ const data = [
     },
 ]
 
-const useIncome = (node_id: string | undefined, initialIncome: object) => {
-    const { data, error } = useSWR(node_id ? `v1/provider/node/${node_id.toLowerCase()}/earnings` : null, fetcher, {
-        initialData: initialIncome,
-        refreshInterval: 10000,
-    })
-
-    const formattedIncome: { [key: string]: number } = {}
-
-    if (data) {
-        const keys = Object.keys(data)
-
-        keys.forEach((key) => {
-            formattedIncome[key] = RoundingFunction(parseFloat(data[key]), 10)
-        })
-    }
-
-    return { income: formattedIncome, error }
-}
-
-const EarningsBlock = ({ date, earnings }: { date: string; earnings: string }) => {
-    return (
-        <li className="relative flex w-full items-center space-x-3 rounded-tremor-small bg-tremor-background-subtle/60 p-1 hover:bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle/60 hover:dark:bg-dark-tremor-background-subtle">
-            <div className="flex w-full py-1.5 px-1.5 items-center justify-between space-x-4 truncate text-tremor-default font-medium">
-                <span className="truncate text-tremor-content dark:text-dark-tremor-content">
-                    <div className="focus:outline-none">
-                        {/* Extend link to entire card */}
-                        <span className="absolute inset-0" aria-hidden={true} />
-                        <h3>{date}</h3>
-                    </div>
-                </span>
-                <div className="pr-1.5 text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                    {earnings}
-                    <span className="text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue"> GLM</span>
-                </div>
-            </div>
-        </li>
-    )
-}
-
 export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: object; initialIncome: object }) => {
     const router = useRouter()
     let { node_id } = router.query
@@ -112,11 +79,6 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
             refreshInterval: 10000,
         }
     )
-
-    const { income: updatedIncome, error: incomeError } = useIncome(node_id, initialIncome)
-
-    if (nodeError || incomeError) return <div>Failed to load</div>
-    if (!nodeData || !updatedIncome) return <Skeleton height={900} />
 
     type Provider = {
         runtimes: {
@@ -165,43 +127,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                 </div>
 
                 <div className="grid grid-cols-1 col-span-12 lg:col-span-4 gap-4 h-full ">
-                    <Card>
-                        <div className="flex justify-between">
-                            <div>
-                                <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                                    Total Earnings
-                                </h3>
-                                <p className="flex items-baseline space-x-2 text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                                    <span className="text-tremor-metric font-semibold">{RoundingFunction(nodeData[0].earnings_total)}</span>
-                                    <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
-                                        GLM
-                                    </span>
-                                </p>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="flex justify-center">
-                                    <Link
-                                        className="golembutton"
-                                        href={`https://polygonscan.com/address/${nodeData[0].wallet}#tokentxns`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        <PolygonScanIcon className="h-5 w-5 mr-2 -ml-2" />
-                                        Polygonscan
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                        <p className="items-space mt-6 flex justify-between text-tremor-label text-tremor-content dark:text-dark-tremor-content">
-                            <span>Overview</span>
-                        </p>
-                        <ul role="list" className="mt-2 space-y-2">
-                            <EarningsBlock date="Today" earnings={RoundingFunction(updatedIncome["24"])} />
-                            <EarningsBlock date="7 Days" earnings={RoundingFunction(updatedIncome["168"])} />
-                            <EarningsBlock date="30 Days" earnings={RoundingFunction(updatedIncome["720"])} />
-                            <EarningsBlock date="90 Days" earnings={RoundingFunction(updatedIncome["2160"])} />
-                        </ul>
-                    </Card>
+                    <EarningsBlock walletAddress={nodeData[0].wallet} />
                 </div>
             </div>
             <div className="grid grid-cols-12 gap-4">
@@ -275,6 +201,24 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                 <div className="lg:col-span-8 col-span-12">
                     <NodeActivityChart nodeId={nodeData[0].node_id.toLowerCase()} />
                 </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <CPUPerformanceChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <MemorySeqChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <MemoryRandMultiChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <DiskFileIoSeqChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <DiskFileIoRandChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <NetworkPerformanceChart nodeId={nodeData[0].node_id.toLowerCase()} />
+                </div>
                 {/* <div className="lg:col-span-6 col-span-12">
                     <TaskStatusChart nodeId={nodeData[0].node_id.toLowerCase()} />
                 </div> */}
@@ -291,8 +235,6 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 export async function getStaticProps({ params }: { params: { node_id: string } }) {
     try {
         const initialData = await fetcher(`v2/provider/node/${params.node_id.toLowerCase()}`)
-
-        const income = await fetcher(`v1/provider/node/${params.node_id.toLowerCase()}/earnings`)
 
         return { props: { initialData, income }, revalidate: 2880 }
     } catch (error) {
