@@ -7,7 +7,7 @@ import PolygonScanIcon from "@/components/svg/Polygonsscan"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 const EarningsBlock = ({ walletAddress }) => {
-    const { data: earningsData, error } = useSWR(walletAddress ? `v1/provider/node/${walletAddress}/earnings` : null, fetcher)
+    const { data: earningsData, error } = useSWR(walletAddress ? `v1/provider/node/${walletAddress}/earningsnew` : null, fetcher)
 
     const earningsPeriods = [
         { period: "Today", key: "24" },
