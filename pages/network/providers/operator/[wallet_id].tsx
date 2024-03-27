@@ -2,6 +2,7 @@ import { ProviderList } from "@/components/ProviderList"
 import { SEO } from "@/components/SEO"
 import { GetServerSideProps, NextPage } from "next"
 import { fetcher } from "@/fetcher"
+import { useRouter } from "next/router"
 
 interface NodeOperatorProps {
     wallet_id: string
@@ -29,7 +30,9 @@ interface NodeOperatorProps {
 //     return { paths, fallback: true }
 // }
 
-const NodeOperator: NextPage<NodeOperatorProps> = ({ wallet_id, initialData }) => {
+const NodeOperator: NextPage<NodeOperatorProps> = ({ initialData }) => {
+    const router = useRouter()
+    let wallet_id = router.query.wallet_id as string
     return (
         <>
             <SEO
