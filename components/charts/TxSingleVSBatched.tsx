@@ -18,9 +18,11 @@ export const TxTypeCountAnalysis: React.FC = () => {
             <div className="px-6 mb-6">
                 <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Daily Transactions Type Counts</h1>
                 <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                    Analysis of single vs batched transactions.
+                    Breakdown of single vs batched transactions on the network. Batched transactions include multiple transfers in a single
+                    transaction. Batching was introduced as a feature in the Golem Network v0.15.0 release.
                 </p>
             </div>
+
             <div className="flex justify-between mt-6">
                 {!isValidating && formattedData.length > 0 ? (
                     <AreaChart

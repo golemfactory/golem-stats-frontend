@@ -55,7 +55,7 @@ export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps
                 </div>
             </Card>
         )
-    if (!data) return <Skeleton className="h-full py-1" />
+    if (!data) return <Skeleton className="h-full py-1" height={320} />
 
     const combinedData = data.data.map((item) => {
         return {

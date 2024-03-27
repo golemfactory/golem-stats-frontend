@@ -14,12 +14,14 @@ export const TxVolumeAnalysis: React.FC = () => {
 
     return (
         <Card className="h-full px-6">
-            <div className="px-8 mb-6">
-                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Transaction Volume Analysis</h1>
-                <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                    Overview of total transactions volume.
+            <div class="px-8 mb-6">
+                <h1 class="text-2xl mb-2 font-medium dark:text-gray-300">Daily Transaction Volume</h1>
+                <p class="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                    This chart visualizes the daily transaction volume on Polygon. It highlights the number of transactions processed each
+                    day.
                 </p>
             </div>
+
             <div className="flex justify-between mt-6">
                 {!isValidating && formattedData.length > 0 ? (
                     <AreaChart

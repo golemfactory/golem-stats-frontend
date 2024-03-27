@@ -20,9 +20,11 @@ export const TxAnalysis: React.FC = () => {
     return (
         <Card className="h-full px-6">
             <div className="px-6 mb-6">
-                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Transaction Analysis</h1>
+                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Golem Transaction Breakdown</h1>
                 <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                    Overview of transactions processed on and off the Golem Network.
+                    This chart visualizes the distribution of Golem (GLM) transactions from the Golem Network compared to those processed
+                    directly on the Polygon blockchain. The size of each area represents the total GLM amount for each category on a given
+                    day.
                 </p>
             </div>
             <div className="flex justify-between mt-6">

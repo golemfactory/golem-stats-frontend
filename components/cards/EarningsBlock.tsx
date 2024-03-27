@@ -4,6 +4,8 @@ import { RoundingFunction } from "@/lib/RoundingFunction"
 import { Card } from "@tremor/react"
 import Link from "next/link"
 import PolygonScanIcon from "@/components/svg/Polygonsscan"
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
 const EarningsBlock = ({ walletAddress }) => {
     const { data: earningsData, error } = useSWR(walletAddress ? `v1/provider/node/${walletAddress}/earnings` : null, fetcher)
 
@@ -15,15 +17,20 @@ const EarningsBlock = ({ walletAddress }) => {
     ]
 
     if (error) return <div>Error loading earnings</div>
-    if (!earningsData) return <div>Loading...</div>
+    if (!earningsData) return <Skeleton className="h-full py-1" height={320} />
 
     return (
         <Card>
             <div className="flex justify-between">
                 <div>
-                    <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">Total Earnings</h3>
+                    <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
+                        Operator Total Earnings
+                    </h3>
                     <p className="flex items-baseline space-x-2 text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                        <span className="text-tremor-metric font-semibold">{RoundingFunction(earningsData["total"])}</span>
+                        <span className="text-tremor-metric font-semibold">
+                            {RoundingFunction(earningsData["total"] !== undefined ? earningsData["total"] : 0)}
+                        </span>
+
                         <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
                             GLM
                         </span>

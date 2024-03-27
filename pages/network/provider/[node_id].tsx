@@ -184,7 +184,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                 <div className="lg:col-span-6 col-span-12">
                     <NetworkPerformanceChart nodeId={node_id} />
                 </div>
-                <div className="col-span-8">
+                <div className="col-span-12">
                     <TaskParticipationTable nodeId={node_id} />
                 </div>
                 {/* <div className="lg:col-span-6 col-span-12">

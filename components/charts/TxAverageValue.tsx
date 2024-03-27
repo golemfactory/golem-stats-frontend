@@ -17,11 +17,12 @@ export const TxAverageValueAnalysis: React.FC = () => {
     return (
         <Card className="h-full p-6">
             <div className="mb-6">
-                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Average Transaction Value</h1>
+                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Daily Average Transaction Value</h1>
                 <p className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-                    Daily average transaction values over time.
+                    This chart visualizes how the average value of GLM transactions fluctuates over time on the Polygon Blockchain
                 </p>
             </div>
+
             {!isValidating && chartData.length > 0 ? (
                 <LineChart
                     className="mt-4 h-72"
