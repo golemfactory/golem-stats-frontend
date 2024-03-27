@@ -13,10 +13,13 @@ const MemorySeqChart = ({ nodeId }) => {
     )
 
     const formatData = (apiData) => {
-        if (!apiData) return []
+        if (!apiData || !apiData.data) {
+            // If .data key is missing, return an empty array to avoid errors
+            return []
+        }
 
-        const formattedData = apiData.data.sequential_write_single.map((writeItem) => {
-            const readItem = apiData.data.sequential_read_single.find((read) => Math.abs(read.timestamp - writeItem.timestamp) < 1)
+        const formattedData = apiData.data?.sequential_write_single?.map((writeItem) => {
+            const readItem = apiData.data?.sequential_read_single?.find((read) => Math.abs(read.timestamp - writeItem.timestamp) < 1)
             return {
                 date: new Date(writeItem.timestamp * 1000).toISOString().substring(0, 16).replace("T", " "),
                 "Write MB/s": writeItem.score,
@@ -31,7 +34,10 @@ const MemorySeqChart = ({ nodeId }) => {
     const latestRead = data?.data?.sequential_read_single.slice(-1)[0]?.score || 0
     const writeDeviation = data?.writeDeviation || 0
     const readDeviation = data?.readDeviation || 0
-    const summary = data?.summary || {}
+    const summary = data?.summary || {
+        sequential_write_single: "stable",
+        sequential_read_single: "stable",
+    }
 
     return (
         <Card className="p-0 h-full">

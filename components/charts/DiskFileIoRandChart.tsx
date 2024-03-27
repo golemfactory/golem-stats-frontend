@@ -13,10 +13,13 @@ const DiskFileIoRandChart = ({ nodeId }) => {
     )
 
     const formatData = (apiData) => {
-        if (!apiData) return []
+        if (!apiData || !apiData.data) {
+            // If .data key is missing, return an empty array to avoid errors
+            return []
+        }
 
-        return apiData.data.fileio_rndwr.map((writeItem) => {
-            const readItem = apiData.data.fileio_rndrd.find((read) => Math.abs(read.timestamp - writeItem.timestamp) < 1)
+        return apiData.data?.fileio_rndwr?.map((writeItem) => {
+            const readItem = apiData.data?.fileio_rndrd?.find((read) => Math.abs(read.timestamp - writeItem.timestamp) < 1)
             return {
                 date: new Date(writeItem.timestamp * 1000).toISOString().substring(0, 16).replace("T", " "),
                 "Write MB/s": writeItem.score,
@@ -30,7 +33,10 @@ const DiskFileIoRandChart = ({ nodeId }) => {
     const latestRead = data?.data?.fileio_rndrd.slice(-1)[0]?.score || 0
     const writeDeviation = data?.writeDeviation || 0
     const readDeviation = data?.readDeviation || 0
-    const summary = data?.summary || {}
+    const summary = data?.summary || {
+        fileio_rndwr: "stable",
+        fileio_rndrd: "stable",
+    }
 
     return (
         <Card className="p-0 h-full">

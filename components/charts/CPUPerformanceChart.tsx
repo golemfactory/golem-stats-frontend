@@ -14,7 +14,10 @@ const CPUPerformanceChart = ({ nodeId }) => {
 
     const formatData = (apiData) => {
         const formattedData = []
-        if (!apiData) return []
+        if (!apiData || !apiData.data) {
+            // If .data key is missing, return an empty array to avoid errors
+            return []
+        }
 
         const formatTimestamp = (timestamp) => {
             const date = new Date(timestamp * 1000)

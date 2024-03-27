@@ -13,10 +13,13 @@ const MemoryRandMultiChart = ({ nodeId }) => {
     )
 
     const formatData = (apiData) => {
-        if (!apiData) return []
+        if (!apiData || !apiData.data) {
+            // If .data key is missing, return an empty array to avoid errors
+            return []
+        }
 
-        const formattedData = apiData.data.random_write_multi.map((writeItem) => {
-            const readItem = apiData.data.random_read_multi.find((read) => Math.abs(read.timestamp - writeItem.timestamp) < 1)
+        const formattedData = apiData.data.random_write_multi?.map((writeItem) => {
+            const readItem = apiData.data.random_read_multi?.find((read) => Math.abs(read.timestamp - writeItem.timestamp) < 1)
             return {
                 date: new Date(writeItem.timestamp * 1000).toISOString().substring(0, 16).replace("T", " "),
                 "Write MB/s": writeItem.score,
@@ -27,11 +30,14 @@ const MemoryRandMultiChart = ({ nodeId }) => {
     }
 
     const formattedData = formatData(data)
-    const latestWrite = data?.data?.random_write_multi.slice(-1)[0]?.score || 0
-    const latestRead = data?.data?.random_read_multi.slice(-1)[0]?.score || 0
+    const latestWrite = data?.data?.random_write_multi?.slice(-1)[0]?.score || 0
+    const latestRead = data?.data?.random_read_multi?.slice(-1)[0]?.score || 0
     const writeDeviation = data?.writeDeviation || 0
     const readDeviation = data?.readDeviation || 0
-    const summary = data?.summary || {}
+    const summary = data?.summary || {
+        random_write_multi: "stable",
+        random_read_multi: "stable",
+    }
 
     return (
         <Card className="p-0 h-full">

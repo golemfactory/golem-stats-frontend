@@ -13,10 +13,13 @@ const DiskFileIoSeqChart = ({ nodeId }) => {
     )
 
     const formatData = (apiData) => {
-        if (!apiData) return []
+        if (!apiData || !apiData.data) {
+            // If .data key is missing, return an empty array to avoid errors
+            return []
+        }
 
-        return apiData.data.fileio_seqwr.map((writeItem) => {
-            const readItem = apiData.data.fileio_seqrd.find((read) => Math.abs(read.timestamp - writeItem.timestamp) < 1)
+        return apiData.data.fileio_seqwr?.map((writeItem) => {
+            const readItem = apiData.data.fileio_seqrd?.find((read) => Math.abs(read.timestamp - writeItem.timestamp) < 1)
             return {
                 date: new Date(writeItem.timestamp * 1000).toISOString().substring(0, 16).replace("T", " "),
                 "Write MB/s": writeItem.score,
@@ -26,11 +29,14 @@ const DiskFileIoSeqChart = ({ nodeId }) => {
     }
 
     const formattedData = formatData(data)
-    const latestWrite = data?.data?.fileio_seqwr.slice(-1)[0]?.score || 0
-    const latestRead = data?.data?.fileio_seqrd.slice(-1)[0]?.score || 0
+    const latestWrite = data?.data?.fileio_seqwr?.slice(-1)[0]?.score || 0
+    const latestRead = data?.data?.fileio_seqrd?.slice(-1)[0]?.score || 0
     const writeDeviation = data?.writeDeviation || 0
     const readDeviation = data?.readDeviation || 0
-    const summary = data?.summary || {}
+    const summary = data?.summary || {
+        fileio_seqwr: "stable",
+        fileio_seqrd: "stable",
+    }
 
     return (
         <Card className="p-0 h-full">
@@ -44,7 +50,7 @@ const DiskFileIoSeqChart = ({ nodeId }) => {
                 </p>
             </div>
             <div className="border-t border-tremor-border p-6 dark:border-dark-tremor-border">
-                {isValidating || !formattedData.length ? (
+                {isValidating || !formattedData?.length ? (
                     <Skeleton height={250} />
                 ) : (
                     <>

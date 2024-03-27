@@ -18,7 +18,7 @@ const NetworkPerformanceChart = ({ nodeId }) => {
     }
 
     const formattedData = formatData(data)
-    const latestScore = data?.data.slice(-1)[0]?.score || 0
+    const latestScore = data?.data?.slice(-1)[0]?.score || 0
     const deviation = data?.deviation || 0
     const summary = data?.summary || ""
 

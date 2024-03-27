@@ -24,12 +24,12 @@ const TaskParticipationTable = ({ nodeId }) => {
     const [page, setPage] = useState(1)
     const itemsPerPage = 10
 
-    const totalPages = useMemo(() => Math.ceil(data?.task_participation.length / itemsPerPage), [data])
+    const totalPages = useMemo(() => Math.ceil(data?.task_participation?.length / itemsPerPage), [data])
 
     const paginatedData = useMemo(
         () =>
             data?.task_participation
-                .sort((a, b) => b.task_started_at - a.task_started_at)
+                ?.sort((a, b) => b.task_started_at - a.task_started_at)
                 .slice((page - 1) * itemsPerPage, page * itemsPerPage),
         [data, page]
     )
@@ -77,28 +77,36 @@ const TaskParticipationTable = ({ nodeId }) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {paginatedData.map((item, index) => (
-                        <TableRow key={index}>
-                            <TableCell>{item.task_id}</TableCell>
-                            <TableCell>{new Date(item.task_started_at * 1000).toLocaleString()}</TableCell>
-                            <TableCell>
-                                <span
-                                    className={classNames(
-                                        "inline-flex items-center rounded-tremor-small px-2 py-0.5 text-tremor-label font-medium ring-1 ring-inset",
-                                        item.completion_status.includes(" but the task was not started")
-                                            ? "bg-orange-100 text-orange-800 ring-orange-600/10 dark:bg-orange-500/20 dark:text-orange-500 dark:ring-orange-400/20"
-                                            : item.completion_status === "Failed" || item.completion_status === "Offer Rejected"
-                                            ? "bg-red-100 text-red-800 ring-red-600/10 dark:bg-red-500/20 dark:text-red-500 dark:ring-red-400/20"
-                                            : "bg-emerald-100 text-emerald-800 ring-emerald-600/10 dark:bg-emerald-500/20 dark:text-emerald-500 dark:ring-emerald-400/20"
-                                    )}
-                                >
-                                    {item.completion_status}
-                                </span>
+                    {(paginatedData || []).length > 0 ? (
+                        (paginatedData || []).map((item, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{item.task_id}</TableCell>
+                                <TableCell>{new Date(item.task_started_at * 1000).toLocaleString()}</TableCell>
+                                <TableCell>
+                                    <span
+                                        className={classNames(
+                                            "inline-flex items-center rounded-tremor-small px-2 py-0.5 text-tremor-label font-medium ring-1 ring-inset",
+                                            item.completion_status.includes(" but the task was not started")
+                                                ? "bg-orange-100 text-orange-800 ring-orange-600/10 dark:bg-orange-500/20 dark:text-orange-500 dark:ring-orange-400/20"
+                                                : item.completion_status === "Failed" || item.completion_status === "Offer Rejected"
+                                                ? "bg-red-100 text-red-800 ring-red-600/10 dark:bg-red-500/20 dark:text-red-500 dark:ring-red-400/20"
+                                                : "bg-emerald-100 text-emerald-800 ring-emerald-600/10 dark:bg-emerald-500/20 dark:text-emerald-500 dark:ring-emerald-400/20"
+                                        )}
+                                    >
+                                        {item.completion_status}
+                                    </span>
+                                </TableCell>
+                                <TableCell className="text-right">{item.error_message || "-"}</TableCell>
+                                <TableCell className="text-right">{RoundingFunction(item.cost, 5) || "-"} GLM</TableCell>
+                            </TableRow>
+                        ))
+                    ) : (
+                        <TableRow>
+                            <TableCell colSpan={5} className="text-center">
+                                No data available
                             </TableCell>
-                            <TableCell className="text-right">{item.error_message || "-"}</TableCell>
-                            <TableCell className="text-right">{RoundingFunction(item.cost, 5) || "-"} GLM</TableCell>
                         </TableRow>
-                    ))}
+                    )}
                 </TableBody>
             </Table>
             <div className="border-t border-tremor-border  dark:border-dark-tremor-border" />
