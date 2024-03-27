@@ -31,7 +31,15 @@ interface ProviderUptimeTrackerProps {
     nodeId: string
 }
 
-export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps> = ({ nodeId, nodeName, cpu, gpu, cpuVendor }) => {
+export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps> = ({
+    nodeId,
+    nodeName,
+    cpu,
+    gpu,
+    cpuVendor,
+    version,
+    subnet,
+}) => {
     const { data, error } = useSWR<UptimeTrackerResponse>(`v2/provider/uptime/${nodeId}`, fetcher, {
         refreshInterval: 60000,
     })
@@ -80,7 +88,13 @@ export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps
                             {nodeName}
                         </h3>
                         <div className="hidden md:flex">
-                            <span className="text-tremor-default text-gray-500 break-words truncate ">{nodeId}</span>
+                            <span className="text-tremor-default text-gray-500 break-words truncate ">Node ID: {nodeId}</span>
+                        </div>
+                        <div className="hidden md:flex">
+                            <span className="text-tremor-default text-gray-500 break-words truncate ">Version: {version}</span>
+                        </div>
+                        <div className="hidden md:flex">
+                            <span className="text-tremor-default text-gray-500 break-words truncate ">Subnet: {subnet}</span>
                         </div>
                     </div>
                     <StatusIndicator current_status={data.current_status} />
