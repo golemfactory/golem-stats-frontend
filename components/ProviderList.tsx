@@ -247,9 +247,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
                             Disk
                         </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Total Earnings
-                        </th>
+
                         <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
                             CPU/h
                         </th>
@@ -373,12 +371,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                                     </p>
                                 </dt>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {RoundingFunction(provider.earnings_total, 2)}{" "}
-                                    <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
-                                </a>
-                            </td>
+
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
                                     {priceHashMapOrDefault(provider, "golem.usage.cpu_sec")}{" "}
