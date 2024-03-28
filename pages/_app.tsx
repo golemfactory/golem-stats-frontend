@@ -62,6 +62,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                     <div className="mx-auto px-4 sm:px-6 lg:px-8 pb-10 mt-5 ">
                         <Component {...pageProps} />
                     </div>
+                    <Banner title="We're upgrading our database at 12:30 UTC. The stats page will be unavailable for up to an hour." />
                 </SessionProvider>
             </PostHogProvider>
         </>
