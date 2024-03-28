@@ -1,17 +1,9 @@
 import { useState, useEffect } from "react"
-import { AreaChart, Card, Tab, TabGroup, TabList, TabPanel, TabPanels, Select, SelectItem } from "@tremor/react"
-import { GolemIcon } from "./svg/GolemIcon"
+import { AreaChart, Card, Tab, TabGroup, TabList } from "@tremor/react"
+import Select from "react-select"
 
-function getProviderType(name: string): string {
-    if (name === "vm-nvidia") {
-        return "GPU"
-    } else if (name === "vm") {
-        return "CPU"
-    } else if (name === "automatic") {
-        return "AI Provider"
-    } else {
-        return name
-    }
+function getProviderType(name) {
+    return { "vm-nvidia": "GPU Provider", vm: "CPU Provider", automatic: "AI Provider" }[name] || name
 }
 
 const customTooltip = ({ active, payload, label }) => {
@@ -56,172 +48,166 @@ const customTooltip = ({ active, payload, label }) => {
     )
 }
 
-const NetworkStats = ({ metricData }) => {
-    const [selectedRuntime, setSelectedRuntime] = useState("vm" in metricData ? "vm" : Object.keys(metricData)[0])
-    const [selectedTimeFrame, setSelectedTimeFrame] = useState("1y")
-    const [colorClass, setColorClass] = useState("")
-    const tabs = [
-        { name: "Providers", metric: "online", unit: "Providers" },
-        { name: "Cores", metric: "cores", unit: "Cores" },
-        { name: "Memory", metric: "memory", unit: "Terabytes" },
-        { name: "Disk", metric: "disk", unit: "Terabytes" },
-        { name: "GPU", metric: "gpus", unit: "GPUs" },
-    ]
-    const timeFrames = Object.keys(metricData[selectedRuntime])
-    const latest1dData = metricData[selectedRuntime]["1d"][metricData[selectedRuntime]["1d"].length - 1] || {}
-    const previousData = metricData[selectedRuntime]["1d"][metricData[selectedRuntime]["1d"].length - 2] || {}
-    const formatDate = (dateString, timeFrame) => {
-        const date = new Date(dateString * 1000)
-        let formatOptions = {}
+const formatDate = (dateString, timeFrame) => {
+    const date = new Date(dateString * 1000)
+    const options =
+        {
+            "1d": { hour: "2-digit", minute: "2-digit" },
+            "7d": { month: "short", day: "numeric" },
+            "1m": { month: "short", day: "numeric", year: "numeric" },
+            "1y": { month: "short", day: "numeric", year: "numeric" },
+            All: { year: "numeric", month: "short", day: "numeric" },
+        }[timeFrame] || {}
+    return date.toLocaleString(navigator.language, options)
+}
 
-        switch (timeFrame) {
-            case "1d":
-                formatOptions = {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                }
-                break
-            case "7d":
-                formatOptions = {
-                    month: "short",
-                    day: "numeric",
-                }
-                break
-            case "1m":
-            case "1y":
-                formatOptions = {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                }
-                break
-            case "All":
-                formatOptions = {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                }
-                break
-        }
-
-        return date.toLocaleString(navigator.language, formatOptions)
-    }
-    useEffect(() => {
-        const latestValue = latest1dData[tabs[0].metric] || 0
-        const previousValue = previousData[tabs[0].metric] || 0
-
-        if (latestValue > previousValue) {
-            setColorClass("text-green-500")
-        } else if (latestValue < previousValue) {
-            setColorClass("text-red-500")
-        }
-
-        const timer = setTimeout(() => setColorClass("dark:text-dark-tremor-content-metric"), 700) // Revert back after 1 second
-
-        return () => clearTimeout(timer)
-    }, [latest1dData, previousData])
-
-    const MetricCardSummary = ({ category, unit }) => {
-        const latestDataPoint = latest1dData[category] || 0
-        const total = `${Intl.NumberFormat("us").format(latestDataPoint)}`
-        return (
-            <div className={`flex justify-between ${colorClass}`}>
-                <div>
-                    <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">Right now</h3>
-                    <div className="flex items-baseline space-x-2">
-                        <span className={`text-tremor-metric font-semibold ${colorClass}`}>{total}</span>
-                        <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
-                            {unit}
-                        </span>
-                    </div>
+const MetricCardSummary = ({ metricData, metric, selectedRuntime, unit }) => {
+    const latestDataPoint = metricData[selectedRuntime]["1d"][metricData[selectedRuntime]["1d"].length - 1] || {}
+    const value = `${Intl.NumberFormat("us").format(latestDataPoint[metric] || 0)}`
+    return (
+        <div className={`flex justify-between`}>
+            <div>
+                <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">Right now</h3>
+                <div className="flex items-baseline space-x-2">
+                    <span className={`text-tremor-metric font-semibold `}>{value}</span>
+                    <span className="text-tremor-default font-medium capitalize text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
+                        {unit}
+                    </span>
                 </div>
             </div>
-        )
-    }
+        </div>
+    )
+}
 
+const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, selectedTimeFrame, onTimeFrameChange, description }) => {
+    const timeFrames = Object.keys(metricData[selectedRuntime])
     return (
         <Card>
-            <div className="flex flex-col md:flex-row justify-between items-start">
+            <div className="flex flex-col md:flex-row justify-between items-start border-b border-tremor-border dark:border-dark-tremor-border">
                 <div className="px-6 mb-6">
-                    <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network Statistics</h1>
-                    <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                        Overview of Golem Network's capacity per provider type, with real-time and trend data for providers online, cores,
-                        memory, disk space and GPU's available.
-                    </p>
+                    <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">{name}</h1>
+                    <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">{description}</p>
                 </div>
-                <div className="px-6 mb-4">
-                    <label htmlFor="runtime" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter">
-                        Runtime
-                    </label>
-                    <Select value={selectedRuntime} onValueChange={setSelectedRuntime}>
-                        {Object.keys(metricData)
-                            .sort((a, b) => getProviderType(a).localeCompare(getProviderType(b)))
-                            .map((runtime) => (
-                                <SelectItem key={runtime} value={runtime}>
-                                    {getProviderType(runtime)}
-                                </SelectItem>
+            </div>
+            <div className="grid md:flex md:items-start md:justify-between px-6 pt-4">
+                <MetricCardSummary metricData={metricData} metric={metric} selectedRuntime={selectedRuntime} unit={unit} />
+                <div className="order-1 md:order-2">
+                    <TabGroup
+                        index={timeFrames.findIndex((frame) => frame === selectedTimeFrame)}
+                        onIndexChange={(index) => onTimeFrameChange(timeFrames[index])}
+                    >
+                        <TabList variant="solid" className="w-full md:w-fit">
+                            {timeFrames.map((frame) => (
+                                <Tab
+                                    key={frame}
+                                    className={`w-full justify-center py-1 ${
+                                        selectedTimeFrame === frame
+                                            ? "ui-selected:text-tremor-content-strong ui-selected:dark:text-dark-tremor-content-strong"
+                                            : ""
+                                    } md:w-fit md:justify-start`}
+                                >
+                                    {frame}
+                                </Tab>
                             ))}
-                    </Select>
+                        </TabList>
+                    </TabGroup>
                 </div>
             </div>
 
-            <TabGroup>
-                <TabList className="px-6">
-                    {tabs
-                        .filter((tab) => selectedRuntime === "vm-nvidia" || tab.name !== "GPU")
-                        .map((tab, index) => (
-                            <Tab
-                                key={index}
-                                className="font-medium hover:border-tremor-content-subtle dark:hover:border-dark-tremor-content-subtle dark:hover:text-dark-tremor-content"
-                            >
-                                {tab.name}
-                            </Tab>
-                        ))}
-                </TabList>
-
-                <TabPanels>
-                    {tabs.map((tab, index) => (
-                        <TabPanel key={index}>
-                            <div className="grid md:flex md:items-start md:justify-between px-6 py-4">
-                                <MetricCardSummary category={tab.metric} unit={tab.unit} />
-                                <div className="order-1 md:order-2 pb-8 pt-4">
-                                    <TabGroup defaultIndex={3}>
-                                        <TabList variant="solid" className="w-full md:w-fit">
-                                            {timeFrames.map((frame) => (
-                                                <Tab
-                                                    key={frame}
-                                                    onClick={() => setSelectedTimeFrame(frame)}
-                                                    className="w-full justify-center py-1 ui-selected:text-tremor-content-strong ui-selected:dark:text-dark-tremor-content-strong md:w-fit md:justify-start"
-                                                >
-                                                    {frame}
-                                                </Tab>
-                                            ))}
-                                        </TabList>
-                                    </TabGroup>
-                                </div>
-                            </div>
-
-                            <AreaChart
-                                data={metricData[selectedRuntime][selectedTimeFrame].map((item) => ({
-                                    ...item,
-                                    date: formatDate(item.date, selectedTimeFrame),
-                                }))}
-                                index="date"
-                                categories={[tab.metric]}
-                                showLegend={false}
-                                showGradient={false}
-                                showAnimation={true}
-                                showTooltip={true}
-                                customTooltip={customTooltip}
-                                yAxisWidth={38}
-                                valueFormatter={(number) => Intl.NumberFormat("us").format(number)}
-                                className="h-72"
-                            />
-                        </TabPanel>
-                    ))}
-                </TabPanels>
-            </TabGroup>
+            <div className="chart-container">
+                <AreaChart
+                    data={metricData[selectedRuntime][selectedTimeFrame].map((item) => ({
+                        ...item,
+                        date: formatDate(item.date, selectedTimeFrame),
+                    }))}
+                    index="date"
+                    categories={[metric]}
+                    customTooltip={customTooltip}
+                    className="h-72"
+                />
+            </div>
         </Card>
+    )
+}
+
+const NetworkStats = ({ metricData }) => {
+    const [selectedRuntime, setSelectedRuntime] = useState(Object.keys(metricData).includes("vm") ? "vm" : Object.keys(metricData)[0])
+    const [selectedTimeFrame, setSelectedTimeFrame] = useState("1y")
+
+    const runtimeOptions = Object.keys(metricData)
+        .sort((a, b) => getProviderType(a).localeCompare(getProviderType(b)))
+        .map((runtime) => ({ value: runtime, label: getProviderType(runtime) }))
+
+    const handleRuntimeChange = (selectedOption) => {
+        setSelectedRuntime(selectedOption.value)
+    }
+
+    const handleTimeFrameChange = (frame) => setSelectedTimeFrame(frame)
+
+    const tabs = [
+        {
+            name: "Connected Providers",
+            metric: "online",
+            unit: "Providers",
+            description: `The number of providers currently available on the network with the runtime ${
+                getProviderType(selectedRuntime) === "AI Provider" ? "AI" : getProviderType(selectedRuntime)
+            }.`,
+        },
+        {
+            name: "Compute Power",
+            metric: "cores",
+            unit: "Cores",
+            description: "The total number of CPU cores offered by online providers.",
+        },
+        {
+            name: "Total Memory",
+            metric: "memory",
+            unit: "TB",
+            description: "The combined amount of memory available from online providers.",
+        },
+        {
+            name: "Storage Capacity",
+            metric: "disk",
+            unit: "TB",
+            description: "The total amount of disk space offered by online providers.",
+        },
+        {
+            name: "Available GPUs",
+            metric: "gpus",
+            unit: "GPUs",
+            description: "The number of GPUs offered by online providers.",
+        },
+    ]
+
+    return (
+        <div>
+            <div className="z-50 bottom-5 right-5 fixed w-40">
+                <Select
+                    value={runtimeOptions.find((option) => option.value === selectedRuntime)}
+                    onChange={handleRuntimeChange}
+                    options={runtimeOptions}
+                    instanceId="runtime-select"
+                    menuPlacement="top"
+                    isSearchable={false}
+                    placeholder="Select Runtime" // Placeholder text
+                />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tabs.map((tab) => (
+                    <NetworkStatChart
+                        name={tab.name}
+                        key={tab.metric}
+                        metricData={metricData}
+                        metric={tab.metric}
+                        unit={tab.unit}
+                        selectedRuntime={selectedRuntime}
+                        selectedTimeFrame={selectedTimeFrame}
+                        onTimeFrameChange={handleTimeFrameChange}
+                        description={tab.description}
+                    />
+                ))}
+            </div>
+        </div>
     )
 }
 

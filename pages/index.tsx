@@ -16,6 +16,7 @@ import { TxAnalysis } from "@/components/charts/PaymentsOnVsOffGolem"
 import { TxVolumeAnalysis } from "@/components/charts/TransactionVolume"
 import { TxTypeCountAnalysis } from "@/components/charts/TxSingleVSBatched"
 import { TxAverageValueAnalysis } from "@/components/charts/TxAverageValue"
+import { StatCard } from "@/components/cards/StatCard"
 
 export default function Index() {
     const { data: metricsData, error } = useSWR("v2/network/historical/stats", fetcher, {
@@ -29,7 +30,7 @@ export default function Index() {
     })
 
     const timePeriods = [
-        { period: "6 Hours", earnings: networkEarnings?.network_earnings_6h?.total_earnings || null },
+        { period: "6 Hours", earnings: networkEarnings?.network_earnings_6h?.total_earnings || "" },
         { period: "24 Hours", earnings: networkEarnings?.network_earnings_24h?.total_earnings || null },
         { period: "7 Days", earnings: networkEarnings?.network_earnings_168h?.total_earnings || null },
         { period: "30 Days", earnings: networkEarnings?.network_earnings_720h?.total_earnings || null },
@@ -42,12 +43,45 @@ export default function Index() {
             </div> */}
             {/* New parent grid for NetworkActivity and NetworkStats */}
             <div className="grid grid-cols-12 gap-4 ">
-                <div className="lg:col-span-7 col-span-12 lg:order-none order-2">
-                    <NetworkActivity />
+                <div className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid gap-4 col-span-12">
+                    <StatCard
+                        title="
+                        Network earnings (6h)
+                    "
+                        value={timePeriods[0].earnings}
+                        unit="GLM"
+                        loading={!networkEarnings}
+                    />
+                    <StatCard
+                        title="
+                        Network earnings (24h)
+                    "
+                        value={timePeriods[1].earnings}
+                        unit="GLM"
+                        loading={!networkEarnings}
+                    />
+                    <StatCard
+                        title="
+                        Network earnings (7d)
+                    "
+                        value={timePeriods[2].earnings}
+                        unit="GLM"
+                        loading={!networkEarnings}
+                    />
+                    <StatCard
+                        title="
+                        Network total earnings
+                    "
+                        value={networkEarnings?.network_total_earnings?.total_earnings}
+                        unit="GLM"
+                        loading={!networkEarnings}
+                    />
                 </div>
-
-                <div className="lg:col-span-5 col-span-12 lg:order-none order-1">
+                <div className="lg:col-span-12 col-span-12">
                     {metricsData ? <NetworkStats metricData={metricsData} /> : <Skeleton height={580} />}
+                </div>
+                <div className="lg:col-span-12 col-span-12 ">
+                    <NetworkActivity />
                 </div>
                 <div className="col-span-12">
                     <NetworkVersionAdoption />
@@ -58,7 +92,7 @@ export default function Index() {
                 <div className="lg:col-span-6 col-span-12">
                     <NetworkCPUVendorDistribution />
                 </div>
-                <div className="lg:col-span-4 col-span-12">
+                {/* <div className="lg:col-span-4 col-span-12">
                     {networkEarnings ? (
                         <EarningsCard
                             title="Network Total Earnings"
@@ -69,7 +103,7 @@ export default function Index() {
                     ) : (
                         <Skeleton height={500} />
                     )}
-                </div>
+                </div> */}
                 <div className="col-span-12">
                     <TxAnalysis />
                 </div>
