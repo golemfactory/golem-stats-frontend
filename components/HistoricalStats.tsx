@@ -144,7 +144,7 @@ const NetworkStats = ({ metricData }) => {
 
     const handleTimeFrameChange = (frame) => setSelectedTimeFrame(frame)
 
-    const tabs = [
+    const [tabs, setTabs] = useState([
         {
             name: "Connected Providers",
             metric: "online",
@@ -171,13 +171,36 @@ const NetworkStats = ({ metricData }) => {
             unit: "TB",
             description: "The total amount of disk space offered by online providers.",
         },
-        {
-            name: "Available GPUs",
-            metric: "gpus",
-            unit: "GPUs",
-            description: "The number of GPUs offered by online providers.",
-        },
-    ]
+    ])
+
+    useEffect(() => {
+        // Aggregate check across all timeframes for any non-zero GPU count
+        const hasGPUData = ["1d", "7d", "1m", "1y", "All"].some((timeframe) =>
+            metricData[selectedRuntime][timeframe].some((entry) => entry.gpus > 0)
+        )
+
+        // Update tabs based on whether GPU data is available
+        setTabs((prevTabs) => {
+            const gpuTabExists = prevTabs.some((tab) => tab.metric === "gpus")
+            const gpuTab = {
+                name: "Available GPUs",
+                metric: "gpus",
+                unit: "GPUs",
+                description: "The number of GPUs offered by online providers.",
+            }
+
+            if (hasGPUData && !gpuTabExists) {
+                // If GPU data is found and the GPU tab doesn't exist, add it
+                return [...prevTabs, gpuTab]
+            } else if (!hasGPUData && gpuTabExists) {
+                // If no GPU data is found and the GPU tab exists, remove it
+                return prevTabs.filter((tab) => tab.metric !== "gpus")
+            }
+
+            // If conditions aren't met, return the tabs as they are
+            return prevTabs
+        })
+    }, [metricData, selectedRuntime]) // Depend on metricData and selectedRuntime to trigger re-evaluation
 
     return (
         <div>
