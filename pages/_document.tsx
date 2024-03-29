@@ -7,15 +7,22 @@ export default function Document() {
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `
-                (function() {
-                  const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                  if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  }
-                })();
-              `,
+      (function() {
+        // First, check for a saved theme in localStorage
+        const storedTheme = localStorage.getItem('theme');
+        // Use system preference as a fallback if no stored theme
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+        
+        // Apply the dark mode class if the resolved theme is 'dark'
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    `,
                     }}
                 />
+
                 <title key="title">Golem Network Stats</title>
                 <link rel="shortcut icon" href="/favicon.ico" />
 
