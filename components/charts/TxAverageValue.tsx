@@ -15,7 +15,7 @@ export const TxAverageValueAnalysis = () => {
             const newFormattedData = data[selectedTimeFrame].map(({ date, on_golem, not_golem }) => ({
                 date: new Date(date).toLocaleDateString(),
                 "On Golem": RoundingFunction(on_golem, 2),
-                "Not on Golem": RoundingFunction(not_golem, 2),
+                "On Polygon": RoundingFunction(not_golem, 2),
             }))
             setFormattedData(newFormattedData)
         }
@@ -74,9 +74,7 @@ export const TxAverageValueAnalysis = () => {
                                     <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
                                         {RoundingFunction(latestNotOnGolem, 3)}{" "}
                                     </span>
-                                    <span className="text-tremor-default font-medium text-red-500 dark:text-dark-tremor-brand-golemblue">
-                                        GLM
-                                    </span>
+                                    <span className="text-tremor-default font-medium text-purple-500">GLM</span>
                                 </div>
                             </div>
                         </li>
@@ -110,8 +108,8 @@ export const TxAverageValueAnalysis = () => {
                         className=" h-72"
                         data={formattedData}
                         index="date"
-                        categories={["On Golem", "Not on Golem"]}
-                        colors={["green", "red"]}
+                        categories={["On Golem", "On Polygon"]}
+                        colors={["blue", "purple"]}
                         yAxisWidth={30}
                         connectNulls={true}
                     />

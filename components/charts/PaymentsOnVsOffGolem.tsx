@@ -12,7 +12,7 @@ export const TxAnalysis = () => {
         apiData[selectedTimeFrame].map(({ date, on_golem, not_golem }) => ({
             date: new Date(date).toLocaleDateString(),
             "On Golem": on_golem,
-            "Not on Golem": not_golem,
+            "On Polygon": not_golem,
         }))
 
     const formattedData = data ? formatData(data) : []
@@ -67,9 +67,7 @@ export const TxAnalysis = () => {
                                     <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
                                         {RoundingFunction(latestNotOnGolem, 2)}{" "}
                                     </span>
-                                    <span className="text-tremor-default font-medium capitalize text-red-500 dark:text-dark-tremor-brand-golemblue">
-                                        GLM
-                                    </span>
+                                    <span className="text-tremor-default font-medium capitalize text-purple-500 ">GLM</span>
                                 </div>
                             </div>
                         </li>
@@ -102,8 +100,8 @@ export const TxAnalysis = () => {
                     <AreaChart
                         data={formattedData}
                         index="date"
-                        categories={["On Golem", "Not on Golem"]}
-                        colors={["green", "red"]}
+                        categories={["On Golem", "On Polygon"]}
+                        colors={["blue", "purple"]}
                         showAnimation={true}
                     />
                 ) : (

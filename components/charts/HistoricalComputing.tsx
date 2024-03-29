@@ -69,7 +69,7 @@ export const HistoricalComputingChart: React.FC = () => {
                                     <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
                                         {athValue}{" "}
                                     </span>
-                                    <span className="text-tremor-default font-medium capitalize text-red-500 dark:text-dark-tremor-brand-golemblue">
+                                    <span className="text-tremor-default font-medium capitalize text-tremor-brand dark:text-dark-tremor-brand-golemblue">
                                         Providers
                                     </span>
                                 </div>

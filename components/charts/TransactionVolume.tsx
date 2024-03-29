@@ -15,7 +15,7 @@ export const TxVolumeAnalysis = () => {
             const newFormattedData = data[selectedTimeFrame].map(({ date, on_golem, not_golem }) => ({
                 date: new Date(date).toLocaleDateString(),
                 "On Golem": RoundingFunction(on_golem, 2),
-                "Not on Golem": RoundingFunction(not_golem, 2),
+                "On Polygon": RoundingFunction(not_golem, 2),
             }))
             setFormattedData(newFormattedData)
         }
@@ -74,9 +74,7 @@ export const TxVolumeAnalysis = () => {
                                     <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
                                         {latestNotOnGolem}{" "}
                                     </span>
-                                    <span className="text-tremor-default font-medium text-red-500 dark:text-dark-tremor-brand-golemblue">
-                                        Transactions
-                                    </span>
+                                    <span className="text-tremor-default font-medium text-purple-500 ">Transactions</span>
                                 </div>
                             </div>
                         </li>
@@ -110,8 +108,8 @@ export const TxVolumeAnalysis = () => {
                         className="h-72"
                         data={formattedData}
                         index="date"
-                        categories={["On Golem", "Not on Golem"]}
-                        colors={["blue", "red"]}
+                        categories={["On Golem", "On Polygon"]}
+                        colors={["blue", "purple"]}
                     />
                 ) : (
                     <Skeleton height={250} />

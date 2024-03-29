@@ -59,7 +59,7 @@ export const TxTypeCountAnalysis = () => {
                                     <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
                                         {latestSingleTransfer}{" "}
                                     </span>
-                                    <span className="text-tremor-default font-medium capitalize text-cyan-500 dark:text-dark-tremor-brand-golemblue">
+                                    <span className="text-tremor-default font-medium capitalize text-tremor-brand dark:text-dark-tremor-brand-golemblue">
                                         transactions
                                     </span>
                                 </div>
@@ -74,9 +74,7 @@ export const TxTypeCountAnalysis = () => {
                                     <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
                                         {latestBatched}{" "}
                                     </span>
-                                    <span className="text-tremor-default font-medium capitalize text-red-500 dark:text-dark-tremor-brand-golemblue">
-                                        transactions
-                                    </span>
+                                    <span className="text-tremor-default font-medium capitalize text-red-500 ">transactions</span>
                                 </div>
                             </div>
                         </li>
@@ -101,7 +99,7 @@ export const TxTypeCountAnalysis = () => {
                         data={formattedData}
                         index="date"
                         categories={["Single Transfer", "Batched"]}
-                        colors={["cyan", "red"]}
+                        colors={["blue", "red"]}
                         showAnimation={true}
                     />
                 ) : (
