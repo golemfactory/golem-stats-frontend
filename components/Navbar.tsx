@@ -123,8 +123,15 @@ export const Navbar: React.FC = () => {
         <header className="relative isolate bg-golemmain text-white z-50">
             <nav className="mx-auto items-center grid grid-cols-4 lg:flex p-6 lg:px-8" aria-label="Global">
                 <div className="flex lg:flex-1 col-span-3">
-                    <Link href="/" className="text-xl font-medium -m-1.5 p-1.5">
-                        <GolemNavIcon className="w-1/4 fill-white text-white" />
+                    <Link
+                        href="/"
+                        className="relative inline-flex items-center justify-center w-24 h-12 overflow-hidden text-xl font-semibold text-blue-900 bg-transparent font-inter align-self[center] order[-1] flex-auto[0] max-w-xs min-w-[100px] leading-5"
+                    >
+                        <img
+                            src="https://assets-global.website-files.com/62446d07873fde065cbcb8d5/62446d07873fde3688bcb8f6_Golem_Logo_Negative_RGB.svg"
+                            alt="Golem Network brand logo"
+                            className="w-full h-auto"
+                        />
                     </Link>
                 </div>
                 <div className="flex lg:hidden justify-end">
@@ -138,9 +145,10 @@ export const Navbar: React.FC = () => {
                     </button>
                 </div>
                 <div className="flex gap-x-8">
-                    <PopoverGroup>
-                        <PopoverArea title="Network" items={network} CTAs={NetworkCTA} />
-                    </PopoverGroup>
+                    <Link href={"/"} className="hidden lg:flex font-semibold leading-6 text-white">
+                        Network
+                    </Link>
+
                     <PopoverGroup>
                         <PopoverArea title="Provider" items={provider} CTAs={providerCTA} />
                     </PopoverGroup>
@@ -152,14 +160,14 @@ export const Navbar: React.FC = () => {
                         rel={"noreferrer noopener"}
                         className="font-semibold leading-6 text-white"
                     >
-                        Golem Homepage
+                        Discover Golem
                     </Link>
                     <DarkModeToggle />
                 </div>
             </nav>
             <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
                 <div className="fixed inset-0 z-10" />
-                <Dialog.Panel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white dark:bg-gray-800 dark:text-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+                <Dialog.Panel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-[#28293c] dark:bg-gray-800 text-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     <div className="flex items-center justify-between">
                         <Link href="/" className="text-xl font-medium -m-1.5 p-1.5">
                             Golem Network Stats
@@ -171,43 +179,44 @@ export const Navbar: React.FC = () => {
                     </div>
                     <div className="mt-6 flow-root">
                         <div className="-my-6 divide-y divide-gray-500/10 ">
-                            <div className="space-y-2 py-6 grid gap-y-4 mt-4">
-                                <Disclosure as="div" className="-mx-3 grid gap-y-4 ">
+                            <div className="space-y-2 py-6 grid mt-8">
+                                <Disclosure as="div" className="-mx-3 grid mb-4  ">
                                     {({ open }) => (
                                         <>
-                                            <Disclosure.Button className="flex w-full items-center justify-between  py-2 mb-2 pl-3 pr-3.5 text-lg font-semibold leading-7 hover:bg-gray-50 dark:hover:bg-gray-700/80">
+                                            <Disclosure.Button className="flex w-full items-center justify-between   py-2 mb-2 pl-3 pr-3.5 text-lg font-semibold leading-7 dark:hover:bg-gray-700/80">
                                                 Network
                                                 <ChevronDownIcon
                                                     className={`h-5 w-5 flex-none ${open ? "rotate-180" : ""}`}
                                                     aria-hidden="true"
                                                 />
                                             </Disclosure.Button>
-                                            <Disclosure.Panel className="mt-2 space-y-2">
+                                            <Disclosure.Panel className="space-y-2">
                                                 {network.map((item) => (
                                                     <Disclosure.Button
                                                         key={item.name}
                                                         as="a"
                                                         href={item.href}
-                                                        className="block  py-2 pl-6 pr-3 font-semibold leading-7 hover:bg-gray-50 dark:hover:bg-gray-700/80"
+                                                        className="block  py-2 pl-6 pr-3 font-semibold leading-7  dark:hover:bg-gray-700/80"
                                                     >
                                                         {item.name}
                                                     </Disclosure.Button>
                                                 ))}
                                             </Disclosure.Panel>
-                                            <Disclosure.Button className="flex w-full items-center justify-between  py-2 pl-3 pr-3.5 text-lg font-semibold leading-7 hover:bg-gray-50 dark:hover:bg-gray-700/80">
+
+                                            <Disclosure.Button className="flex mt-4 w-full items-center justify-between  py-2 pl-3 pr-3.5 text-lg font-semibold leading-7  dark:hover:bg-gray-700/80">
                                                 Provider
                                                 <ChevronDownIcon
                                                     className={`h-5 w-5 flex-none ${open ? "rotate-180" : ""}`}
                                                     aria-hidden="true"
                                                 />
                                             </Disclosure.Button>
-                                            <Disclosure.Panel className="mt-2 space-y-2">
+                                            <Disclosure.Panel className="mt-2 ">
                                                 {provider.map((item) => (
                                                     <Disclosure.Button
                                                         key={item.name}
                                                         as="a"
                                                         href={item.href}
-                                                        className="block  py-2 pl-6 pr-3 font-semibold leading-7 hover:bg-gray-50 dark:hover:bg-gray-700/80"
+                                                        className="block  py-2 pl-6 pr-3 font-semibold leading-7  dark:hover:bg-gray-700/80"
                                                     >
                                                         {item.name}
                                                     </Disclosure.Button>

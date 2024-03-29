@@ -17,6 +17,7 @@ import { TxVolumeAnalysis } from "@/components/charts/TransactionVolume"
 import { TxTypeCountAnalysis } from "@/components/charts/TxSingleVSBatched"
 import { TxAverageValueAnalysis } from "@/components/charts/TxAverageValue"
 import { StatCard } from "@/components/cards/StatCard"
+import { HistoricalComputingChart } from "@/components/charts/HistoricalComputing"
 
 export default function Index() {
     const { data: metricsData, error } = useSWR("v2/network/historical/stats", fetcher, {
@@ -91,6 +92,9 @@ export default function Index() {
                 </div>
                 <div className="lg:col-span-6 col-span-12">
                     <NetworkCPUVendorDistribution />
+                </div>
+                <div className="lg:col-span-12 col-span-12">
+                    <HistoricalComputingChart />
                 </div>
                 {/* <div className="lg:col-span-4 col-span-12">
                     {networkEarnings ? (
