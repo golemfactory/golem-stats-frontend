@@ -21,8 +21,20 @@ export const TxTypeCountAnalysis = () => {
     }, [data, selectedTimeFrame])
 
     const timeFrames = ["7d", "14d", "1m", "3m", "6m", "1y", "All"]
-    const latestSingleTransfer = formattedData[formattedData.length - 1]?.["Single Transfer"]
-    const latestBatched = formattedData[formattedData.length - 1]?.["Batched"]
+    const findLatestDataPoint = (apiData) => {
+        const allData = apiData["All"] || []
+        if (allData.length === 0) return { latestSingleTransfer: undefined, latestBatched: undefined }
+
+        const latestEntry = allData.reduce((latest, entry) => (new Date(entry.date) > new Date(latest.date) ? entry : latest), allData[0])
+
+        return {
+            latestSingleTransfer: latestEntry.singleTransfer,
+            latestBatched: latestEntry.batched,
+        }
+    }
+    const { latestSingleTransfer, latestBatched } = data
+        ? findLatestDataPoint(data)
+        : { latestSingleTransfer: undefined, latestBatched: undefined }
 
     if (error) return <div>Failed to load data...</div>
 
@@ -41,7 +53,7 @@ export const TxTypeCountAnalysis = () => {
                         <li className="flex items-center">
                             <div>
                                 <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                                    Single Transfer
+                                    Single Transfers Today
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
                                     <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
@@ -56,7 +68,7 @@ export const TxTypeCountAnalysis = () => {
                         <li className="flex items-center ">
                             <div>
                                 <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                                    Batched
+                                    Batched Today
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
                                     <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>

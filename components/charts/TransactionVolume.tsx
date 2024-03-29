@@ -22,8 +22,18 @@ export const TxVolumeAnalysis = () => {
     }, [data, selectedTimeFrame])
 
     const timeFrames = ["7d", "14d", "1m", "3m", "6m", "1y", "All"]
-    const latestOnGolem = formattedData[formattedData.length - 1]?.["On Golem"]
-    const latestNotOnGolem = formattedData[formattedData.length - 1]?.["Not on Golem"]
+    const findLatestDataPoint = (apiData) => {
+        const allData = apiData["All"] || []
+        if (allData.length === 0) return { latestOnGolem: undefined, latestNotOnGolem: undefined }
+
+        const latestEntry = allData.reduce((latest, entry) => (new Date(entry.date) > new Date(latest.date) ? entry : latest), allData[0])
+
+        return {
+            latestOnGolem: latestEntry.on_golem,
+            latestNotOnGolem: latestEntry.not_golem,
+        }
+    }
+    const { latestOnGolem, latestNotOnGolem } = data ? findLatestDataPoint(data) : { latestOnGolem: undefined, latestNotOnGolem: undefined }
 
     if (error) return <div>Failed to load data...</div>
 
@@ -43,7 +53,7 @@ export const TxVolumeAnalysis = () => {
                         <li className="flex items-center">
                             <div>
                                 <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                                    On Golem
+                                    Today On Golem
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
                                     <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
@@ -58,7 +68,7 @@ export const TxVolumeAnalysis = () => {
                         <li className="flex items-center ">
                             <div>
                                 <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                                    On Polygon
+                                    Today On Polygon
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
                                     <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
