@@ -4,6 +4,18 @@ export default function Document() {
     return (
         <Html lang="en">
             <Head>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                (function() {
+                  const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  }
+                })();
+              `,
+                    }}
+                />
                 <title key="title">Golem Network Stats</title>
                 <link rel="shortcut icon" href="/favicon.ico" />
 
