@@ -21,7 +21,7 @@ const EarningsBlock = ({ walletAddress }) => {
 
     return (
         <Card>
-            <div className="flex justify-between">
+            <div className="flex flex-wrap gap-y-4 justify-between">
                 <div>
                     <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
                         Operator Total Earnings
