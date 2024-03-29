@@ -44,7 +44,9 @@ export const TxTypeCountAnalysis = () => {
                                     Single Transfer
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className={`text-tremor-metric font-semibold `}>{latestSingleTransfer} </span>
+                                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
+                                        {latestSingleTransfer}{" "}
+                                    </span>
                                     <span className="text-tremor-default font-medium capitalize text-cyan-500 dark:text-dark-tremor-brand-golemblue">
                                         transactions
                                     </span>
@@ -57,7 +59,9 @@ export const TxTypeCountAnalysis = () => {
                                     Batched
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className={`text-tremor-metric font-semibold `}>{latestBatched} </span>
+                                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
+                                        {latestBatched}{" "}
+                                    </span>
                                     <span className="text-tremor-default font-medium capitalize text-red-500 dark:text-dark-tremor-brand-golemblue">
                                         transactions
                                     </span>

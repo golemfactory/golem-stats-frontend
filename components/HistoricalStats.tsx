@@ -69,7 +69,7 @@ const MetricCardSummary = ({ metricData, metric, selectedRuntime, unit }) => {
             <div>
                 <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">Right now</h3>
                 <div className="flex items-baseline space-x-2">
-                    <span className={`text-tremor-metric font-semibold `}>{value}</span>
+                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>{value}</span>
                     <span className="text-tremor-default font-medium capitalize text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
                         {unit}
                     </span>

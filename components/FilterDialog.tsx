@@ -97,10 +97,12 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
                     </button>
                 </div>
                 <div className="flex  ">
-                    <div className="md:w-96 md:border-r md:border-t md:border-tremor-border md:dark:border-dark-tremor-border bg-white">
+                    <div className="md:w-96 md:border-r md:border-t md:border-tremor-border md:dark:border-dark-tremor-border bg-white dark:bg-dark-tremor-background">
                         <div className="flex flex-col h-full p-6 justify-between">
                             <div>
-                                <h3 className="font-medium text-tremor-content-strong text-tremor-title mb-2">Filter Providers</h3>
+                                <h3 className="font-medium text-tremor-content-strong dark:text-white text-tremor-title mb-2">
+                                    Filter Providers
+                                </h3>
                                 <p className="text-tremor-content text-sm">
                                     Customize your search with filters for Provider name, wallet addressses hardware requirements and much
                                     more. Save these settings as presets for future use.
@@ -148,7 +150,7 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
                             </div>
                         </div>
                     </div>
-                    <div className="flex-1 space-y-6 p-6 md:px-6  md:pt-6 bg-white">
+                    <div className="flex-1 space-y-6 p-6 md:px-6  md:pt-6 bg-white dark:bg-dark-tremor-background">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label

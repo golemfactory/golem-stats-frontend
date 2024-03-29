@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 input {
-    @apply bg-tremor-background-graygolem !important;
+    @apply bg-tremor-background-graygolem bg-dark-tremor-background !important;
 }
 
 .golembutton {

@@ -116,8 +116,8 @@ const TaskParticipationTable = ({ nodeId }) => {
                     disabled={page === 1}
                     className={`px-5 py-2 ${
                         page === 1
-                            ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed border border-gray-200"
-                            : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
+                            ? "text-gray-400 bg-gray-200 dark:bg-dark-tremor-background-muted dark:text-gray-600 dark:border-dark-tremor-border cursor-not-allowed border border-gray-200"
+                            : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-white border dark:bg-dark-tremor-background-muted dark:border-dark-tremor-border border-golemblue "
                     }`}
                 >
                     Previous
@@ -128,8 +128,8 @@ const TaskParticipationTable = ({ nodeId }) => {
                         onClick={() => setPage(pageNumber)}
                         className={`px-5 py-2  ${
                             page === pageNumber
-                                ? "text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue bg-white border border-golemblue"
-                                : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
+                                ? "text-gray-400 bg-gray-200 dark:bg-dark-tremor-background-muted dark:text-white dark:border-dark-tremor-border cursor-not-allowed border border-gray-200"
+                                : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-gray-600 border dark:bg-dark-tremor-background dark:border-dark-tremor-border border-golemblue "
                         }`}
                     >
                         {pageNumber}
@@ -140,8 +140,8 @@ const TaskParticipationTable = ({ nodeId }) => {
                     disabled={page === totalPages}
                     className={`px-5 py-2  ${
                         page === totalPages
-                            ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed border border-gray-200"
-                            : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue border border-golemblue "
+                            ? "text-gray-400 bg-gray-200 dark:bg-dark-tremor-background-muted dark:text-gray-600 dark:border-dark-tremor-border cursor-not-allowed border border-gray-200"
+                            : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-white border dark:bg-dark-tremor-background-muted dark:border-dark-tremor-border border-golemblue "
                     }`}
                 >
                     Next

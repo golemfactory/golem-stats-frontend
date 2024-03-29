@@ -4,7 +4,7 @@ import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 export const StatCard = ({ title, value, unit, loading }: { title: string; value: number; unit: string; loading: boolean }) => {
     return (
-        <Card className="relative bg-white dark:bg-gray-800 ">
+        <Card className="relative bg-white dark:bg-gray-900 ">
             <dt>
                 <div className="absolute bg-golemblue  p-3">
                     <GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />
@@ -38,7 +38,7 @@ export const StatCard = ({ title, value, unit, loading }: { title: string; value
                             })()}
                         </p>
 
-                        <p className="ml-2 flex items-baseline text-sm font-semibold text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue dark:text-gray-400">
+                        <p className="ml-2 flex items-baseline text-sm font-semibold text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue ">
                             {unit}
                         </p>
                     </>

@@ -51,7 +51,9 @@ export const HistoricalComputingChart: React.FC = () => {
                                     Yesterday
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className={`text-tremor-metric font-semibold `}>{latestValue} </span>
+                                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
+                                        {latestValue}{" "}
+                                    </span>
                                     <span className="text-tremor-default font-medium capitalize text-tremor-brand dark:text-dark-tremor-brand-golemblue">
                                         Providers
                                     </span>
@@ -64,7 +66,9 @@ export const HistoricalComputingChart: React.FC = () => {
                                     All-time high
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className={`text-tremor-metric font-semibold `}>{athValue} </span>
+                                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
+                                        {athValue}{" "}
+                                    </span>
                                     <span className="text-tremor-default font-medium capitalize text-red-500 dark:text-dark-tremor-brand-golemblue">
                                         Providers
                                     </span>

@@ -39,7 +39,9 @@ export const TxAnalysis = () => {
                                     Today on Golem
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className={`text-tremor-metric font-semibold `}>{RoundingFunction(latestOnGolem, 2)} </span>
+                                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
+                                        {RoundingFunction(latestOnGolem, 2)}{" "}
+                                    </span>
                                     <span className="text-tremor-default font-medium capitalize text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
                                         GLM
                                     </span>
@@ -52,7 +54,9 @@ export const TxAnalysis = () => {
                                     Today outside Golem
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className={`text-tremor-metric font-semibold `}>{RoundingFunction(latestNotOnGolem, 2)} </span>
+                                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
+                                        {RoundingFunction(latestNotOnGolem, 2)}{" "}
+                                    </span>
                                     <span className="text-tremor-default font-medium capitalize text-red-500 dark:text-dark-tremor-brand-golemblue">
                                         GLM
                                     </span>

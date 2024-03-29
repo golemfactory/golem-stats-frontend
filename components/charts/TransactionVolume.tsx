@@ -46,7 +46,9 @@ export const TxVolumeAnalysis = () => {
                                     On Golem
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className={`text-tremor-metric font-semibold `}>{latestOnGolem} </span>
+                                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
+                                        {latestOnGolem}{" "}
+                                    </span>
                                     <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
                                         Transactions
                                     </span>
@@ -59,7 +61,9 @@ export const TxVolumeAnalysis = () => {
                                     On Polygon
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className={`text-tremor-metric font-semibold `}>{latestNotOnGolem} </span>
+                                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
+                                        {latestNotOnGolem}{" "}
+                                    </span>
                                     <span className="text-tremor-default font-medium text-red-500 dark:text-dark-tremor-brand-golemblue">
                                         Transactions
                                     </span>
