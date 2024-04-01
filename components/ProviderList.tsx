@@ -157,7 +157,9 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     const isMainnet = properties["golem.com.payment.platform.erc20-mainnet-glm.address"] !== undefined
                     return (filterValue === "Mainnet" && isMainnet) || (filterValue === "Testnet" && !isMainnet)
                 case "walletAddress":
+                    if (provider.wallet === null) return false
                     return provider.wallet.toLowerCase().includes(filterValue.toLowerCase())
+
                 default:
                     return true
             }
