@@ -38,6 +38,7 @@ const NodeActivityChart = ({ nodeId }) => {
                 valueFormatter={valueFormatter}
                 showYAxis={true}
                 className="mt-6 h-48"
+                
             />
         </Card>
     )

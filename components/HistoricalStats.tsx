@@ -124,6 +124,7 @@ const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, sel
                     categories={[metric]}
                     customTooltip={customTooltip}
                     className="h-72"
+                    showAnimation={true}
                 />
             </div>
         </Card>

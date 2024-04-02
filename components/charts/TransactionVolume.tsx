@@ -110,6 +110,7 @@ export const TxVolumeAnalysis = () => {
                         index="date"
                         categories={["On Golem", "On Polygon"]}
                         colors={["blue", "purple"]}
+                        showAnimation={true}
                     />
                 ) : (
                     <Skeleton height={250} />

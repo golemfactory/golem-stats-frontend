@@ -99,6 +99,7 @@ export const HistoricalComputingChart: React.FC = () => {
                         index="date"
                         categories={["Simultaneous providers computing"]}
                         yAxisWidth={30}
+                        showAnimation={true}
                     />
                 ) : (
                     <span>Loading...</span>

@@ -108,6 +108,7 @@ const DiskFileIoRandChart = ({ nodeId }) => {
                             showLegend={false}
                             showGradient={false}
                             className="mt-10 h-72"
+                            showAnimation={true}
                         />
                     </>
                 )}

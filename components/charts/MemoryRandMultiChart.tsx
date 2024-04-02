@@ -109,6 +109,7 @@ const MemoryRandMultiChart = ({ nodeId }) => {
                             showLegend={false}
                             showGradient={false}
                             className="mt-10 h-72"
+                            showAnimation={true}
                         />
                     </>
                 )}

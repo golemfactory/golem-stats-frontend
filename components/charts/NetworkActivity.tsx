@@ -83,6 +83,7 @@ export const NetworkActivity: React.FC = () => {
                                 colors={["blue"]}
                                 yAxisWidth={30}
                                 showAnimation={true}
+                                showAnimation={true}
                             />
                         )}
                     </TabPanel>
