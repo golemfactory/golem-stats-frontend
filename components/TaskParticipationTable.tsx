@@ -12,8 +12,7 @@ const Title = () => (
     <div className="p-6">
         <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Reputation Tests</h3>
         <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-            This table displays the results of reputation tests for this provider conducted on the network. For a provider to be eligible
-            for tests
+            This table displays the results of reputation tests for this provider conducted on the network.
         </p>
     </div>
 )
@@ -50,16 +49,16 @@ const TaskParticipationTable = ({ nodeId }) => {
         return range
     }, [page, totalPages])
 
-    if (error)
-        return (
-            <Card className="p-0 h-full">
-                <Title />
-                <div className="border-t border-tremor-border  dark:border-dark-tremor-border" />
-                <div className="p-6">
-                    <p className="text-tremor-content dark:text-dark-tremor-content">Failed to load data</p>
-                </div>
-            </Card>
-        )
+    if (error) console.log(error)
+    return (
+        <Card className="p-0 h-full">
+            <Title />
+            <div className="border-t border-tremor-border  dark:border-dark-tremor-border" />
+            <div className="p-6">
+                <p className="text-tremor-content dark:text-dark-tremor-content">Failed to load data</p>
+            </div>
+        </Card>
+    )
     if (!data) return <p>Loading...</p>
 
     return (

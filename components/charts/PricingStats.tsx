@@ -21,6 +21,23 @@ const PricingStats = () => {
         return !(isNaN(data) || data === null)
     }
 
+    // Initialize values to a default (e.g., null or 0)
+    let cpuValue = null
+    let envValue = null
+    let startValue = null
+
+    // Check if data is available before trying to access its properties
+    if (data && metricData) {
+        const networkData = metricData[network] // Assuming metricData contains historical data as per your structure
+        const currentData = data // Assuming 'data' contains the current metric values
+
+        // Now, safely attempt to assign values if 'data' and 'metricData' are not null
+        // Adjust property access according to your actual data structure
+        cpuValue = selectedMetric === "Median" ? data[`${network}`].cpu_median : data[`${network}`].cpu_average
+        envValue = selectedMetric === "Median" ? data[`${network}`].env_median : data[`${network}`].env_average
+        startValue = selectedMetric === "Median" ? data[`${network}`].start_median : data[`${network}`].start_average
+    }
+
     if (!metricData || !data)
         return (
             <Card>

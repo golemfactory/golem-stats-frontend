@@ -24,7 +24,7 @@ export default function Home() {
                 url="https://stats.golem.network/network/provider/pricing"
             />
 
-            {/* <PricingStats /> */}
+            <PricingStats />
             <TaskPricingTable />
         </div>
     )
