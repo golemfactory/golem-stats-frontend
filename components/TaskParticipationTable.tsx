@@ -3,7 +3,8 @@ import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import { useState, useMemo } from "react"
 import { RoundingFunction } from "@/lib/RoundingFunction"
-
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
 function classNames(...classes) {
     return classes.filter(Boolean).join(" ")
 }
@@ -49,17 +50,29 @@ const TaskParticipationTable = ({ nodeId }) => {
         return range
     }, [page, totalPages])
 
-    if (error) console.log(error)
-    return (
-        <Card className="p-0 h-full">
-            <Title />
-            <div className="border-t border-tremor-border  dark:border-dark-tremor-border" />
-            <div className="p-6">
-                <p className="text-tremor-content dark:text-dark-tremor-content">Failed to load data</p>
-            </div>
-        </Card>
-    )
-    if (!data) return <p>Loading...</p>
+    if (error) {
+        console.log(error)
+        return (
+            <Card className="p-0 h-full">
+                <Title />
+                <div className="border-t border-tremor-border  dark:border-dark-tremor-border" />
+                <div className="p-6">
+                    <p className="text-tremor-content dark:text-dark-tremor-content">Failed to load data</p>
+                </div>
+            </Card>
+        )
+    }
+    if (!data) {
+        return (
+            <Card className="p-0 h-full">
+                <Title />
+                <div className="border-t border-tremor-border  dark:border-dark-tremor-border" />
+                <div className="p-6">
+                    <Skeleton count={itemsPerPage} height={50} />
+                </div>
+            </Card>
+        )
+    }
 
     return (
         <Card className="p-0 h-full">
@@ -69,7 +82,6 @@ const TaskParticipationTable = ({ nodeId }) => {
                 <TableHead>
                     <TableRow className="border-b border-tremor-border dark:border-dark-tremor-border">
                         <TableHeaderCell className="text-white dark:text-dark-tremor-content-strong">Task ID</TableHeaderCell>
-                        <TableHeaderCell className="text-white dark:text-dark-tremor-content-strong">Date</TableHeaderCell>
                         <TableHeaderCell className="text-white dark:text-dark-tremor-content-strong">Status</TableHeaderCell>
                         <TableHeaderCell className="text-right text-white dark:text-dark-tremor-content-strong">Error</TableHeaderCell>
                         <TableHeaderCell className="text-right text-white dark:text-dark-tremor-content-strong">Cost</TableHeaderCell>
@@ -80,7 +92,6 @@ const TaskParticipationTable = ({ nodeId }) => {
                         (paginatedData || []).map((item, index) => (
                             <TableRow key={index}>
                                 <TableCell>{item.task_id}</TableCell>
-                                <TableCell>{new Date(item.task_started_at * 1000).toLocaleString()}</TableCell>
                                 <TableCell>
                                     <span
                                         className={classNames(
