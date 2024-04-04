@@ -105,31 +105,66 @@ const VmRuntimeView = ({ provider }) => {
                             data-tooltip-id={`price-comparison-tooltip${provider.node_id}`}
                             className="text-sm text-green-500 dark:text-gray-400"
                         >
-                            -{RoundingFunction(provider.runtimes.vm?.times_cheaper)}%{" "}
+                            {RoundingFunction(provider.runtimes.vm?.times_cheaper)}x
                             <RiArrowDownLine className="inline-block h-4 w-4 text-green-500" />
                             <ReactTooltip
                                 id={`price-comparison-tooltip${provider.node_id}`}
                                 place="bottom"
-                                content={`Based on available data, this provider's pricing is approximately ${RoundingFunction(
-                                    provider.runtimes.vm?.times_cheaper
-                                )}% cheaper than an AWS instance of similar specifications.`}
+                                content={
+                                    provider.runtimes.vm?.cheaper_than
+                                        ? `Based on available data, this provider's hourly price is $${RoundingFunction(
+                                              provider.runtimes.vm?.hourly_price_usd,
+                                              3
+                                          )} USD, which is approximately ${RoundingFunction(
+                                              provider.runtimes.vm?.times_cheaper
+                                          )} times cheaper than AWS's similar specification instance, ${
+                                              provider.runtimes.vm?.cheaper_than.name
+                                          }, with an hourly price of $${provider.runtimes.vm?.cheaper_than.price_usd} USD (vCPU: ${
+                                              provider.runtimes.vm?.cheaper_than.vcpu
+                                          }, Memory: ${provider.runtimes.vm?.cheaper_than.memory}GB).`
+                                        : `Based on available data, this provider's hourly price is $${RoundingFunction(
+                                              provider.runtimes.vm?.hourly_price_usd,
+                                              3
+                                          )} USD, which is approximately ${RoundingFunction(
+                                              provider.runtimes.vm?.times_cheaper
+                                          )} times cheaper than an AWS instance with similar specifications.`
+                                }
                                 className="break-words max-w-64 z-50"
                             />
                         </p>
                     )}
+
                     {provider.runtimes?.vm?.times_more_expensive && (
                         <p
                             data-tooltip-id={`price-comparison-tooltip${provider.node_id}`}
                             className="text-sm text-red-500 dark:text-gray-400"
                         >
-                            +{RoundingFunction(provider.runtimes.vm?.times_more_expensive)}%
+                            {RoundingFunction(provider.runtimes.vm?.times_more_expensive)}x
                             <RiArrowUpLine className="inline-block h-4 w-4 text-red-500" />
                             <ReactTooltip
                                 id={`price-comparison-tooltip${provider.node_id}`}
                                 place="bottom"
-                                content={`Based on available data, this provider's pricing is approximately ${RoundingFunction(
-                                    provider.runtimes.vm?.times_more_expensive
-                                )}% higher than an AWS instance of similar specifications.`}
+                                content={
+                                    provider.runtimes.vm?.overpriced_compared_to
+                                        ? `Based on available data, this provider's hourly price is approximately $${RoundingFunction(
+                                              provider.runtimes.vm?.hourly_price_usd,
+                                              3
+                                          )} USD, which is about ${RoundingFunction(
+                                              provider.runtimes.vm?.times_more_expensive
+                                          )} times more expensive than AWS's similar specification instance, ${
+                                              provider.runtimes.vm?.overpriced_compared_to.name
+                                          }, with an hourly price of $${
+                                              provider.runtimes.vm?.overpriced_compared_to.price_usd
+                                          } USD (vCPU: ${provider.runtimes.vm?.overpriced_compared_to.vcpu}, Memory: ${
+                                              provider.runtimes.vm?.overpriced_compared_to.memory
+                                          }GB).`
+                                        : `Based on available data, this provider's hourly price is approximately $${RoundingFunction(
+                                              provider.runtimes.vm?.hourly_price_usd,
+                                              3
+                                          )} USD, which is about ${RoundingFunction(
+                                              provider.runtimes.vm?.times_more_expensive
+                                          )} times more expensive compared to an AWS instance of similar specs.`
+                                }
                                 className="break-words max-w-64 z-50"
                             />
                         </p>
