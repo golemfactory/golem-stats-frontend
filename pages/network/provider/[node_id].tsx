@@ -264,7 +264,7 @@ export async function getStaticProps({ params }: { params: { node_id: string } }
                                     wallet: "0x7ad8ce2f95f69be197d136e308303d2395e68379",
                                     "golem.com.scheme": "payu",
                                     "golem.inf.mem.gib": 8.0,
-                                    "golem.node.id.name": "fractal_02_0.h",
+                                    "golem.node.id.name": "unknown-node",
                                     "golem.runtime.name": "vm",
                                     "golem.inf.cpu.brand": "Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz",
                                     "golem.inf.cpu.cores": 8,
