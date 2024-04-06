@@ -31,9 +31,11 @@ interface NodeOperatorProps {
 //     return { paths, fallback: true }
 // }
 
-const NodeOperator: NextPage<NodeOperatorProps> = ({ initialData }) => {
+const NodeOperator = ({ initialData }) => {
     const router = useRouter()
-    let wallet_id = (router.query.wallet_id as string).toLowerCase()
+
+    // Use optional chaining with nullish coalescing to ensure we don't call toLowerCase on undefined.
+    let wallet_id = (router.query.wallet_id as string)?.toLowerCase() ?? ""
 
     useEffect(() => {}, [router.query.wallet_id])
 
@@ -44,7 +46,7 @@ const NodeOperator: NextPage<NodeOperatorProps> = ({ initialData }) => {
                 description={`Golem Network nodes operated by wallet ${wallet_id}`}
                 url={`https://stats.golem.network/network/providers/operator/${wallet_id}`}
             />
-            <h1 className="text-2xl  font-medium dark:text-gray-300">Nodes operated by wallet</h1>
+            <h1 className="text-2xl font-medium dark:text-gray-300">Nodes operated by wallet</h1>
             <span className="text-gray-500 dark:text-gray-400 mb-6 block">{wallet_id}</span>
 
             <ProviderList initialData={initialData} enableShowingOfflineNodes={true} endpoint={`v2/provider/wallet/${wallet_id}`} />
