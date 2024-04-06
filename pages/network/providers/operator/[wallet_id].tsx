@@ -3,6 +3,7 @@ import { SEO } from "@/components/SEO"
 import { GetServerSideProps, NextPage } from "next"
 import { fetcher } from "@/fetcher"
 import { useRouter } from "next/router"
+import { useEffect } from "react"
 
 interface NodeOperatorProps {
     wallet_id: string
@@ -32,7 +33,10 @@ interface NodeOperatorProps {
 
 const NodeOperator: NextPage<NodeOperatorProps> = ({ initialData }) => {
     const router = useRouter()
-    let wallet_id = router.query.wallet_id as string
+    let wallet_id = (router.query.wallet_id as string).toLowerCase()
+
+    useEffect(() => {}, [router.query.wallet_id])
+
     return (
         <>
             <SEO
@@ -42,6 +46,7 @@ const NodeOperator: NextPage<NodeOperatorProps> = ({ initialData }) => {
             />
             <h1 className="text-2xl  font-medium dark:text-gray-300">Nodes operated by wallet</h1>
             <span className="text-gray-500 dark:text-gray-400 mb-6 block">{wallet_id}</span>
+
             <ProviderList initialData={initialData} enableShowingOfflineNodes={true} endpoint={`v2/provider/wallet/${wallet_id}`} />
         </>
     )
