@@ -27,10 +27,7 @@ const TaskParticipationTable = ({ nodeId }) => {
     const totalPages = useMemo(() => Math.ceil(data?.task_participation?.length / itemsPerPage), [data])
 
     const paginatedData = useMemo(
-        () =>
-            data?.task_participation
-                ?.sort((a, b) => b.task_started_at - a.task_started_at)
-                .slice((page - 1) * itemsPerPage, page * itemsPerPage),
+        () => data?.task_participation?.sort((a, b) => b.task_id - a.task_id).slice((page - 1) * itemsPerPage, page * itemsPerPage),
         [data, page]
     )
 
