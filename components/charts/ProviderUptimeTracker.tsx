@@ -11,6 +11,7 @@ import NvidiaIcon from "../svg/NvidiaIcon"
 const colorMapping = {
     online: "emerald-500",
     offline: "red-500",
+    outage: "yellow-500",
 }
 
 interface UptimeTracker {

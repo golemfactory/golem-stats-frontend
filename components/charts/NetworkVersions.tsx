@@ -80,7 +80,7 @@ export const NetworkVersionAdoption: React.FC = () => {
             <div className="flex justify-between px-6">
                 <div>
                     <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
-                        Latest official release
+                        Latest Stable Version
                     </h3>
                     <div className="flex items-baseline space-x-2">
                         {latestYagnaVersion ? (
