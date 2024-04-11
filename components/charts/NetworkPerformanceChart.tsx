@@ -68,6 +68,7 @@ const NetworkPerformanceChart = ({ nodeId }) => {
                             index="date"
                             categories={["Download Mbit/s"]}
                             colors={["blue"]}
+                            autoMinValue={true}
                             showLegend={false}
                             showGradient={false}
                             className="mt-10 h-72"

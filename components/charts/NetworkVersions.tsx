@@ -15,11 +15,49 @@ export const NetworkVersionAdoption: React.FC = () => {
         {}
     )
 
+    const customTooltip = (props) => {
+        const { payload, active } = props
+        if (!active || !payload) return null
+        console.log(payload)
+        return (
+            <div className="w-56 rounded-tremor-default border border-tremor-border dark:border-dark-tremor-border bg-tremor-background dark:bg-dark-tremor-background p-2 text-tremor-default shadow-tremor-dropdown">
+                {payload.map((category, idx) => (
+                    <div key={idx} className="flex flex-1 space-x-2.5">
+                        {/* Conditional color coding for the indicator */}
+                        <div className={`flex w-1 ${category.payload.rc ? "bg-yellow-500" : "bg-green-500"}`} />
+                        <div className="space-y-1">
+                            {/* Type line with color coding for the value only */}
+                            <p className="font-medium text-tremor-content-emphasis dark:text-white ">
+                                Type:{" "}
+                                <span className={`font-medium ${category.payload.rc ? "text-yellow-500" : "text-green-500"}`}>
+                                    {category.payload.rc ? "Test Version" : "Stable Version"}
+                                </span>
+                            </p>
+                            {/* Version line with conditional color */}
+                            <p className={`font-medium text-tremor-content-emphasis dark:text-dark-tremor-content `}>
+                                Version: <span className="text-tremor-default dark:text-white">{category.payload.version}</span>
+                            </p>
+                            {/* Providers remains standard for readability */}
+                            <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content">
+                                Percentage: <span className="text-tremor-default dark:text-white">{category.payload.percentage}%</span>
+                            </p>
+                            <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content">
+                                Providers: <span className="text-tremor-default dark:text-white">{category.value}</span>
+                            </p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )
+    }
+
     useEffect(() => {
         if (data) {
             const formattedData = data.map((obj: any) => ({
                 version: obj.version,
                 Providers: obj.count,
+                rc: obj.rc,
+                percentage: obj.percentage,
             }))
             setChartData(formattedData)
         }
@@ -61,13 +99,13 @@ export const NetworkVersionAdoption: React.FC = () => {
                 index="version"
                 categories={["Providers"]}
                 valueFormatter={valueFormatter}
+                customTooltip={customTooltip}
                 showLegend={true}
                 showYAxis={true}
                 yAxisWidth={45}
                 showTooltip={true}
                 showAnimation={true}
-                // Assuming you find the maximum value for the Providers count and want to ensure the Y axis scales correctly:
-                maxValue={Math.max(...chartData.map((obj) => obj.Providers), 0) + 50} // Adjust 50 or use another method as buffer or for scaling
+                maxValue={Math.max(...chartData.map((obj) => obj.Providers), 0) + 0}
             />
         </Card>
     )

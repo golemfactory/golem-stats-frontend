@@ -101,6 +101,7 @@ export const TxTypeCountAnalysis = () => {
                         categories={["Single Transfer", "Batched"]}
                         colors={["blue", "red"]}
                         showAnimation={true}
+                        autoMinValue={true}
                     />
                 ) : (
                     <Skeleton height={250} />

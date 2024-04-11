@@ -97,9 +97,11 @@ export const HistoricalComputingChart: React.FC = () => {
                         className="h-72"
                         data={formattedData}
                         index="date"
+                        autoMinValue={true}
                         categories={["Simultaneous providers computing"]}
                         yAxisWidth={30}
                         showAnimation={true}
+                        autoMinValue={true}
                     />
                 ) : (
                     <span>Loading...</span>

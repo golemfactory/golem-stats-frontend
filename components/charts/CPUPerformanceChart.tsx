@@ -108,6 +108,7 @@ const CPUPerformanceChart = ({ nodeId }) => {
                         <AreaChart
                             data={formattedData}
                             index="date"
+                            autoMinValue={true}
                             categories={["Multi Thread", "Single Thread"]}
                             colors={["blue", "red"]}
                             showLegend={false}

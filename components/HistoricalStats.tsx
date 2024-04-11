@@ -121,6 +121,7 @@ const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, sel
                         date: formatDate(item.date, selectedTimeFrame),
                     }))}
                     index="date"
+                    autoMinValue={true}
                     categories={[metric]}
                     customTooltip={customTooltip}
                     className="h-72"

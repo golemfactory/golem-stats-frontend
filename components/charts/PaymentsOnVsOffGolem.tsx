@@ -100,6 +100,7 @@ export const TxAnalysis = () => {
                     <AreaChart
                         data={formattedData}
                         index="date"
+                        autoMinValue={true}
                         categories={["On Golem", "On Polygon"]}
                         colors={["blue", "purple"]}
                         showAnimation={true}

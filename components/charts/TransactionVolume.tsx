@@ -106,6 +106,7 @@ export const TxVolumeAnalysis = () => {
                 {!isValidating && formattedData.length > 0 ? (
                     <AreaChart
                         className="h-72"
+                        autoMinValue={true}
                         data={formattedData}
                         index="date"
                         categories={["On Golem", "On Polygon"]}

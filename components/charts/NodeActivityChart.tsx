@@ -30,6 +30,7 @@ const NodeActivityChart = ({ nodeId }) => {
             <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Node Activity</h3>
             <AreaChart
                 data={chartData}
+                autoMinValue={true}
                 index="date"
                 categories={["Status"]}
                 showLegend={false}
@@ -38,7 +39,6 @@ const NodeActivityChart = ({ nodeId }) => {
                 valueFormatter={valueFormatter}
                 showYAxis={true}
                 className="mt-6 h-48"
-                
             />
         </Card>
     )

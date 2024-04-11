@@ -87,9 +87,9 @@ export default function Index() {
                 <div className="col-span-12">
                     <NetworkVersionAdoption />
                 </div>
-                <div className="lg:col-span-6 col-span-12">
+                {/* <div className="lg:col-span-6 col-span-12">
                     <NetworkCpuArchitectureChart />
-                </div>
+                </div> */}
                 <div className="lg:col-span-6 col-span-12">
                     <NetworkCPUVendorDistribution />
                 </div>
@@ -108,7 +108,7 @@ export default function Index() {
                         <Skeleton height={500} />
                     )}
                 </div> */}
-                <div className="col-span-12">
+                {/* <div className="col-span-12">
                     <TxAnalysis />
                 </div>
                 <div className="col-span-12">
@@ -119,15 +119,15 @@ export default function Index() {
                 </div>
                 <div className="col-span-12">
                     <TxAverageValueAnalysis />
-                </div>
+                </div> */}
             </div>
 
             {/* Remaining components in the layout */}
-            <div className="grid grid-cols-12 gap-4">
+            {/* <div className="grid grid-cols-12 gap-4">
                 <div className="lg:col-span-12 col-span-12">
                     {overview ? <EC2vsGolemPricing data={overview} /> : <Skeleton height={500} />}
                 </div>
-            </div>
+            </div> */}
         </div>
     )
 }

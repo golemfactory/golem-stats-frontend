@@ -235,7 +235,7 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                         <ReactTooltip
                             id="price-tooltip"
                             place="bottom"
-                            content="This shows the hourly price for the provider at full utilization. Hover over the price for a detailed explanation. The percentage reflects cost comparison to an AWS instance with similar specs: green means cheaper, red means more expensive. Note: No comparison data for GPU providers is available yet."
+                            content="This shows the hourly price for the provider at full utilization. Hover over the price for a detailed explanation."
                             className="break-words max-w-64 z-50"
                         />
                     </div>

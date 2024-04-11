@@ -182,6 +182,7 @@ const PricingStats = () => {
 
                                     return transformedItem
                                 })}
+                                autoMinValue={true}
                                 index="date"
                                 categories={["CPU/h", "Env/h", "Start Price"]}
                                 colors={["blue-400", "golemblue", "golemmain"]}

@@ -79,6 +79,7 @@ export const NetworkActivity: React.FC = () => {
                             <AreaChart
                                 data={data}
                                 index="date"
+                                autoMinValue={true}
                                 categories={["Providers computing"]}
                                 colors={["blue"]}
                                 yAxisWidth={30}

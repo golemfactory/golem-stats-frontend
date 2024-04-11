@@ -100,7 +100,7 @@ const VmRuntimeView = ({ provider }) => {
                             className="break-words max-w-64 z-50"
                         />
                     </p>
-                    {provider.runtimes?.vm?.times_cheaper && (
+                    {/* {provider.runtimes?.vm?.times_cheaper && (
                         <p
                             data-tooltip-id={`price-comparison-tooltip${provider.node_id}`}
                             className="text-sm text-green-500 dark:text-gray-400"
@@ -168,7 +168,7 @@ const VmRuntimeView = ({ provider }) => {
                                 className="break-words max-w-64 z-50"
                             />
                         </p>
-                    )}
+                    )} */}
                 </div>
             </div>
             <div className="lg:col-span-2 col-span-4 lg:flex hidden items-center gap-2">

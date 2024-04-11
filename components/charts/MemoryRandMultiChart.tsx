@@ -104,6 +104,7 @@ const MemoryRandMultiChart = ({ nodeId }) => {
                         <AreaChart
                             data={formattedData}
                             index="date"
+                            autoMinValue={true}
                             categories={["Read MB/s", "Write MB/s"]}
                             colors={["blue", "red"]}
                             showLegend={false}
