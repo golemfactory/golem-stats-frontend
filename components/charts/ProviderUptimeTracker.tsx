@@ -53,10 +53,17 @@ const Block = ({ color, status, date, tooltip, test }) => {
                             </p>
                             {status === "outage" ? (
                                 <>
-                                    <p className="mt-1 text-tremor-label text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
-                                        {tooltip.human_period}
-                                    </p>
-                                    <div className="my-2 h-px w-full bg-tremor-border dark:bg-dark-tremor-border" aria-hidden={true} />
+                                    {tooltip.map((item, index) => (
+                                        <>
+                                            <p className="mt-1 text-tremor-label text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
+                                                {item.human_period} between {item.time_period}
+                                            </p>
+                                            <div
+                                                className="my-2 h-px w-full bg-tremor-border dark:bg-dark-tremor-border"
+                                                aria-hidden={true}
+                                            />
+                                        </>
+                                    ))}
                                 </>
                             ) : null}
                             <p className="mt-1 text-tremor-label text-tremor-content dark:text-dark-tremor-content">{date}</p>
@@ -88,13 +95,13 @@ interface UptimeTracker {
     color: string
     date: string
     status: string
-    downtime: { human_period: string }
+    downtimes: { human_period: string; time_period: string; date: string }[]
 }
 
 interface UptimeTrackerResponse {
     first_seen: string
     uptime_percentage: number
-    downtime_periods: { human_period: string }[]
+    downtime_periods: { human_period: string; time_period: string; date: string }[]
     current_status: string
     data: UptimeTracker[]
 }
@@ -141,7 +148,7 @@ export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps
         return {
             color: item.color,
             status: item.status,
-            tooltip: item.downtime,
+            tooltip: item.downtimes,
             date: item.date,
             color: colorMapping[item.status],
         }
