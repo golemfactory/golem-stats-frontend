@@ -9,7 +9,6 @@ import "react-loading-skeleton/dist/skeleton.css"
 import HardwareBadge from "../HardwareBadge"
 import NvidiaIcon from "../svg/NvidiaIcon"
 import * as HoverCardPrimitives from "@radix-ui/react-hover-card"
-import { RiArrowRightUpLine, RiCheckboxCircleFill } from "@remixicon/react"
 import React from "react"
 
 import clsx from "clsx"
