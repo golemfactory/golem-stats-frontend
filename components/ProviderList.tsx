@@ -186,27 +186,24 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
     const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
 
     return (
-        <div className="flex flex-col ">
-            <div>
-                <div className="fixed z-[99999] bottom-5 right-5">
-                    <div className="flex justify-center">
-                        <button className="golembutton group" onClick={() => setIsFilterDialogOpen(true)}>
-                            <div className="button-content px-2 group-hover:gap-x-2">
-                                <RiFilterLine className="icon h-5 w-5 -ml-2" />
-                                <span className="text">Filter</span>
-                            </div>
-                        </button>
-                    </div>
+        <>
+            <div className="flex flex-row justify-end">
+                <div>
+                    <button className="golembutton group flex gap-x-2 items-center" onClick={() => setIsFilterDialogOpen(true)}>
+                        <RiFilterLine className="icon h-5 w-5 -ml-2" />
+                        <span className="text">Filter</span>
+                    </button>
+                    {/* Existing components */}
+                    <FilterDialog
+                        isOpen={isFilterDialogOpen}
+                        onClose={() => setIsFilterDialogOpen(false)}
+                        filters={filters}
+                        setFilters={setFilters}
+                        data={rawData}
+                    />
                 </div>
-                {/* Existing components */}
-                <FilterDialog
-                    isOpen={isFilterDialogOpen}
-                    onClose={() => setIsFilterDialogOpen(false)}
-                    filters={filters}
-                    setFilters={setFilters}
-                    data={rawData}
-                />
             </div>
+
             <div>
                 <div className="grid grid-cols-12 gap-4 px-4 bg-golemblue text-white py-4 my-4 font-medium">
                     <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
@@ -316,6 +313,6 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
                     </button>
                 </div>
             </div>
-        </div>
+        </>
     )
 }

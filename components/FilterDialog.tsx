@@ -86,10 +86,10 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
     return (
         <Dialog open={isOpen} onClose={onClose} className="z-[100] ">
             <DialogPanel className="overflow-visible p-0 sm:max-w-6xl bg-transparent ring-none ring-0">
-                <div className="absolute right-0 top-0 pr-3 pt-3">
+                <div className="absolute right-0 top-0 pr-3 pt-1">
                     <button
                         type="button"
-                        className="rounded-tremor-small p-2 text-tremor-content-subtle hover:bg-tremor-background-subtle hover:text-tremor-content"
+                        className="rounded-tremor-small p-2 text-tremor-content-subtle hover:bg-tremor-background-subtle hover:text-tremor-content dark:text-dark-tremor-content hover:dark:bg-dark-tremor-background-subtle "
                         onClick={onClose}
                         aria-label="Close"
                     >
@@ -221,7 +221,7 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
                                     htmlFor="maxPrice"
                                     className="block text-sm font-medium leading-6 text-gray-900 dark:text-white font-inter"
                                 >
-                                    Min Price
+                                    Max Price
                                 </label>
                                 <TextInput
                                     type="number"
