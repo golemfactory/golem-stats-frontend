@@ -56,7 +56,9 @@ const Block = ({ color, status, date, tooltip, test }) => {
                                     {tooltip.map((item, index) => (
                                         <>
                                             <p className="mt-1 text-tremor-label text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
-                                                {item.human_period} between {item.time_period}
+                                                {item.human_period}
+                                                <br></br>
+                                                {item.time_period}
                                             </p>
                                             <div
                                                 className="my-2 h-px w-full bg-tremor-border dark:bg-dark-tremor-border"
