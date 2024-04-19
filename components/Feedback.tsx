@@ -82,10 +82,12 @@ const Feedback = () => {
                                                     {" "}
                                                     The stats page is about to get a complete refresh, and we're looking to make it the
                                                     perfect service for <b>YOU</b>.<br></br> <br></br> We want to hear your honest and
-                                                    unfiltered feedback. Don't hold back! Think out loud and let us know what you love, what
+                                                    unfiltered feedback, especially any feature requests or improvements that could make
+                                                    your life easier. Don't hold back! Think out loud and let us know what you love, what
                                                     you hate, what you're missing, or any other thoughts you have.<br></br>
                                                     <br></br> We're open to all suggestions, critiques, and ideas. This is your chance to
-                                                    shape the future of the stats page, so speak your mind freely.{" "}
+                                                    shape the future of the stats page and help us build the features that will truly
+                                                    benefit you, so speak your mind freely.{" "}
                                                 </p>
 
                                                 <textarea
