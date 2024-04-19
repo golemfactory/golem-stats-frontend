@@ -8,6 +8,7 @@ import { useRouter } from "next/router"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 import { GoogleAnalytics } from "nextjs-google-analytics"
+import Feedback from "@/components/Feedback"
 
 // Check that PostHog is client-side (used to handle Next.js SSR)
 if (typeof window !== "undefined") {
@@ -33,6 +34,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                     <Navbar />
                     <div className="mx-auto px-4 sm:px-6 lg:px-8 pb-10 mt-5 ">
                         <Component {...pageProps} />
+                        <Feedback />
                     </div>
                 </SessionProvider>
             </PostHogProvider>
