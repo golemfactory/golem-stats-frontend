@@ -90,9 +90,9 @@ export default function Index() {
                 {/* <div className="lg:col-span-6 col-span-12">
                     <NetworkCpuArchitectureChart />
                 </div> */}
-                <div className="lg:col-span-6 col-span-12">
+                {/* <div className="lg:col-span-6 col-span-12">
                     <NetworkCPUVendorDistribution />
-                </div>
+                </div> */}
                 <div className="lg:col-span-12 col-span-12">
                     <HistoricalComputingChart />
                 </div>
