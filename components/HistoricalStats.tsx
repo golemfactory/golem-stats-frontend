@@ -86,7 +86,14 @@ const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, sel
             <div className="flex flex-col md:flex-row justify-between items-start border-b border-tremor-border dark:border-dark-tremor-border">
                 <div className="px-6 mb-6">
                     <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">{name}</h1>
-                    <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">{description}</p>
+                    {name === "Connected Providers" ? (
+                        <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                            The number of providers currently available on the network with the <b>{getProviderType(selectedRuntime)}</b>{" "}
+                            runtime
+                        </p>
+                    ) : (
+                        <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">{description}</p>
+                    )}
                 </div>
             </div>
             <div className="grid md:flex md:items-start md:justify-between px-6 pt-4">
@@ -151,9 +158,7 @@ const NetworkStats = ({ metricData }) => {
             name: "Connected Providers",
             metric: "online",
             unit: "Providers",
-            description: `The number of providers currently available on the network with the runtime ${
-                getProviderType(selectedRuntime) === "AI Provider" ? "AI" : getProviderType(selectedRuntime)
-            }.`,
+            description: `The number of providers currently available on the network with the ${selectedRuntime} runtime`,
         },
         {
             name: "Compute Power",

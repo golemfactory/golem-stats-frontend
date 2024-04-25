@@ -187,22 +187,24 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
 
     return (
         <>
-            <div className="flex flex-row justify-end">
-                <div>
-                    <button className="golembutton group flex gap-x-2 items-center" onClick={() => setIsFilterDialogOpen(true)}>
-                        <RiFilterLine className="icon h-5 w-5 -ml-2" />
-                        <span className="text">Filter</span>
-                    </button>
-                    {/* Existing components */}
-                    <FilterDialog
-                        isOpen={isFilterDialogOpen}
-                        onClose={() => setIsFilterDialogOpen(false)}
-                        filters={filters}
-                        setFilters={setFilters}
-                        data={rawData}
-                    />
+            {rawData && (
+                <div className="flex flex-row justify-end">
+                    <div>
+                        <button className="golembutton group flex gap-x-2 items-center" onClick={() => setIsFilterDialogOpen(true)}>
+                            <RiFilterLine className="icon h-5 w-5 -ml-2" />
+                            <span className="text">Filter</span>
+                        </button>
+                        {/* Existing components */}
+                        <FilterDialog
+                            isOpen={isFilterDialogOpen}
+                            onClose={() => setIsFilterDialogOpen(false)}
+                            filters={filters}
+                            setFilters={setFilters}
+                            data={rawData}
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div>
                 <div className="grid grid-cols-12 gap-4 px-4 bg-golemblue text-white py-4 my-4 font-medium">
