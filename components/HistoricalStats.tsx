@@ -201,8 +201,12 @@ const NetworkStats = ({ metricData }) => {
             }
 
             if (hasGPUData && !gpuTabExists) {
-                // If GPU data is found and the GPU tab doesn't exist, add it
-                return [...prevTabs, gpuTab]
+                // Insert the GPU tab at the second position
+                return [
+                    ...prevTabs.slice(0, 1), // Include the first tab
+                    gpuTab, // Insert the new GPU tab
+                    ...prevTabs.slice(1), // Include the rest of the tabs
+                ]
             } else if (!hasGPUData && gpuTabExists) {
                 // If no GPU data is found and the GPU tab exists, remove it
                 return prevTabs.filter((tab) => tab.metric !== "gpus")
