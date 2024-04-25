@@ -3,7 +3,7 @@ import { AreaChart, Card, Tab, TabGroup, TabList } from "@tremor/react"
 import Select from "react-select"
 
 function getProviderType(name) {
-    return { "vm-nvidia": "GPU Provider", vm: "CPU Provider", automatic: "AI Provider" }[name] || name
+    return { "vm-nvidia": "GPU Provider (Beta)", vm: "CPU Provider", automatic: "AI Provider" }[name] || name
 }
 
 const customTooltip = ({ active, payload, label }) => {
