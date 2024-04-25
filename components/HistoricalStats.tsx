@@ -83,17 +83,21 @@ const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, sel
     const timeFrames = Object.keys(metricData[selectedRuntime])
     return (
         <Card>
-            <div className="flex flex-col md:flex-row justify-between items-start border-b border-tremor-border dark:border-dark-tremor-border">
+            <div className="flex relative flex-col md:flex-row justify-between items-start border-b border-tremor-border dark:border-dark-tremor-border">
                 <div className="px-6 mb-6">
-                    <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">{name}</h1>
-                    {name === "Connected Providers" ? (
-                        <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                            The number of providers currently available on the network with the <b>{getProviderType(selectedRuntime)}</b>{" "}
-                            runtime
-                        </p>
-                    ) : (
-                        <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">{description}</p>
-                    )}
+                    <h1 className="relative text-2xl mb-2 font-medium dark:text-gray-300">{name} </h1>
+
+                    <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">{description}</p>
+                    <span
+                        className=" mt-3
+                        inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-1 text-tremor-label text-tremor-content ring-1 ring-inset ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring"
+                    >
+                        Runtime
+                        <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
+                        <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis">
+                            {getProviderType(selectedRuntime)}
+                        </span>
+                    </span>
                 </div>
             </div>
             <div className="grid md:flex md:items-start md:justify-between px-6 pt-4">
@@ -158,7 +162,7 @@ const NetworkStats = ({ metricData }) => {
             name: "Connected Providers",
             metric: "online",
             unit: "Providers",
-            description: `The number of providers currently available on the network with the ${selectedRuntime} runtime`,
+            description: `The number of providers currently available on the network with the selected runtime.`,
         },
         {
             name: "Compute Power",
