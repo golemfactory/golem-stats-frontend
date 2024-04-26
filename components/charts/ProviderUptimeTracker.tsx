@@ -35,7 +35,7 @@ const Block = ({ color, status, date, tooltip, test }) => {
                     avoidCollisions
                     sticky
                     className={cx(
-                        "group z-40 relative min-w-52 max-w-64 rounded-tremor-default shadow-tremor-dropdown dark:shadow-dark-tremor-dropdown",
+                        "group z-[60] relative min-w-52 max-w-64 rounded-tremor-default shadow-tremor-dropdown dark:shadow-dark-tremor-dropdown",
                         "text-tremor-content-strong dark:text-dark-tremor-content-strong",
                         "bg-tremor-background dark:bg-dark-tremor-background",
                         "border border-tremor-border dark:border-dark-tremor-border"
