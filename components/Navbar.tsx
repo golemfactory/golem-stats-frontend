@@ -8,6 +8,7 @@ import { useRouter } from "next/router"
 import { NetworkCTA, provider, network, providerCTA } from "@/lib/NavRoutes"
 import DarkModeToggle from "./DarkModeToggle"
 import GolemNavIcon from "./svg/GolemNavIcon"
+import { Search } from "./Search"
 
 const NavItem = ({
     item,
@@ -154,14 +155,7 @@ export const Navbar: React.FC = () => {
                     </PopoverGroup>
                 </div>
                 <div className="hidden lg:flex lg:flex-1 gap-x-4 lg:justify-end items-center">
-                    <Link
-                        href={"https://golem.network"}
-                        target="_blank"
-                        rel={"noreferrer noopener"}
-                        className="font-semibold leading-6 text-white"
-                    >
-                        Discover Golem
-                    </Link>
+                    <Search />
                     <DarkModeToggle />
                 </div>
             </nav>
