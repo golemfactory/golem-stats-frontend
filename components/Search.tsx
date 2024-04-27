@@ -2,6 +2,9 @@ import { useEffect, useState, Fragment, useRef, useId } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import Highlighter from "react-highlight-words"
 import { useRouter } from "next/router"
+import { ArrowSmallUpIcon, ArrowSmallDownIcon } from "@heroicons/react/24/solid"
+import { event } from "nextjs-google-analytics"
+
 function SearchIcon(props) {
     return (
         <svg aria-hidden="true" viewBox="0 0 20 20" {...props}>
@@ -27,38 +30,48 @@ function LoadingIcon(props) {
     )
 }
 
-function SearchResult({ result, autocomplete, collection, query, type }) {
+function HighlightQuery({ text, query }) {
+    return (
+        <Highlighter
+            highlightClassName="group-aria-selected:underline bg-transparent text-primary dark:text-darkprimary font-medium"
+            searchWords={[query]}
+            autoEscape={true}
+            textToHighlight={text}
+        />
+    )
+}
+
+function SearchResult({ result, autocomplete, collection, query, type, isSelected, onResultClick }) {
     let id = useId()
     let router = useRouter()
 
-    const handleResultClick = (result) => {
-        if (type === "wallet") {
-            router.push(`/network/providers/operator/${result.address}`)
-        } else if (type === "provider") {
-            router.push(`/network/provider/${result.id}`)
-        }
-    }
-    console.log(result)
     return (
         <li
-            className="group-result group block cursor-default hover:bg-gray-100"
+            className={`group-result group block cursor-default ${
+                isSelected
+                    ? "bg-gray-100"
+                    : "hover:bg-gray-100 dark:hover:bg-dark-tremor-background-muted dark:group-aria-selected:bg-dark-tremor-background-muted "
+            }`}
             aria-labelledby={`${id}-hierarchy ${id}-title`}
-            role="listitem"
+            role="option"
+            aria-selected={isSelected}
             {...autocomplete.getItemProps({
                 item: result,
                 source: collection.source,
             })}
-            onClick={() => handleResultClick(result)}
+            onClick={() => onResultClick(result)}
         >
             <div
                 id={`${id}-title`}
                 aria-hidden="true"
-                className="relative rounded-lg py-2 pl-3 text-sm text-slate-700 hover:cursor-pointer group-aria-selected:bg-slate-100 group-aria-selected:text-primary dark:text-white/70 dark:group-aria-selected:bg-slate-700/30 dark:group-aria-selected:text-white/50"
+                className="relative  py-2 pl-3 text-sm text-slate-700 hover:cursor-pointer group-aria-selected:bg-slate-100 group-aria-selected:text-primary dark:text-white/70 dark:group-aria-selected:bg-dark-tremor-background-muted dark:group-aria-selected:
+                
+                text-white/50"
             >
                 <div className="grid items-center gap-x-2 break-words md:grid-cols-3">
                     <div className="flex items-center gap-x-2 break-words md:col-span-2">
                         <div className="md:truncate">
-                            {/* <HighlightQuery text={result.title} query={query} /> */}
+                            <HighlightQuery text={result.title} query={query} />
                             <div
                                 id={`${id}-hierarchy`}
                                 aria-hidden="true"
@@ -67,12 +80,14 @@ function SearchResult({ result, autocomplete, collection, query, type }) {
                                 <span className="break-words">
                                     {type === "wallet" ? (
                                         <>
-                                            <p className="font-medium text-sm">{result.address}</p>
-                                            <span className="text-slate-400">{result.provider_count} Providers under this operator</span>
+                                            <p className="font-medium text-sm dark:text-white">{result.address}</p>
+                                            <span className="text-slate-400 dark:text-dark-tremor-background-graygolem">
+                                                {result.provider_count} Providers under this operator
+                                            </span>
                                         </>
                                     ) : (
                                         <>
-                                            <p className="font-medium text-sm">{result.provider_name}</p>
+                                            <p className="font-medium text-sm dark:text-white">{result.provider_name}</p>
                                             <span className="text-slate-400">{result.id}</span>
                                         </>
                                     )}
@@ -89,13 +104,15 @@ function SearchResult({ result, autocomplete, collection, query, type }) {
     )
 }
 
-function SearchResults({ autocomplete, query, wallets, providers }) {
+function SearchResults({ autocomplete, query, wallets, providers, selectedIndex, onResultClick }) {
+    const allResults = [...providers, ...wallets]
+
     return (
         <>
-            <section className="border-t border-slate-200 bg-white  py-3 empty:hidden dark:border-slate-400/10 dark:bg-slate-800">
+            <section className="border-t border-slate-200 bg-white py-3 empty:hidden dark:border-slate-400/10 dark:bg-dark-tremor-background">
                 <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">Providers</h3>
-                <ul role="list" {...autocomplete.getListProps()}>
-                    {providers.map((result) => (
+                <ul role="listbox" {...autocomplete.getListProps()}>
+                    {providers.map((result, index) => (
                         <SearchResult
                             key={result.id}
                             result={result}
@@ -103,14 +120,16 @@ function SearchResults({ autocomplete, query, wallets, providers }) {
                             collection={{ items: providers }}
                             query={query}
                             type="provider"
+                            isSelected={selectedIndex === index}
+                            onResultClick={onResultClick}
                         />
                     ))}
                 </ul>
             </section>
-            <section className="border-t border-slate-200 bg-white py-3 empty:hidden dark:border-slate-400/10 dark:bg-slate-800">
+            <section className="border-t border-slate-200 bg-white py-3 empty:hidden dark:border-slate-400/10 dark:bg-dark-tremor-background">
                 <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">Operators</h3>
-                <ul role="list" {...autocomplete.getListProps()}>
-                    {wallets.map((result) => (
+                <ul role="listbox" {...autocomplete.getListProps()}>
+                    {wallets.map((result, index) => (
                         <SearchResult
                             key={result.wallet}
                             result={result}
@@ -118,6 +137,8 @@ function SearchResults({ autocomplete, query, wallets, providers }) {
                             collection={{ items: wallets }}
                             query={query}
                             type="wallet"
+                            isSelected={selectedIndex === providers.length + index}
+                            onResultClick={onResultClick}
                         />
                     ))}
                 </ul>
@@ -130,10 +151,27 @@ export default function SearchComponent(fullWidth = false) {
     const [isOpen, setIsOpen] = useState(false)
     const [query, setQuery] = useState("")
     const [results, setResults] = useState({ wallets: [], providers: [] })
+    const [selectedIndex, setSelectedIndex] = useState(0)
     const inputRef = useRef(null)
     const panelRef = useRef(null)
     const formRef = useRef(null)
     let [modifierKey, setModifierKey] = useState()
+    const router = useRouter()
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+                event.preventDefault()
+                setIsOpen((prevIsOpen) => !prevIsOpen)
+            }
+        }
+
+        document.addEventListener("keydown", handleKeyDown)
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown)
+        }
+    }, [])
 
     useEffect(() => {
         setModifierKey(/(Mac|iPhone|iPod|iPad)/i.test(navigator.platform) ? "⌘" : "Ctrl ")
@@ -159,6 +197,7 @@ export default function SearchComponent(fullWidth = false) {
                         wallets: data.wallets.slice(0, 3),
                         providers: data.providers.slice(0, 3),
                     })
+                    setSelectedIndex(0)
                 })
                 .catch((error) => {
                     console.error("Failed to fetch data:", error)
@@ -166,8 +205,42 @@ export default function SearchComponent(fullWidth = false) {
                 })
         } else {
             setResults({ wallets: [], providers: [] })
+            setSelectedIndex(0)
         }
     }, [query])
+
+    const handleKeyDown = (event) => {
+        const totalResults = results.providers.length + results.wallets.length
+
+        if (event.key === "ArrowUp") {
+            event.preventDefault()
+            setSelectedIndex((prevIndex) => (prevIndex - 1 + totalResults) % totalResults)
+        } else if (event.key === "ArrowDown") {
+            event.preventDefault()
+            setSelectedIndex((prevIndex) => (prevIndex + 1) % totalResults)
+        } else if (event.key === "Enter") {
+            event.preventDefault()
+            const selectedResult = [...results.providers, ...results.wallets][selectedIndex]
+            if (selectedResult) {
+                handleResultClick(selectedResult)
+            }
+        }
+    }
+
+    const handleResultClick = (result) => {
+        event("search_article_click", {
+            article_url: result.url,
+            article_title: result.title,
+            search_query: query,
+        })
+
+        if (result.address) {
+            router.push(`/network/providers/operator/${result.address}`)
+        } else if (result.id) {
+            router.push(`/network/provider/${result.id}`)
+        }
+        closeModal()
+    }
 
     return (
         <>
@@ -211,7 +284,7 @@ export default function SearchComponent(fullWidth = false) {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden  bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden bg-white dark:bg-dark-tremor-background p-6 text-left align-middle shadow-xl transition-all">
                                     <div>
                                         <form ref={formRef}>
                                             <div className="group relative flex h-12">
@@ -222,6 +295,7 @@ export default function SearchComponent(fullWidth = false) {
                                                     type="text"
                                                     value={query}
                                                     onChange={(e) => setQuery(e.target.value)}
+                                                    onKeyDown={handleKeyDown}
                                                     placeholder="Find something..."
                                                 />
                                                 {query && (
@@ -230,6 +304,7 @@ export default function SearchComponent(fullWidth = false) {
                                                     </div>
                                                 )}
                                             </div>
+
                                             <div ref={panelRef}>
                                                 <SearchResults
                                                     autocomplete={{
@@ -239,6 +314,8 @@ export default function SearchComponent(fullWidth = false) {
                                                     query={query}
                                                     wallets={results.wallets}
                                                     providers={results.providers}
+                                                    selectedIndex={selectedIndex}
+                                                    onResultClick={handleResultClick}
                                                 />
                                             </div>
                                         </form>
@@ -248,30 +325,19 @@ export default function SearchComponent(fullWidth = false) {
                                             </div>
                                             <div className=" ml-auto flex items-center gap-x-2">
                                                 <div className=" flex items-center gap-x-1">
-                                                    <div className="rounded-md   bg-lightbluedarker px-2 py-1 text-gray-500 dark:bg-darkcontent dark:text-white">
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 24 24"
-                                                            version="1.1"
-                                                            className="h-4 w-4 opacity-50 dark:fill-white dark:text-white dark:opacity-100"
-                                                        >
-                                                            <g id="🔍-System-Icons" stroke="none" strokeWidth="1" fillRule="evenodd">
-                                                                <g id="ic_fluent_arrow_enter_24_regular" fillRule="nonzero">
-                                                                    <path
-                                                                        d="M21.25,4 C21.6642136,4 22,4.33578644 22,4.75 L22,4.75 L22,11.25 C22,13.3210678 20.3210678,15 18.25,15 L18.25,15 L4.58583574,15 L8.30516583,18.7196699 C8.57143239,18.9859365 8.59563844,19.4026002 8.37778398,19.6962117 L8.30516583,19.7803301 C8.03889927,20.0465966 7.62223558,20.0708027 7.32862409,19.8529482 L7.24450566,19.7803301 L2.24450566,14.7803301 C1.97823909,14.5140635 1.95403304,14.0973998 2.1718875,13.8037883 L2.24450566,13.7196699 L7.24450566,8.71966991 C7.53739888,8.4267767 8.01227261,8.4267767 8.30516583,8.71966991 C8.57143239,8.98593648 8.59563844,9.40260016 8.37778398,9.69621165 L8.30516583,9.78033009 L4.58583574,13.5 L18.25,13.5 C19.440864,13.5 20.4156449,12.5748384 20.4948092,11.4040488 L20.5,11.25 L20.5,4.75 C20.5,4.33578644 20.8357864,4 21.25,4 Z"
-                                                                        id="🎨-Color"
-                                                                    ></path>
-                                                                </g>
-                                                            </g>
-                                                        </svg>
+                                                    <div className="rounded-md   bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle px-2 py-1 text-gray-500 dark:bg-darkcontent dark:text-white">
+                                                        <ArrowSmallUpIcon className="h-4 w-4" />
                                                     </div>
-                                                    <span className="ml-1.5 font-semibold text-slate-800 dark:text-white/70">Select</span>
+                                                    <div className="rounded-md   bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle px-2 py-1 text-gray-500 dark:bg-darkcontent dark:text-white">
+                                                        <ArrowSmallDownIcon className="h-4 w-4" />
+                                                    </div>
+                                                    <span className="ml-1.5 font-semibold text-slate-800 dark:text-white/70">Move</span>
                                                 </div>
                                                 <div className=" flex items-center gap-x-1 ">
-                                                    <div className="rounded-md   bg-lightbluedarker px-2 py-1 text-gray-500 dark:bg-darkcontent dark:text-white">
+                                                    <div className="rounded-md   bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle px-2 py-1 text-gray-500 dark:bg-darkcontent dark:text-white">
                                                         {modifierKey}
                                                     </div>
-                                                    <div className="rounded-md   bg-lightbluedarker px-2 py-1 text-gray-500 dark:bg-darkcontent dark:text-white">
+                                                    <div className="rounded-md   bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle px-2 py-1 text-gray-500 dark:bg-darkcontent dark:text-white">
                                                         K
                                                     </div>
                                                     <span className="ml-1.5 font-semibold text-slate-800 dark:text-white/70">Quit</span>

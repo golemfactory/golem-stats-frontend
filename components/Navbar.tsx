@@ -155,14 +155,14 @@ export const Navbar: React.FC = () => {
                     </PopoverGroup>
                 </div>
                 <div className="hidden lg:flex lg:flex-1 gap-x-4 lg:justify-end items-center">
-                    <Link
+                    {/* <Link
                         href={"https://golem.network"}
                         target="_blank"
                         rel={"noreferrer noopener"}
                         className="font-semibold leading-6 text-white"
                     >
                         Discover Golem
-                    </Link>
+                    </Link> */}
                     <SearchComponent />
                     <DarkModeToggle />
                 </div>

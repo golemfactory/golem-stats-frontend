@@ -60,7 +60,7 @@ module.exports = {
                         golemblue: "#323cfa",
                     },
                     background: {
-                        muted: "#131A2B",
+                        muted: "#131a2bf7",
                         subtle: colors.gray[800],
                         DEFAULT: colors.gray[900],
                         emphasis: colors.gray[300],
