@@ -37,7 +37,6 @@ function SearchResult({ result, autocomplete, collection, query, type }) {
         } else if (type === "provider") {
             router.push(`/network/provider/${result.id}`)
         }
-        
     }
     console.log(result)
     return (
@@ -127,7 +126,7 @@ function SearchResults({ autocomplete, query, wallets, providers }) {
     )
 }
 
-export default function SearchComponent() {
+export default function SearchComponent(fullWidth = false) {
     const [isOpen, setIsOpen] = useState(false)
     const [query, setQuery] = useState("")
     const [results, setResults] = useState({ wallets: [], providers: [] })
@@ -172,11 +171,20 @@ export default function SearchComponent() {
 
     return (
         <>
-            <div className="flex justify-center">
-                <button type="button" onClick={openModal} className="rounded-md bg-blue-500 py-2 px-4 text-white">
-                    Search
-                </button>
-            </div>
+            <button
+                onClick={openModal}
+                className={`
+        group flex h-6  items-center justify-center w-auto md:h-auto md:flex-none md:rounded md:py-1.5 md:pl-4 md:pr-3.5 md:text-sm md:ring-1 md:hover:ring-primaryhover dark:md:ring-inset ring-slate-800 hover:ring-white/50`}
+            >
+                <SearchIcon className="h-4 w-4 flex-none fill-white/70  " />
+                <span className="sr-only md:not-sr-only md:ml-2 text-white/70">Search</span>
+                {modifierKey && (
+                    <kbd className="ml-16 hidden gap-x-2 text-xs  font-medium text-lightgray  dark:text-white/70 md:flex">
+                        <kbd className="rounded border  px-2 py-0.5 font-sans border-slate-800 ">{modifierKey}</kbd>
+                        <kbd className="rounded border  px-2 py-0.5 font-sans border-slate-800">K</kbd>
+                    </kbd>
+                )}
+            </button>
 
             <Transition appear show={isOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-[60]" onClose={closeModal}>
@@ -203,7 +211,7 @@ export default function SearchComponent() {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden  bg-white p-6 text-left align-middle shadow-xl transition-all">
                                     <div>
                                         <form ref={formRef}>
                                             <div className="group relative flex h-12">
