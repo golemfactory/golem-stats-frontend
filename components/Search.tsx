@@ -174,7 +174,7 @@ export default function SearchComponent(fullWidth = false) {
 
     useEffect(() => {
         if (query) {
-            fetch(`http://api.localhost/v2/search-list?query=${encodeURIComponent(query)}`)
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}v2/search-list?query=${encodeURIComponent(query)}`)
                 .then((response) => {
                     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
                     return response.json()
