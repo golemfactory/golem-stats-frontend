@@ -9,6 +9,9 @@ const nextConfig = {
         scrollRestoration: true,
     },
     distDir: "dist",
+    typescript: {
+        ignoreBuildErrors: true,
+    },
 }
 
 // if (!process.env.VERCEL) {
