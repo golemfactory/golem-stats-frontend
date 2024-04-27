@@ -237,7 +237,7 @@ export default function SearchComponent(fullWidth = false) {
         group flex h-6  items-center justify-center w-auto md:h-auto md:flex-none md:rounded md:py-1.5 md:pl-4 md:pr-3.5 md:text-sm md:ring-1 md:hover:ring-primaryhover dark:md:ring-inset ring-slate-700 hover:ring-white/50`}
             >
                 <SearchIcon className="h-4 w-4 flex-none fill-white/70  " />
-                <span className="sr-only md:not-sr-only md:ml-2 text-white/70">Search Provider</span>
+                <span className="sr-only md:not-sr-only md:ml-2 text-white/70">Find Provider</span>
                 {modifierKey && (
                     <kbd className="ml-10 hidden gap-x-2 text-xs  font-medium text-lightgray  dark:text-white/70 md:flex">
                         <kbd className="rounded border  px-2 py-0.5 font-sans border-slate-800 ">{modifierKey}</kbd>
