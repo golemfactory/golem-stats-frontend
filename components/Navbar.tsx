@@ -8,6 +8,7 @@ import { useRouter } from "next/router"
 import { NetworkCTA, provider, network, providerCTA } from "@/lib/NavRoutes"
 import DarkModeToggle from "./DarkModeToggle"
 import GolemNavIcon from "./svg/GolemNavIcon"
+import SearchComponent from "./Search"
 
 const NavItem = ({
     item,
@@ -162,6 +163,7 @@ export const Navbar: React.FC = () => {
                     >
                         Discover Golem
                     </Link>
+                    <SearchComponent />
                     <DarkModeToggle />
                 </div>
             </nav>
