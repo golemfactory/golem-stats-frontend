@@ -1,6 +1,7 @@
 import { createLoader } from "simple-functional-loader"
 import * as url from "url"
 
+
 const __filename = url.fileURLToPath(import.meta.url)
 import fetch from "node-fetch"
 export default function (nextConfig = {}) {
