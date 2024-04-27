@@ -1,6 +1,5 @@
 import { useEffect, useState, Fragment, useRef, useId } from "react"
 import { Dialog, Transition } from "@headlessui/react"
-import Highlighter from "react-highlight-words"
 import { useRouter } from "next/router"
 import { ArrowSmallUpIcon, ArrowSmallDownIcon } from "@heroicons/react/24/solid"
 import { event } from "nextjs-google-analytics"
@@ -27,17 +26,6 @@ function LoadingIcon(props) {
                 </linearGradient>
             </defs>
         </svg>
-    )
-}
-
-function HighlightQuery({ text, query }) {
-    return (
-        <Highlighter
-            highlightClassName="group-aria-selected:underline bg-transparent text-primary dark:text-darkprimary font-medium"
-            searchWords={[query]}
-            autoEscape={true}
-            textToHighlight={text}
-        />
     )
 }
 
@@ -71,7 +59,6 @@ function SearchResult({ result, autocomplete, collection, query, type, isSelecte
                 <div className="grid items-center gap-x-2 break-words md:grid-cols-3">
                     <div className="flex items-center gap-x-2 break-words md:col-span-2">
                         <div className="md:truncate">
-                            <HighlightQuery text={result.title} query={query} />
                             <div
                                 id={`${id}-hierarchy`}
                                 aria-hidden="true"
@@ -82,7 +69,7 @@ function SearchResult({ result, autocomplete, collection, query, type, isSelecte
                                         <>
                                             <p className="font-medium text-sm dark:text-white">{result.address}</p>
                                             <span className="text-slate-400 dark:text-dark-tremor-background-graygolem">
-                                                {result.provider_count} Providers under this operator
+                                                {result.provider_count} Provider(s) under this operator
                                             </span>
                                         </>
                                     ) : (
