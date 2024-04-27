@@ -247,12 +247,12 @@ export default function SearchComponent(fullWidth = false) {
             <button
                 onClick={openModal}
                 className={`
-        group flex h-6  items-center justify-center w-auto md:h-auto md:flex-none md:rounded md:py-1.5 md:pl-4 md:pr-3.5 md:text-sm md:ring-1 md:hover:ring-primaryhover dark:md:ring-inset ring-slate-800 hover:ring-white/50`}
+        group flex h-6  items-center justify-center w-auto md:h-auto md:flex-none md:rounded md:py-1.5 md:pl-4 md:pr-3.5 md:text-sm md:ring-1 md:hover:ring-primaryhover dark:md:ring-inset ring-slate-700 hover:ring-white/50`}
             >
                 <SearchIcon className="h-4 w-4 flex-none fill-white/70  " />
-                <span className="sr-only md:not-sr-only md:ml-2 text-white/70">Search</span>
+                <span className="sr-only md:not-sr-only md:ml-2 text-white/70">Search Provider</span>
                 {modifierKey && (
-                    <kbd className="ml-16 hidden gap-x-2 text-xs  font-medium text-lightgray  dark:text-white/70 md:flex">
+                    <kbd className="ml-10 hidden gap-x-2 text-xs  font-medium text-lightgray  dark:text-white/70 md:flex">
                         <kbd className="rounded border  px-2 py-0.5 font-sans border-slate-800 ">{modifierKey}</kbd>
                         <kbd className="rounded border  px-2 py-0.5 font-sans border-slate-800">K</kbd>
                     </kbd>
@@ -319,7 +319,7 @@ export default function SearchComponent(fullWidth = false) {
                                                 />
                                             </div>
                                         </form>
-                                        <div className="flex items-center border-t border-slate-200 px-4 py-4 text-sm font-semibold text-gray-400 dark:border-slate-400/10">
+                                        <div className="flex items-center border-t border-slate-200 px-4 py-4 text-sm font-semibold text-gray-400 dark:border-slate-400/20">
                                             <div className="flex flex-col gap-y-2 font-semibold text-slate-800 dark:text-white/70">
                                                 Keyboard Controls
                                             </div>
