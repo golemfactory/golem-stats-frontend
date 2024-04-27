@@ -283,7 +283,7 @@ export default function SearchComponent(fullWidth = false) {
                                                     value={query}
                                                     onChange={(e) => setQuery(e.target.value)}
                                                     onKeyDown={handleKeyDown}
-                                                    placeholder="Find something..."
+                                                    placeholder="Find a Provider or Operator"
                                                 />
                                                 {query && (
                                                     <div className="absolute inset-y-0 right-3 flex items-center">
