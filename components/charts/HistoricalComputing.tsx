@@ -29,7 +29,12 @@ export const HistoricalComputingChart: React.FC = () => {
         })
     )
 
-    const latestValue = formattedData[formattedData.length - 1]?.["Simultaneous providers computing"]
+    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString() // 86400000 ms = 1 day
+    let latestValue = 0
+    if (formattedData.length > 0) {
+        const yesterdaysData = formattedData.filter((d) => d.date === yesterday)
+        latestValue = yesterdaysData.reduce((max, curr) => Math.max(max, curr["Simultaneous providers computing"]), 0)
+    }
 
     if (error) return <div>Failed to load data...</div>
 
