@@ -96,7 +96,7 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
                         <RiCloseLine className="h-5 w-5" aria-hidden={true} />
                     </button>
                 </div>
-                <div className="flex  ">
+                <div className="lg:flex  ">
                     <div className="md:w-96 md:border-r md:border-t md:border-tremor-border md:dark:border-dark-tremor-border bg-white dark:bg-dark-tremor-background">
                         <div className="flex flex-col h-full p-6 justify-between">
                             <div>
