@@ -1,9 +1,14 @@
 import { Html, Head, Main, NextScript } from "next/document"
+import Script from "next/script"
 
 export default function Document() {
     return (
         <Html lang="en">
             <Head>
+                <Script
+                    strategy="beforeInteractive"
+                    src={`https://cdn-cookieyes.com/client_data/8d9e86c3dd88742506b050d9/script.js`}
+                ></Script>
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `

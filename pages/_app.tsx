@@ -28,8 +28,8 @@ const robotoMono = Roboto_Mono({
 if (typeof window !== "undefined") {
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
         api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-        capture_pageview: false, // Disable automatic pageview capture, as we capture manually
-        autocapture: false,
+        capture_pageview: true, // Disable automatic pageview capture, as we capture manually
+        autocapture: true,
         loaded: (posthog) => {
             if (process.env.NODE_ENV === "development") posthog.debug()
         },
@@ -38,36 +38,10 @@ if (typeof window !== "undefined") {
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     const clientrouter = useRouter()
-    const [previousConsent, setPreviousConsent] = useState(false)
-    const [askedForConsent, setAskedForConsent] = useState(true)
 
-    useEffect(() => {
-        const isAnalyticsEnabled = localStorage.getItem("GolemStatsAnalyticsConsent")
-
-        if (isAnalyticsEnabled === null) {
-            setAskedForConsent(false)
-        }
-
-        if (isAnalyticsEnabled === "true") {
-            setPreviousConsent(true)
-            const handleRouteChange = () => posthog.capture("$pageview")
-            clientrouter.events.on("routeChangeComplete", handleRouteChange)
-
-            return () => {
-                clientrouter.events.off("routeChangeComplete", handleRouteChange)
-            }
-        } else {
-            setPreviousConsent(false)
-        }
-    }, [])
     return (
         // <div className={`${robotoMono.variable} ${inter.variable}`}>
         <div>
-            {!askedForConsent ? (
-                <>
-                    <AnalyticsBanner posthog={posthog} setPreviousConsent={setPreviousConsent} setAskedForConsent={setAskedForConsent} />
-                </>
-            ) : null}
             <PostHogProvider apiKey={process.env.NEXT_PUBLIC_POSTHOG_KEY}>
                 <GoogleAnalytics trackPageViews gaMeasurementId="GTM-5WPVB2J" />
                 <SessionProvider session={session} refetchInterval={5 * 58}>
