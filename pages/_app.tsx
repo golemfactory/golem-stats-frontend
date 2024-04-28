@@ -4,8 +4,6 @@ import NextNProgress from "nextjs-progressbar"
 import { Navbar } from "@/components/Navbar"
 import Banner from "@/components/Banner"
 import type { AppProps } from "next/app"
-import AnalyticsBanner from "@/components/analytics/Banner"
-import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
@@ -57,8 +55,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                         }}
                     >
                         <Component {...pageProps} />
-
-                        {/* <Banner title="We are currently updating our infrastructure responsible for collecting metrics. This can cause instability on the stats page." /> */}
+                        <Feedback />
                     </div>
                 </SessionProvider>
             </PostHogProvider>

@@ -6,7 +6,7 @@ import Skeleton from "react-loading-skeleton"
 
 const NodeActivityChart = ({ nodeId }) => {
     const { data, error } = useSWR(`v1/provider/node/${nodeId}/activity`, fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 30000,
     })
     const [chartData, setChartData] = useState([])
 
