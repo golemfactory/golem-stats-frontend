@@ -58,9 +58,33 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 
     // Assuming PriceHashmap returns a specific type, replace 'any' with that type
     function priceHashMapOrDefault(provider: Provider, usage: Usage): any {
-        const runtime = provider.runtimes.vm || provider.runtimes.wasmtime || provider.runtimes.automatic || provider.runtimes["vm-nvidia"]
+        const runtime = provider.runtimes.vm || provider.runtimes["vm-nvidia"] || provider.runtimes.automatic || provider.runtimes.wasmtime
         if (!runtime) return "N/A"
         return PriceHashmap(runtime.properties, usage)
+    }
+
+    function renderPricingCoeff() {
+        const runtimes = nodeData[0].runtimes
+
+        if (runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
+            return runtimes.vm.properties["golem.com.pricing.model.linear.coeffs"][
+                runtimes.vm.properties["golem.com.pricing.model.linear.coeffs"].length - 1
+            ]
+        } else if (runtimes["vm-nvidia"]?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
+            return runtimes["vm-nvidia"].properties["golem.com.pricing.model.linear.coeffs"][
+                runtimes["vm-nvidia"].properties["golem.com.pricing.model.linear.coeffs"].length - 1
+            ]
+        } else if (runtimes.wasmtime?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
+            return runtimes.wasmtime.properties["golem.com.pricing.model.linear.coeffs"][
+                runtimes.wasmtime.properties["golem.com.pricing.model.linear.coeffs"].length - 1
+            ]
+        } else if (runtimes.automatic?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
+            return runtimes.automatic.properties["golem.com.pricing.model.linear.coeffs"][
+                runtimes.automatic.properties["golem.com.pricing.model.linear.coeffs"].length - 1
+            ]
+        }
+
+        return null // Return null or a default value if no valid runtime data is found
     }
 
     return (
@@ -85,11 +109,27 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                     <ProviderUptimeTrackerComponent
                         nodeId={node_id}
                         cpuVendor={nodeData[0].runtimes.vm?.properties["golem.inf.cpu.vendor"]}
-                        nodeName={nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}
-                        cpu={nodeData[0].runtimes.vm?.properties["golem.inf.cpu.brand"] ?? "Unknown"}
+                        nodeName={
+                            nodeData[0].runtimes.vm?.properties["golem.node.id.name"] ||
+                            nodeData[0].runtimes["vm-nvidia"]?.properties["golem.node.id.name"] ||
+                            nodeData[0].runtimes.wasmtime?.properties["golem.node.id.name"] ||
+                            nodeData[0].runtimes.automatic?.properties["golem.node.id.name"]
+                        }
+                        cpu={
+                            (nodeData[0].runtimes.vm?.properties["golem.inf.cpu.brand"] ||
+                                nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.cpu.brand"] ||
+                                nodeData[0].runtimes.wasmtime?.properties["golem.inf.cpu.brand"] ||
+                                nodeData[0].runtimes.automatic?.properties["golem.inf.cpu.brand"]) ??
+                            "Unknown CPU"
+                        }
                         gpu={nodeData[0].runtimes["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"] ?? null}
                         version={nodeData[0].version}
-                        subnet={nodeData[0].runtimes.vm?.properties["golem.node.debug.subnet"]}
+                        subnet={
+                            nodeData[0].runtimes.vm?.properties["golem.node.debug.subnet"] ||
+                            nodeData[0].runtimes["vm-nvidia"]?.properties["golem.node.debug.subnet"] ||
+                            nodeData[0].runtimes.wasmtime?.properties["golem.node.debug.subnet"] ||
+                            nodeData[0].runtimes.automatic?.properties["golem.node.debug.subnet"]
+                        }
                     />
                 </div>
 
@@ -105,19 +145,34 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                         <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-center mt-2">
                             <HardwareBadge
                                 title="CPU"
-                                value={nodeData[0].runtimes.vm?.properties["golem.inf.cpu.threads"]}
+                                value={
+                                    nodeData[0].runtimes.vm?.properties["golem.inf.cpu.threads"] ||
+                                    nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.cpu.threads"] ||
+                                    nodeData[0].runtimes.wasmtime?.properties["golem.inf.cpu.threads"] ||
+                                    nodeData[0].runtimes.automatic?.properties["golem.inf.cpu.threads"]
+                                }
                                 icon={<CpuChipIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
                             />
 
                             <HardwareBadge
                                 title="Memory"
-                                value={RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.mem.gib"], 2)}
+                                value={
+                                    RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.mem.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.mem.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes.wasmtime?.properties["golem.inf.mem.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes.automatic?.properties["golem.inf.mem.gib"], 2)
+                                }
                                 icon={<Square3Stack3DIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
                             />
 
                             <HardwareBadge
                                 title="Disk"
-                                value={RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.storage.gib"], 2)}
+                                value={
+                                    RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.storage.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.storage.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes.wasmtime?.properties["golem.inf.storage.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes.automatic?.properties["golem.inf.storage.gib"], 2)
+                                }
                                 icon={<CircleStackIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
                             />
                         </div>
@@ -151,11 +206,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                                 Start
                                 <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
                                 <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">
-                                    {
-                                        nodeData[0].runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"][
-                                            nodeData[0].runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"].length - 1
-                                        ]
-                                    }
+                                    {renderPricingCoeff()}
                                 </span>
                                 <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
                                     {" "}
