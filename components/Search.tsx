@@ -101,11 +101,8 @@ function SearchResults({ autocomplete, query, wallets, providers, selectedIndex,
                 <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">Providers</h3>
                 {providers.length === 0 && query && (
                     <div className="text-center">
-                        <p className="text-sm text-center text-red-400 dark:text-white">No online provider(s) was found</p>
-                        <Link
-                            className="text-sm text-center hover:underline text-gray-400 dark:text-white"
-                            href={`/network/provider/${query}`}
-                        >
+                        <p className="text-sm text-center text-red-400 ">No online provider(s) was found</p>
+                        <Link className="text-sm text-center hover:underline text-gray-400 " href={`/network/provider/${query}`}>
                             To view provider information for <b>{query}</b>, click here
                         </Link>
                     </div>
@@ -129,11 +126,8 @@ function SearchResults({ autocomplete, query, wallets, providers, selectedIndex,
                 <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">Operators</h3>
                 {wallets.length === 0 && query && (
                     <div className="text-center">
-                        <p className="text-sm text-center text-red-400 dark:text-white">No online operator(s) was found</p>
-                        <Link
-                            className="text-sm text-center hover:underline text-gray-400 dark:text-white"
-                            href={`/network/providers/operator/${query}`}
-                        >
+                        <p className="text-sm text-center text-red-400 ">No online operator(s) was found</p>
+                        <Link className="text-sm text-center hover:underline text-gray-400 " href={`/network/providers/operator/${query}`}>
                             To view operator information for <b>{query}</b>, click here
                         </Link>
                     </div>
