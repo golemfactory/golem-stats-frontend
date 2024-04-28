@@ -1,149 +1,117 @@
-import React, { useState, useEffect } from "react"
-import dynamic from "next/dynamic"
-import { fetcher } from "@/fetcher"
-import { RoundingFunction } from "@/lib/RoundingFunction"
-import { ApexOptions } from "apexcharts"
+import { useState, useEffect } from "react"
 import useSWR from "swr"
+import { fetcher } from "@/fetcher"
+import { Card, Tab, TabGroup, TabList, TabPanel, TabPanels, AreaChart } from "@tremor/react"
+import { RoundingFunction } from "@/lib/RoundingFunction"
 
-const DynamicApexChart = dynamic(() => import("react-apexcharts"), {
-    ssr: false,
-})
-
-type Props = {
-    endpoint: string
-    title: string
-    colors: string
-}
-
-export const HistoricalComputingChart: React.FC<Props> = ({ endpoint, title, colors }) => {
-    const [options, setOptions] = useState<ApexOptions>({})
-    const [series, setSeries] = useState<any[]>([])
-    const { data: apiResponse } = useSWR<any[]>(endpoint, fetcher, {
-        refreshInterval: 10000,
-    })
-    const { data: releaseData } = useSWR<any[]>("v1/api/yagna/releases", fetcher)
+export const HistoricalComputingChart: React.FC = () => {
+    const [selectedTimeFrame, setSelectedTimeFrame] = useState("All")
+    const { data, error, isValidating } = useSWR("v2/network/historical/computing", fetcher, {})
+    const [formattedData, setFormattedData] = useState([])
 
     useEffect(() => {
-        if (apiResponse) {
-            const count: any[] = []
-            apiResponse.forEach((obj: any) => {
-                count.push({ x: new Date(obj.date).getTime(), y: obj.total })
-            })
-            setSeries([
-                {
-                    data: count,
-                    name: "Simultaneous providers computing",
-                },
-            ])
+        if (data && selectedTimeFrame in data) {
+            const newFormattedData = data[selectedTimeFrame].map(({ truncated_date, total }) => ({
+                date: new Date(truncated_date).toLocaleDateString(),
+                "Simultaneous providers computing": RoundingFunction(total, 2),
+            }))
+            setFormattedData(newFormattedData)
         }
-    }, [apiResponse])
+    }, [data, selectedTimeFrame])
 
-    useEffect(() => {
-        if (releaseData) {
-            const annotations = releaseData.map((release: any) => {
-                return {
-                    x: new Date(release.published_at).getTime(),
-                    strokeDashArray: 0,
-                    borderColor: "#3F51B5",
-                    label: {
-                        borderColor: "#3F51B5",
-                        style: {
-                            color: "#fff",
-                            background: "#3F51B5",
-                        },
-                        text: `${release.tag_name} Released`,
-                    },
-                }
-            })
+    const timeFrames = ["7d", "14d", "1m", "3m", "6m", "1y", "All"]
+    const athValue = Math.max(
+        ...timeFrames.map((frame) => {
+            if (data && frame in data) {
+                return Math.max(...data[frame].map((item) => item.total))
+            }
+            return 0
+        })
+    )
 
-            setOptions({
-                chart: {
-                    id: "area-datetime",
-                    type: "area",
-                    zoom: {
-                        autoScaleYaxis: true,
-                    },
-                    animations: {
-                        enabled: false,
-                        easing: "linear",
-                        dynamicAnimation: {
-                            speed: 1000,
-                        },
-                    },
-                },
+    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString() // 86400000 ms = 1 day
+    let latestValue = 0
+    if (formattedData.length > 0) {
+        const yesterdaysData = formattedData.filter((d) => d.date === yesterday)
+        latestValue = yesterdaysData.reduce((max, curr) => Math.max(max, curr["Simultaneous providers computing"]), 0)
+    }
 
-                tooltip: {
-                    enabled: true,
-                    x: {
-                        show: true,
-                        formatter: undefined,
-                    },
-                },
-                dataLabels: {
-                    enabled: false,
-                },
-                markers: {
-                    size: 0,
-                },
-                annotations: {
-                    xaxis: annotations,
-                },
-
-                fill: {
-                    type: "gradient",
-                    gradient: {
-                        shadeIntensity: 0.1,
-                        inverseColors: false,
-                        opacityFrom: 0.2,
-                        opacityTo: 0,
-                        stops: [0, 90, 100],
-                    },
-                },
-                yaxis: {
-                    title: {
-                        rotate: -90,
-                        offsetX: 0,
-                        offsetY: 0,
-                        style: {
-                            color: undefined,
-                            fontSize: "12px",
-                            fontWeight: 600,
-                            cssClass: "apexcharts-yaxis-title",
-                        },
-                    },
-                    labels: {
-                        formatter: function (value) {
-                            return value + " "
-                        },
-                    },
-                },
-                colors: ["#0000ff"],
-                xaxis: {
-                    type: "datetime",
-                    title: {
-                        offsetX: -25,
-                        offsetY: 0,
-                        style: {
-                            color: undefined,
-                            fontSize: "12px",
-                            fontWeight: 600,
-                            cssClass: "apexcharts-yaxis-title",
-                        },
-                    },
-                    labels: {},
-                    tickAmount: 10,
-                },
-            })
-        }
-    }, [releaseData])
+    if (error) return <div>Failed to load data...</div>
 
     return (
-        <div className="relative bg-white dark:bg-gray-800 p-6 rounded-xl">
-            <h1 className="text-2xl font-medium dark:text-gray-300 mb-2">{title}</h1>
-
-            <div className="mt-4">
-                <DynamicApexChart width="100%" height="350" series={series} options={options} type="area" />
+        <Card className="h-full px-6">
+            <div className="px-6 mb-6">
+                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Historical Computing Chart</h1>
+                <p className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                    This chart visualizes the historical number of simultaneous providers computing on the Golem Network. The size of each
+                    area represents the total number of providers computing on a given day.
+                </p>
             </div>
-        </div>
+            <div className="border-t border-tremor-border p-6 dark:border-dark-tremor-border">
+                <div className="grid md:flex md:items-start md:justify-between">
+                    <ul role="list" className="order-2 mt-6 flex flex-wrap items-center gap-x-8 gap-y-8 md:order-1 md:mt-0">
+                        <li className="flex items-center">
+                            <div>
+                                <h3 className="text-tremor-default font-medium text-tremor-content dark:text-dark-tremor-content">
+                                    Yesterday
+                                </h3>
+                                <div className="flex items-baseline space-x-2">
+                                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
+                                        {latestValue}{" "}
+                                    </span>
+                                    <span className="text-tremor-default font-medium capitalize text-tremor-brand dark:text-dark-tremor-brand-golemblue">
+                                        Providers
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                        <li className="flex items-center">
+                            <div>
+                                <h3 className="text-tremor-default font-medium text-red-500 dark:text-dark-tremor-content">
+                                    All-time high
+                                </h3>
+                                <div className="flex items-baseline space-x-2">
+                                    <span className={`text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric `}>
+                                        {athValue}{" "}
+                                    </span>
+                                    <span className="text-tremor-default font-medium capitalize text-tremor-brand dark:text-dark-tremor-brand-golemblue">
+                                        Providers
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div className="order-1 md:order-2">
+                        <TabGroup
+                            index={timeFrames.findIndex((frame) => frame === selectedTimeFrame)}
+                            onIndexChange={(index) => setSelectedTimeFrame(timeFrames[index])}
+                        >
+                            <TabList variant="solid" className="flex flex-wrap justify-center md:justify-start w-full md:w-fit">
+                                {timeFrames.map((frame) => (
+                                    <Tab key={frame}>{frame}</Tab>
+                                ))}
+                            </TabList>
+                        </TabGroup>
+                    </div>
+                </div>
+            </div>
+            <div className="flex justify-between">
+                {!isValidating && formattedData.length > 0 ? (
+                    <AreaChart
+                        className="h-72"
+                        data={formattedData}
+                        index="date"
+                        autoMinValue={true}
+                        categories={["Simultaneous providers computing"]}
+                        yAxisWidth={30}
+                        showAnimation={true}
+                        autoMinValue={true}
+                    />
+                ) : (
+                    <span>Loading...</span>
+                )}
+            </div>
+        </Card>
     )
 }

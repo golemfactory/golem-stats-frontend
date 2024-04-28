@@ -1,14 +1,19 @@
 // @ts-nocheck
-import { PriceHashmap } from "@/lib/PriceHashmap"
-import useSWR, { SWRResponse } from "swr"
+import useSWR from "swr"
 import { fetcher } from "@/fetcher"
-import { RoundingFunction } from "@/lib/RoundingFunction"
-import { GolemIcon } from "./svg/GolemIcon"
 import { useState } from "react"
-import { CpuChipIcon, CircleStackIcon, Square3Stack3DIcon } from "@heroicons/react/24/solid"
-import { useRouter } from "next/router"
 import { useMemo, useCallback } from "react"
 import moment from "moment-timezone"
+import { TextInput, Select, SelectItem, Card } from "@tremor/react"
+import { Tooltip as ReactTooltip } from "react-tooltip"
+import { RiFilterLine, RiQuestionLine, RiTeamLine } from "@remixicon/react"
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
+import VmRuntimeView from "./VmRuntimeView"
+import VmNvidiaRuntimeView from "./VmNvidiaRuntimeView"
+import { Accordion, AccordionBody, AccordionHeader, AccordionList } from "@tremor/react"
+import HardwareFilterModal from "./HardwareFilterModal"
+import FilterDialog from "./FilterDialog"
 const ITEMS_PER_PAGE = 30
 
 const displayPages = (currentPage: number, lastPage: number) => {
@@ -27,13 +32,42 @@ const displayPages = (currentPage: number, lastPage: number) => {
     return pages
 }
 
-const useProviderPagination = (data) => {
+const useProviderPagination = (data, sortBy) => {
     const [page, setPage] = useState(1)
 
     const sortedData = useMemo(() => {
         if (!data) return []
-        return [...data].sort((a, b) => Number(b.online) - Number(a.online) || b.earnings_total - a.earnings_total)
-    }, [data])
+
+        const sorted = [...data].sort((a, b) => {
+            // Check for the presence of provider.runtimes["vm-nvidia"] and give top priority
+            const aHasNvidia = a.runtimes?.["vm-nvidia"] !== undefined
+            const bHasNvidia = b.runtimes?.["vm-nvidia"] !== undefined
+
+            if (aHasNvidia && !bHasNvidia) return -1
+            if (bHasNvidia && !aHasNvidia) return 1
+
+            // Then handle null values in taskReputation by pushing them to the bottom
+            if (a.reputation.taskReputation === null) return 1
+            if (b.reputation.taskReputation === null) return -1
+
+            // Finally, sort in descending order by taskReputation
+            return b.reputation.taskReputation - a.reputation.taskReputation
+        })
+
+        if (sortBy) {
+            switch (sortBy) {
+                case "price":
+                    return sorted.sort((a, b) => a.runtimes.vm?.hourly_price_usd - b.runtimes.vm?.hourly_price_usd)
+                case "reputation":
+                    return sorted.sort((a, b) => b.reputation.taskReputation - a.reputation.taskReputation)
+                case "uptime":
+                    return sorted.sort((a, b) => b.uptime - a.uptime)
+                default:
+                    return sorted
+            }
+        }
+        return sorted
+    }, [data, sortBy])
 
     const paginatedData = useMemo(() => {
         return sortedData.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
@@ -59,377 +93,228 @@ export const isUpdateNeeded = (updatedAt) => {
 }
 
 export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
-    const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 10000, initialData })
+    const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 60000, initialData })
 
-    const [filters, setFilters] = useState({ showOffline: false })
-
-    const handleFilterChange = useCallback((key, value) => {
-        if (key === "showOffline") {
-            value = value === "True"
-        } else if (value === "") {
-            value = null // Allow clearing of filter values
-        }
-        setFilters((prevFilters) => ({ ...prevFilters, [key]: value }))
-        setPage(1)
-    }, [])
-    const handleNameSearchChange = (event, filterKey) => {
-        const value = event.target.value
-        handleFilterChange(filterKey, value)
-    }
+    const [filters, setFilters] = useState({ showOffline: false, runtime: "all" })
 
     const filterProvider = useCallback((provider, filters) => {
         if (!filters.showOffline && !provider.online) {
             return false
         }
-        return Object.entries(filters).every(([filterKey, filterValue]) => {
-            if (filterValue === null) return true // Ignore empty filters
+        if (filters.runtime !== "all" && !provider.runtimes?.[filters.runtime]) {
+            return false
+        }
 
+        if (filters.hardware && filters.hardware.length) {
+            const hardwareMatched = filters.hardware.some((hardware) => {
+                const hasHardwareInVm = provider.runtimes?.vm?.properties["golem.inf.cpu.brand"] === hardware
+                const hasHardwareInVmNvidia =
+                    provider.runtimes?.["vm-nvidia"]?.properties["golem.!exp.gap-35.v1.inf.gpu.model"] === hardware
+                return hasHardwareInVm || hasHardwareInVmNvidia
+            })
+            if (!hardwareMatched) return false
+        }
+
+        return Object.entries(filters).every(([filterKey, filterValue]) => {
+            if (filterKey === "hardware") return true // Skip hardware as it's already handled
+            if (filterValue === null) return true
             const properties = provider?.runtimes?.vm?.properties || {}
             let valueToCheck
 
             switch (filterKey) {
-                case "golem.node.id.name":
-                    valueToCheck = properties["golem.node.id.name"]
-                    return valueToCheck?.toString().toLowerCase().includes(filterValue.toLowerCase())
+                case "nodeName":
+                    return properties["golem.node.id.name"]?.toLowerCase().includes(filterValue.toLowerCase())
+                case "providerId":
+                    return provider.node_id.toString().toLowerCase().includes(filterValue.toLowerCase())
+                case "price":
+                    valueToCheck =
+                        filters.runtime === "all"
+                            ? Math.min(
+                                  provider.runtimes?.vm?.hourly_price_usd ?? Infinity,
+                                  provider.runtimes?.["vm-nvidia"]?.hourly_price_usd ?? Infinity
+                              )
+                            : provider.runtimes?.[filters.runtime]?.hourly_price_usd
+                    return valueToCheck !== Infinity ? valueToCheck <= parseFloat(filterValue) : false
+
+                case "taskReputation":
+                    valueToCheck = provider.reputation.taskReputation
+                    return valueToCheck !== null ? valueToCheck >= parseFloat(filterValue) : false
+                case "uptime":
+                    valueToCheck = provider.uptime
+                    return valueToCheck !== null ? valueToCheck >= parseFloat(filterValue) : false
+                case "runtimes.vm.hourly_price_usd":
+                    valueToCheck = provider.runtimes?.[filters.runtime]?.hourly_price_usd ?? provider.runtimes?.vm?.hourly_price_usd
+                    return valueToCheck ? valueToCheck <= parseFloat(filterValue) : false
                 case "golem.inf.cpu.threads":
                     valueToCheck = properties["golem.inf.cpu.threads"]
-                    return valueToCheck === parseInt(filterValue)
+                    return valueToCheck ? valueToCheck === parseInt(filterValue) : false
                 case "golem.inf.mem.gib":
                 case "golem.inf.storage.gib":
                     valueToCheck = parseFloat(properties[filterKey])
-                    const tolerance = 0.5 // define your tolerance level
-                    return Math.abs(valueToCheck - parseFloat(filterValue)) <= tolerance
+                    const tolerance = 0.5
+                    return valueToCheck ? Math.abs(valueToCheck - parseFloat(filterValue)) <= tolerance : false
                 case "network":
-                    // Assuming filterValue is either "Mainnet" or "Testnet"
                     const isMainnet = properties["golem.com.payment.platform.erc20-mainnet-glm.address"] !== undefined
                     return (filterValue === "Mainnet" && isMainnet) || (filterValue === "Testnet" && !isMainnet)
-                case "showOffline":
-                    // Show both online and offline providers
-                    return true
+                case "walletAddress":
+                    if (provider.wallet === null) return false
+                    return provider.wallet.toLowerCase().includes(filterValue.toLowerCase())
+
                 default:
-                    valueToCheck = provider[filterKey]
-                    if (typeof filterValue === "boolean") {
-                        return filterValue === valueToCheck
-                    }
-                    return valueToCheck?.toString().toLowerCase().includes(filterValue.toLowerCase())
+                    return true
             }
         })
     }, [])
 
-    const filteredData = useMemo(
-        () => (rawData ? rawData.filter((provider) => filterProvider(provider, filters)) : []),
-        [rawData, filters, filterProvider]
-    )
+    const filteredData = useMemo(() => {
+        return rawData
+            ? rawData.filter((provider) => {
+                  const isProviderFiltered = filterProvider(provider, filters)
 
-    const priceHashMapOrDefault = (provider, usage) => {
-        const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
-        return PriceHashmap(runtime.properties, usage)
-    }
+                  const hasRequiredRuntime = provider.runtimes && (filters.runtime === "all" || provider.runtimes[filters.runtime])
 
-    const { page, data: paginatedData, lastPage, setPage } = useProviderPagination(filteredData)
-    const router = useRouter()
+                  return isProviderFiltered && hasRequiredRuntime
+              })
+            : []
+    }, [rawData, filters, filterProvider])
+
+    const { page, data: paginatedData, lastPage, setPage } = useProviderPagination(filteredData, filters.sortBy)
+
     const handleNext = () => setPage(page < lastPage ? page + 1 : lastPage)
     const handlePrevious = () => setPage(page > 1 ? page - 1 : 1)
     const visiblePages = displayPages(page, lastPage)
-    if (error) return <div className="text-black dark:text-white">Error loading data.</div>
-    if (!rawData) return <div className="text-black dark:text-white">Loading...</div>
+    const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
 
     return (
-        <div className="flex flex-col">
-            <h2 className="text-xl mb-2 font-medium  dark:text-gray-300">Filters</h2>
-            <div className="flex flex-wrap gap-4 mb-2">
-                <div>
-                    <label htmlFor="providerName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Node Name
-                    </label>
-                    <div className="mt-2">
-                        <input
-                            type="text"
-                            name="providerName"
-                            id="providerName"
-                            onChange={(event) => handleNameSearchChange(event, "golem.node.id.name")}
-                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
-                            placeholder="Search by Name"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label htmlFor="cores" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Cores
-                    </label>
-                    <div className="mt-2">
-                        <input
-                            type="number"
-                            name="cores"
-                            id="cores"
-                            onChange={(event) => handleNameSearchChange(event, "golem.inf.cpu.threads")}
-                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label htmlFor="memory" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Memory <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
-                    </label>
-
-                    <div className="mt-2">
-                        <input
-                            type="number"
-                            name="memory"
-                            id="memory"
-                            onChange={(event) => handleNameSearchChange(event, "golem.inf.mem.gib")}
-                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label htmlFor="disk" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Disk <span className="text-xs font-light text-gray-600 dark:text-gray-400">(±0.5 GB tolerance)</span>
-                    </label>
-
-                    <div className="mt-2">
-                        <input
-                            type="number"
-                            name="disk"
-                            id="disk"
-                            onChange={(event) => handleNameSearchChange(event, "golem.inf.storage.gib")}
-                            className="shadow-sm p-2 w-full block sm:text-sm dark:bg-gray-700 dark:text-gray-400 rounded-md"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                        Network
-                    </label>
-                    <select
-                        id="network"
-                        name="network"
-                        className="mt-2 block dark:bg-gray-700 dark:text-gray-400 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        onChange={(event) => handleNameSearchChange(event, "network")}
-                    >
-                        <option>Mainnet</option>
-                        <option>Testnet</option>
-                    </select>
-                </div>
-                {enableShowingOfflineNodes && (
+        <>
+            {rawData && (
+                <div className="flex flex-row justify-end">
                     <div>
-                        <label htmlFor="network" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            Show offline nodes
-                        </label>
-                        <select
-                            id="showOffline"
-                            name="showOffline"
-                            className="mt-2 block dark:bg-gray-700 dark:text-gray-400 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            onChange={(event) => handleFilterChange("showOffline", event.target.value)}
-                        >
-                            <option value="False">Hide Offline</option>
-                            <option value="True">Show Offline</option>
-                        </select>
+                        <button className="golembutton group flex gap-x-2 items-center" onClick={() => setIsFilterDialogOpen(true)}>
+                            <RiFilterLine className="icon h-5 w-5 -ml-2" />
+                            <span className="text">Filter</span>
+                        </button>
+                        {/* Existing components */}
+                        <FilterDialog
+                            isOpen={isFilterDialogOpen}
+                            onClose={() => setIsFilterDialogOpen(false)}
+                            filters={filters}
+                            setFilters={setFilters}
+                            data={rawData}
+                        />
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
-            <table className="divide-y-12 divide-gray-900 border-separate rowspacing w-full inline-block lg:table md:table xl:table col-span-12">
-                <thead>
-                    <tr>
-                        <th
-                            scope="col"
-                            className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider rounded-l-lg"
-                        >
-                            Provider
-                        </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Cores
-                        </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Memory
-                        </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Disk
-                        </th>
+            <div>
+                <div className="grid grid-cols-12 gap-4 px-4 bg-golemblue text-white py-4 my-4 font-medium">
+                    <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
+                        <p className="font-inter">Provider</p>
+                        <RiQuestionLine data-tooltip-id="provider-tooltip" className="h-4 w-4 ml-1" />
+                        <ReactTooltip
+                            id="provider-tooltip"
+                            place="bottom"
+                            content="The name of the provider, the subnet it is running on, and the version of the provider."
+                            className="break-words max-w-64 z-50"
+                        />
+                    </div>
+                    <div className="lg:col-span-4 md:col-span-4 col-span-12 inline-flex items-center">
+                        <p className="font-inter">Hardware</p>
+                        <RiQuestionLine data-tooltip-id="hardware-tooltip" className="h-4 w-4 ml-1" />
+                        <ReactTooltip
+                            id="hardware-tooltip"
+                            place="bottom"
+                            content="GPU support is currently in beta testing. CPU is supported by default."
+                            className="break-words max-w-64 z-50"
+                        />
+                    </div>
+                    <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
+                        <p className="font-inter">Price</p>
+                        <RiQuestionLine data-tooltip-id="price-tooltip" className="h-4 w-4 ml-1" />
+                        <ReactTooltip
+                            id="price-tooltip"
+                            place="bottom"
+                            content="This shows the hourly price for the provider at full utilization. Hover over the price for a detailed explanation."
+                            className="break-words max-w-64 z-50"
+                        />
+                    </div>
+                    <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
+                        <p className="font-inter">Reputation Score</p>
+                        <RiQuestionLine data-tooltip-id="reputation-tooltip" className="h-4 w-4 ml-1" />
+                        <ReactTooltip
+                            id="reputation-tooltip"
+                            place="bottom"
+                            content="The reputation score measures how well a provider completes tasks when being checked by the reputation system. A score of 100% means the provider did all tasks successfully during this time. A score of 0% shows that the provider didn't complete any tasks successfully. If the score is 'N/A', it usually means the provider hasn't been checked yet, which might be because it's too expensive to do the test."
+                            className="break-words max-w-64 z-50"
+                        />
+                    </div>
+                    <div className="lg:col-span-2 md:col-span-4 col-span-12 inline-flex items-center">
+                        <p className="font-inter">Uptime</p>
+                        <RiQuestionLine data-tooltip-id="uptime-tooltip" className="h-4 w-4 ml-1" />
+                        <ReactTooltip
+                            id="uptime-tooltip"
+                            place="bottom"
+                            content="This shows the provider's total uptime percentage since it was first seen on the network, with ten squares representing the complete time frame. Green squares indicate uptime, while gray squares indicate downtime."
+                            className="break-words max-w-64 z-50"
+                        />
+                    </div>
+                </div>
+                <div className="grid lg:grid-cols-5 gap-4 h-full grid-cols-12">
+                    {!rawData
+                        ? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+                              <div key={index} className="lg:col-span-5 col-span-12">
+                                  <Skeleton height={100} />
+                              </div>
+                          ))
+                        : paginatedData?.map((provider) => {
+                              if (filters.runtime === "vm-nvidia" || (filters.runtime === "all" && provider.runtimes["vm-nvidia"])) {
+                                  return <VmNvidiaRuntimeView provider={provider} key={provider.node_id} />
+                              } else if (filters.runtime === "vm" || (filters.runtime === "all" && provider.runtimes["vm"])) {
+                                  return <VmRuntimeView provider={provider} key={provider.node_id} />
+                              } else {
+                                  return null
+                              }
+                          })}
+                </div>
 
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            CPU/h
-                        </th>
-                        <th scope="col" className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider">
-                            Env/h
-                        </th>
-                        <th
-                            scope="col"
-                            className="px-6 py-5 text-left text-xs font-medium text-white uppercase tracking-wider rounded-r-lg whitespace-nowrap"
-                        >
-                            Start price
-                        </th>
-                    </tr>
-                </thead>
-                <tbody className="bg-gray-50 dark:bg-gray-800 divide-y-12 divide-gray-900">
-                    {paginatedData?.map((provider) => (
-                        <tr
-                            onClick={() => {
-                                router.push(`/network/provider/${provider.node_id}`)
-                            }}
-                            key={provider.node_id}
-                            className="hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer my-12 golemtr shadow-sm"
-                        >
-                            <td className="px-6 py-4 rounded-l-lg">
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0 h-12 w-12 bg-golemblue rounded-md p-3 relative">
-                                        {
-                                            // Check if the provider is offline
-                                            !provider.online ? (
-                                                <div>
-                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-gray-500"></div>
-                                                </div>
-                                            ) : provider.computing_now ? (
-                                                // Check if the provider is online and computing
-                                                <div>
-                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500 animate-ping"></div>
-                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-yellow-500"></div>
-                                                </div>
-                                            ) : (
-                                                // Provider is online but not computing
-                                                <div>
-                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300 animate-ping"></div>
-                                                    <div className="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 rounded-full bg-green-300"></div>
-                                                </div>
-                                            )
-                                        }
-                                        <GolemIcon
-                                            className={`h-6 w-6 text-white ${provider.online ? "opacity-100" : "opacity-50"}`}
-                                            aria-hidden="true"
-                                        />
-                                    </div>
-
-                                    <div className="ml-4">
-                                        <div className="text-sm font-medium text-gray-900 golemtext dark:text-gray-300">
-                                            {provider.runtimes.vm?.properties["golem.node.id.name"]}
-                                        </div>
-
-                                        <div className="text-sm text-gray-500 golemtext">
-                                            {provider.runtimes.vm?.properties["golem.node.debug.subnet"]}
-                                        </div>
-                                        {provider.online ? (
-                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ||
-                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20-polygon-glm.address"] ||
-                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20next-mainnet-glm.address"] ||
-                                            provider.runtimes.vm?.properties["golem.com.payment.platform.erc20next-polygon-glm.address"] ? (
-                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue golembadge text-white golemtext">
-                                                    Mainnet
-                                                </span>
-                                            ) : (
-                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-yellow-500 text-white golemtext">
-                                                    Testnet
-                                                </span>
-                                            )
-                                        ) : (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 golembadge text-white golemtext">
-                                                Offline
-                                            </span>
-                                        )}
-
-                                        <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-golemblue text-white golemtext">
-                                            v{provider.version}
-                                        </span>
-                                        {isUpdateNeeded(provider.runtimes.vm?.updated_at) && (
-                                            <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 golembadge text-white golemtext">
-                                                1 Issue
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                    <div className="bg-golemblue rounded-md p-3">
-                                        <CpuChipIcon className="h-4 w-4 text-white" aria-hidden="true" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <div className="text-sm font-medium text-gray-900 golemtext dark:text-gray-300">
-                                            {provider.runtimes.vm?.properties["golem.inf.cpu.threads"]}
-                                        </div>
-                                        <div className="text-sm text-gray-500 golemtext">Cores</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="px-6 py-4">
-                                <dt className="flex flex-row items-center">
-                                    <div className="bg-golemblue rounded-md p-3">
-                                        <Square3Stack3DIcon className="h-4 w-4 text-white" aria-hidden="true" />
-                                    </div>
-                                    <p className="ml-2 text-sm font-medium text-gray-900 golemtext dark:text-gray-300">
-                                        {RoundingFunction(provider.runtimes.vm?.properties["golem.inf.mem.gib"], 2)} GB
-                                    </p>
-                                </dt>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <dt className="flex flex-row items-center">
-                                    <div className="bg-golemblue rounded-md p-3">
-                                        <CircleStackIcon className="h-4 w-4 text-white" aria-hidden="true" />
-                                    </div>
-                                    <p className="ml-2 text-sm font-medium text-gray-900 golemtext dark:text-gray-300">
-                                        {RoundingFunction(provider.runtimes.vm?.properties["golem.inf.storage.gib"], 2)} GB
-                                    </p>
-                                </dt>
-                            </td>
-
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {priceHashMapOrDefault(provider, "golem.usage.cpu_sec")}{" "}
-                                    <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
-                                </a>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {priceHashMapOrDefault(provider, "golem.usage.duration_sec")}{" "}
-                                    <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
-                                </a>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium rounded-r-lg">
-                                <a className="font-semibold text-gray-900 text-sm golemtext dark:text-gray-300">
-                                    {
-                                        (
-                                            provider.runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"] ||
-                                            provider.runtimes.wasmtime.properties["golem.com.pricing.model.linear.coeffs"]
-                                        ).slice(-1)[0]
-                                    }{" "}
-                                    <span className="text-golemblue golemgradient dark:text-gray-400">GLM</span>
-                                </a>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <div className="flex justify-center mt-4 gap-2">
-                <button
-                    onClick={handlePrevious}
-                    disabled={page === 1}
-                    className={`px-5 py-2 rounded-md ${
-                        page === 1 ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed" : "text-white bg-golemblue"
-                    }`}
-                >
-                    Previous
-                </button>
-                {visiblePages.map((pageNumber) => (
+                <div className="flex justify-center mt-4 py-4 gap-2 flex-wrap">
                     <button
-                        key={pageNumber}
-                        onClick={() => setPage(pageNumber)}
-                        className={`px-5 py-2 rounded-md ${
-                            page === pageNumber ? "text-white bg-golemblue" : "text-white bg-golemblue/60 hover:bg-golemblue"
+                        onClick={handlePrevious}
+                        disabled={page === 1}
+                        className={`px-5 py-2 ${
+                            page === 1
+                                ? "text-gray-400 bg-gray-200 dark:bg-dark-tremor-background-muted dark:text-gray-600 dark:border-dark-tremor-border cursor-not-allowed border border-gray-200"
+                                : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-white border dark:bg-dark-tremor-background-muted dark:border-dark-tremor-border border-golemblue "
                         }`}
                     >
-                        {pageNumber}
+                        Previous
                     </button>
-                ))}
-                <button
-                    onClick={handleNext}
-                    disabled={page === lastPage}
-                    className={`px-5 py-2 rounded-md ${
-                        page === lastPage ? "text-gray-400 bg-gray-200 dark:bg-golemblue/20 cursor-not-allowed" : "text-white bg-golemblue"
-                    }`}
-                >
-                    Next
-                </button>
+                    {visiblePages.map((pageNumber) => (
+                        <button
+                            key={pageNumber}
+                            onClick={() => setPage(pageNumber)}
+                            className={`px-5 py-2  ${
+                                page === pageNumber
+                                    ? "text-gray-400 bg-gray-200 dark:bg-dark-tremor-background-muted dark:text-white dark:border-dark-tremor-border cursor-not-allowed border border-gray-200"
+                                    : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-gray-600 border dark:bg-dark-tremor-background dark:border-dark-tremor-border border-golemblue "
+                            }`}
+                        >
+                            {pageNumber}
+                        </button>
+                    ))}
+                    <button
+                        onClick={handleNext}
+                        disabled={page === lastPage}
+                        className={`px-5 py-2  ${
+                            page === lastPage
+                                ? "text-gray-400 bg-gray-200 dark:bg-dark-tremor-background-muted dark:text-gray-600 dark:border-dark-tremor-border cursor-not-allowed border border-gray-200"
+                                : "text-white bg-golemblue hover:bg-white transition duration-300 hover:text-tremor-brand-golemblue dark:text-white border dark:bg-dark-tremor-background-muted dark:border-dark-tremor-border border-golemblue "
+                        }`}
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
-        </div>
+        </>
     )
 }

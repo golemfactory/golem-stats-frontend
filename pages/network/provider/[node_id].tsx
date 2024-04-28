@@ -11,62 +11,39 @@ import { SEO } from "@/components/SEO"
 import { useSession } from "next-auth/react"
 import { HealthCheckModal, OpenHealthCheckModalButton } from "@/components/ProviderHealthCheck"
 import { isUpdateNeeded } from "@/components/ProviderList"
-const useIncome = (node_id: string | undefined, initialIncome: object) => {
-    const { data, error } = useSWR(node_id ? `v1/provider/node/${node_id.toLowerCase()}/earnings` : null, fetcher, {
-        initialData: initialIncome,
-        refreshInterval: 10000,
-    })
-
-    const formattedIncome: { [key: string]: number } = {}
-
-    if (data) {
-        const keys = Object.keys(data)
-
-        keys.forEach((key) => {
-            formattedIncome[key] = RoundingFunction(parseFloat(data[key]), 10)
-        })
-    }
-
-    return { income: formattedIncome, error }
-}
-
-const EarningSection = ({ icon, title, value, unit }: { icon: React.ReactNode; title: string; value: number; unit: string }) => (
-    <div className="relative bg-white dark:bg-gray-800 pt-5 px-4 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden">
-        <dt>
-            <div className="absolute bg-golemblue rounded-md p-3">{icon}</div>
-            <p className="ml-16 text-sm font-medium text-gray-500 truncate dark:text-gray-400">{title}</p>
-        </dt>
-        <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
-            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-300">{value}</p>
-            <p className="ml-2 flex items-baseline text-sm font-semibold text-golemblue dark:text-gray-400">{unit}</p>
-        </dd>
-    </div>
-)
+import { ProviderUptimeTrackerComponent } from "@/components/charts/ProviderUptimeTracker"
+import { Button, Card, Divider } from "@tremor/react"
+import { RiSearch2Line, RiTeamLine } from "@remixicon/react"
+import Link from "next/link"
+import HardwareBadge from "@/components/HardwareBadge"
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
+import TaskStatusChart from "@/components/charts/TaskStatusChart"
+import EarningsBlock from "@/components/cards/EarningsBlock"
+import CPUPerformanceChart from "@/components/charts/CPUPerformanceChart"
+import MemorySeqChart from "@/components/charts/MemorySeqChart"
+import MemoryRandMultiChart from "@/components/charts/MemoryRandMultiChart"
+import DiskFileIoSeqChart from "@/components/charts/DiskFileIoSeqChart"
+import DiskFileIoRandChart from "@/components/charts/DiskFileIoRandChart"
+import NetworkPerformanceChart from "@/components/charts/NetworkPerformanceChart"
+import TaskParticipationTable from "@/components/TaskParticipationTable"
 
 export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: object; initialIncome: object }) => {
     const router = useRouter()
-    let { node_id } = router.query
+    let node_id = router.query.node_id as string
+
+    if (!node_id) {
+        return <div>Provider not found</div>
+    }
+
+    node_id = node_id.toLowerCase()
     const { data: session } = useSession()
     const [open, setOpen] = useState(false)
 
-    // if node_id is an array, use the first value
-    if (Array.isArray(node_id)) {
-        node_id = node_id[0].toLowerCase()
-    }
-
-    const { data: nodeData = initialData, error: nodeError } = useSWR(
-        node_id ? `v2/provider/node/${node_id.toLowerCase()}` : null,
-        fetcher,
-        {
-            initialData: initialData,
-            refreshInterval: 10000,
-        }
-    )
-
-    const { income: updatedIncome, error: incomeError } = useIncome(node_id, initialIncome)
-
-    if (nodeError || incomeError) return <div>Failed to load</div>
-    if (!nodeData || !updatedIncome) return <div>Loading...</div>
+    const { data: nodeData = initialData, error: nodeError } = useSWR(node_id ? `v2/provider/node/${node_id}` : null, fetcher, {
+        initialData: initialData,
+        refreshInterval: 10000,
+    })
 
     type Provider = {
         runtimes: {
@@ -81,262 +58,202 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 
     // Assuming PriceHashmap returns a specific type, replace 'any' with that type
     function priceHashMapOrDefault(provider: Provider, usage: Usage): any {
-        const runtime = provider.runtimes.vm || provider.runtimes.wasmtime || provider.runtimes.automatic || provider.runtimes["vm-nvidia"]
-        if (!runtime) {
-            return "N/A"
-        }
+        const runtime = provider.runtimes.vm || provider.runtimes["vm-nvidia"] || provider.runtimes.automatic || provider.runtimes.wasmtime
+        if (!runtime) return "N/A"
         return PriceHashmap(runtime.properties, usage)
+    }
+
+    function renderPricingCoeff() {
+        const runtimes = nodeData[0].runtimes
+
+        if (runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
+            return runtimes.vm.properties["golem.com.pricing.model.linear.coeffs"][
+                runtimes.vm.properties["golem.com.pricing.model.linear.coeffs"].length - 1
+            ]
+        } else if (runtimes["vm-nvidia"]?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
+            return runtimes["vm-nvidia"].properties["golem.com.pricing.model.linear.coeffs"][
+                runtimes["vm-nvidia"].properties["golem.com.pricing.model.linear.coeffs"].length - 1
+            ]
+        } else if (runtimes.wasmtime?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
+            return runtimes.wasmtime.properties["golem.com.pricing.model.linear.coeffs"][
+                runtimes.wasmtime.properties["golem.com.pricing.model.linear.coeffs"].length - 1
+            ]
+        } else if (runtimes.automatic?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
+            return runtimes.automatic.properties["golem.com.pricing.model.linear.coeffs"][
+                runtimes.automatic.properties["golem.com.pricing.model.linear.coeffs"].length - 1
+            ]
+        }
+
+        return null // Return null or a default value if no valid runtime data is found
     }
 
     return (
         <div className="min-h-full z-10 relative">
+            <div className="fixed z-20 bottom-[70px] right-5">
+                <div className="flex justify-center">
+                    <Link href={`/network/providers/operator/${nodeData[0].wallet}`} className="golembutton group">
+                        <div className="button-content px-2 group-hover:gap-x-2">
+                            <RiTeamLine className="icon h-5 w-5 -ml-2" />
+                            <span className="text">Operator</span>
+                        </div>
+                    </Link>
+                </div>
+            </div>
             <div className="fixed z-20 bottom-5 right-5">
                 <OpenHealthCheckModalButton setOpen={setOpen} />
+
+                <HealthCheckModal open={open} setOpen={setOpen} node_id={node_id} online={nodeData[0].online} />
+            </div>
+            <div className="grid grid-cols-12 gap-4 mb-4">
+                <div className="lg:col-span-8 col-span-12 min-h-full">
+                    <ProviderUptimeTrackerComponent
+                        nodeId={node_id}
+                        cpuVendor={
+                            nodeData[0].runtimes.vm?.properties["golem.inf.cpu.vendor"] ||
+                            nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.cpu.vendor"] ||
+                            nodeData[0].runtimes.wasmtime?.properties["golem.inf.cpu.vendor"] ||
+                            nodeData[0].runtimes.automatic?.properties["golem.inf.cpu.vendor"]
+                        }
+                        nodeName={
+                            nodeData[0].runtimes.vm?.properties["golem.node.id.name"] ||
+                            nodeData[0].runtimes["vm-nvidia"]?.properties["golem.node.id.name"] ||
+                            nodeData[0].runtimes.wasmtime?.properties["golem.node.id.name"] ||
+                            nodeData[0].runtimes.automatic?.properties["golem.node.id.name"]
+                        }
+                        cpu={
+                            (nodeData[0].runtimes.vm?.properties["golem.inf.cpu.brand"] ||
+                                nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.cpu.brand"] ||
+                                nodeData[0].runtimes.wasmtime?.properties["golem.inf.cpu.brand"] ||
+                                nodeData[0].runtimes.automatic?.properties["golem.inf.cpu.brand"]) ??
+                            "Unknown CPU"
+                        }
+                        gpu={nodeData[0].runtimes["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"] ?? null}
+                        version={nodeData[0].version}
+                        subnet={
+                            nodeData[0].runtimes.vm?.properties["golem.node.debug.subnet"] ||
+                            nodeData[0].runtimes["vm-nvidia"]?.properties["golem.node.debug.subnet"] ||
+                            nodeData[0].runtimes.wasmtime?.properties["golem.node.debug.subnet"] ||
+                            nodeData[0].runtimes.automatic?.properties["golem.node.debug.subnet"]
+                        }
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 col-span-12 lg:col-span-4 gap-4 h-full ">
+                    <EarningsBlock walletAddress={nodeData[0].wallet} />
+                </div>
+            </div>
+            <div className="grid grid-cols-12 gap-4">
+                <Card className="lg:col-span-4 col-span-12 flex flex-col">
+                    <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Provider Settings</h3>
+                    <div className="flex-1">
+                        <Divider>Hardware</Divider>
+                        <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-center mt-2">
+                            <HardwareBadge
+                                title="CPU"
+                                value={
+                                    nodeData[0].runtimes.vm?.properties["golem.inf.cpu.threads"] ||
+                                    nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.cpu.threads"] ||
+                                    nodeData[0].runtimes.wasmtime?.properties["golem.inf.cpu.threads"] ||
+                                    nodeData[0].runtimes.automatic?.properties["golem.inf.cpu.threads"]
+                                }
+                                icon={<CpuChipIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
+                            />
+
+                            <HardwareBadge
+                                title="Memory"
+                                value={
+                                    RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.mem.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.mem.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes.wasmtime?.properties["golem.inf.mem.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes.automatic?.properties["golem.inf.mem.gib"], 2)
+                                }
+                                icon={<Square3Stack3DIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
+                            />
+
+                            <HardwareBadge
+                                title="Disk"
+                                value={
+                                    RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.storage.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.storage.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes.wasmtime?.properties["golem.inf.storage.gib"], 2) ||
+                                    RoundingFunction(nodeData[0].runtimes.automatic?.properties["golem.inf.storage.gib"], 2)
+                                }
+                                icon={<CircleStackIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
+                            />
+                        </div>
+                    </div>{" "}
+                    <div className="flex-1">
+                        <Divider>Pricing</Divider>
+                        <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-center mt-2">
+                            <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-3 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
+                                CPU/h
+                                <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
+                                <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">
+                                    {priceHashMapOrDefault(nodeData[0], "golem.usage.cpu_sec")}
+                                </span>
+                                <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
+                                    {" "}
+                                    GLM
+                                </span>
+                            </span>
+                            <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-3 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
+                                Env/h
+                                <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
+                                <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">
+                                    {priceHashMapOrDefault(nodeData[0], "golem.usage.duration_sec")}
+                                </span>
+                                <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
+                                    {" "}
+                                    GLM
+                                </span>
+                            </span>
+                            <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-3 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
+                                Start
+                                <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
+                                <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">
+                                    {renderPricingCoeff()}
+                                </span>
+                                <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
+                                    {" "}
+                                    GLM
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </Card>
+                <div className="lg:col-span-8 col-span-12">
+                    <NodeActivityChart nodeId={node_id} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <CPUPerformanceChart nodeId={node_id} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <MemorySeqChart nodeId={node_id} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <MemoryRandMultiChart nodeId={node_id} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <DiskFileIoSeqChart nodeId={node_id} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <DiskFileIoRandChart nodeId={node_id} />
+                </div>
+                <div className="lg:col-span-6 col-span-12">
+                    <NetworkPerformanceChart nodeId={node_id} />
+                </div>
+                <div className="col-span-12">
+                    <TaskParticipationTable nodeId={node_id} />
+                </div>
+                {/* <div className="lg:col-span-6 col-span-12">
+                    <TaskStatusChart nodeId={node_id} />
+                </div> */}
             </div>
             <SEO
                 title={`${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]} | Golem Network Stats`}
                 description={`Detailed Golem Network statistics for provider with name ${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}`}
                 url={`https://stats.golem.network/network/provider/${node_id}`}
             />
-            <main className="pb-10">
-                <div className="mt-2 grid grid-cols-1 gap-6  lg:grid-flow-col-dense lg:grid-cols-3">
-                    <div className="bg-white dark:bg-gray-800 col-span-12 rounded-lg px-6 overflow-auto py-4 md:flex md:items-center md:justify-between md:space-x-5">
-                        <div className="grid grid-cols-1 gap-y-1">
-                            <div className="lg:flex lg:flex-row lg:items-center md:gap-y-2 lg:gap-y-4 grid">
-                                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-300 pr-2">
-                                    {nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}
-                                </h1>
-
-                                <HealthCheckModal open={open} setOpen={setOpen} node_id={node_id} online={nodeData[0].online} />
-                                <div className="flex flex-wrap gap-2 mt-2 lg:mt-0 ">
-                                    <div>
-                                        {nodeData[0].online ? (
-                                            <span className="px-2 lg:ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-500 text-white">
-                                                Online
-                                            </span>
-                                        ) : (
-                                            <span className="px-2 lg:ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 text-white">
-                                                Offline
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div>
-                                        {nodeData[0].online ? (
-                                            nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"] ||
-                                            nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-polygon-glm.address"] ||
-                                            nodeData[0].runtimes.vm?.properties[
-                                                "golem.com.payment.platform.erc20next-mainnet-glm.address"
-                                            ] ||
-                                            nodeData[0].runtimes.vm?.properties[
-                                                "golem.com.payment.platform.erc20next-polygon-glm.address"
-                                            ] ? (
-                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue golembadge text-white golemtext">
-                                                    Mainnet
-                                                </span>
-                                            ) : (
-                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full golembadge bg-yellow-500 text-white golemtext">
-                                                    Testnet
-                                                </span>
-                                            )
-                                        ) : null}
-                                    </div>
-
-                                    <div>
-                                        {nodeData[0].computing_now ? (
-                                            <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-500 text-white">
-                                                Computing
-                                            </span>
-                                        ) : (
-                                            <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-golemblue text-white">
-                                                Waiting for task
-                                            </span>
-                                        )}
-                                    </div>
-                                    {isUpdateNeeded(nodeData[0].runtimes.vm?.updated_at) && (
-                                        <div>
-                                            <span className="px-2 ml-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-500 text-white">
-                                                Restart Recommended
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <p className="text-sm font-medium truncate text-gray-500 mt-2 ">{nodeData[0].node_id}</p>
-                            {nodeData[0].runtimes.vm?.properties["golem.inf.cpu.brand"] ? (
-                                <p className="text-sm font-medium truncate text-gray-500 mt-2 ">
-                                    {nodeData[0].runtimes.vm?.properties["golem.inf.cpu.brand"]}
-                                </p>
-                            ) : null}
-                            {isUpdateNeeded(nodeData[0].runtimes.vm?.updated_at) && (
-                                <p className="text-sm font-medium truncate text-red-500 mt-2 ">
-                                    We've identified the provider might be having network issues.<br></br> We recommend restarting the
-                                    provider to ensure it's communicating properly with the network.
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
-                            <button
-                                onClick={() => {
-                                    router.push(`/network/providers/operator/${nodeData[0].runtimes.vm?.properties["wallet"]}`)
-                                }}
-                                className="inline-flex items-center justify-center px-2 py-2 border border-transparent text-sm font-medium rounded-md shadow-2xl text-white bg-golemblue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500"
-                            >
-                                Node by Operator
-                            </button>
-                            <button
-                                aria-label="Show Polygon Wallet"
-                                onClick={() => {
-                                    if (nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"]) {
-                                        window.open(
-                                            `https://polygonscan.com/address/${nodeData[0].runtimes.vm?.properties["wallet"]}#tokentxns`,
-                                            "_blank"
-                                        )
-                                    } else {
-                                        window.open(
-                                            `https://mumbai.polygonscan.com/address/${nodeData[0].runtimes.vm?.properties["wallet"]}#tokentxns`,
-                                            "_blank"
-                                        )
-                                    }
-                                }}
-                                type="button"
-                                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-2xl text-white bg-golemblue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500"
-                            >
-                                Polygon
-                            </button>
-
-                            <button
-                                aria-label="Show Etherscan Wallet"
-                                onClick={() => {
-                                    if (nodeData[0].runtimes.vm?.properties["golem.com.payment.platform.erc20-mainnet-glm.address"]) {
-                                        window.open(
-                                            `https://etherscan.io/address/${nodeData[0].runtimes.vm?.properties["wallet"]}`,
-                                            "_blank"
-                                        )
-                                    } else {
-                                        window.open(
-                                            `https://goerli.etherscan.io/address/${nodeData[0].runtimes.vm?.properties["wallet"]}`,
-                                            "_blank"
-                                        )
-                                    }
-                                }}
-                                type="button"
-                                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-2xl text-white bg-golemblue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500"
-                            >
-                                Etherscan
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-flow-col-dense  lg:grid-cols-12">
-                    <section aria-labelledby="Node Hardware" className="lg:col-span-6 col-span-12">
-                        <h2 id="Node Hardware" className="text-lg font-medium text-gray-900 dark:text-white">
-                            Hardware
-                        </h2>
-                        <dl className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                            <div className="relative bg-white dark:bg-gray-800 pt-5 px-4 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden">
-                                <dt>
-                                    <div className="absolute bg-golemblue rounded-md p-3">
-                                        <CpuChipIcon className="h-6 w-6 text-white" aria-hidden="true" />
-                                    </div>
-                                    <p className="ml-16 text-sm font-medium text-gray-500 truncate dark:text-gray-400">CPU</p>
-                                </dt>
-                                <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
-                                    <p className="text-2xl font-semibold text-gray-900 dark:text-gray-300">
-                                        {RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.cpu.threads"], 2)}
-                                    </p>
-                                    <p className="text-golemblue ml-2 flex items-baseline text-sm font-semibold dark:text-gray-400">
-                                        Cores
-                                    </p>
-                                </dd>
-                            </div>
-                            <div className="relative bg-white dark:bg-gray-800 pt-5 px-4 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden">
-                                <dt>
-                                    <div className="absolute bg-golemblue rounded-md p-3">
-                                        <Square3Stack3DIcon className="h-6 w-6 text-white" aria-hidden="true" />
-                                    </div>
-                                    <p className="ml-16 text-sm font-medium text-gray-500 truncate dark:text-gray-400">RAM</p>
-                                </dt>
-                                <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
-                                    <p className="text-2xl font-semibold text-gray-900 dark:text-gray-300">
-                                        {RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.mem.gib"], 2)}
-                                    </p>
-                                    <p className="text-golemblue ml-2 flex items-baseline text-sm font-semibold dark:text-gray-400">GB</p>
-                                </dd>
-                            </div>
-                            <div className="relative bg-white dark:bg-gray-800 pt-5 px-4 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden">
-                                <dt>
-                                    <div className="absolute bg-golemblue rounded-md p-3">
-                                        <CircleStackIcon className="h-6 w-6 text-white" aria-hidden="true" />
-                                    </div>
-                                    <p className="ml-16 text-sm font-medium text-gray-500 truncate dark:text-gray-400">Disk</p>
-                                </dt>
-                                <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
-                                    <p className="text-2xl font-semibold text-gray-900 dark:text-gray-300">
-                                        {RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.storage.gib"], 2)}
-                                    </p>
-                                    <p className="text-golemblue ml-2 flex items-baseline text-sm font-semibold dark:text-gray-400">GB</p>
-                                </dd>
-                            </div>
-                        </dl>
-                    </section>
-
-                    <section aria-labelledby="Node Pricing" className="lg:col-start-1 lg:col-span-6 col-span-12">
-                        <h2 id="Node Pricing" className="text-xl font-medium text-gray-900 dark:text-white">
-                            Pricing
-                        </h2>
-
-                        <dl className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                            <EarningSection
-                                icon={<GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />}
-                                title={"CPU/h"}
-                                value={priceHashMapOrDefault(nodeData[0], "golem.usage.cpu_sec")}
-                                unit="GLM"
-                            />
-                            <EarningSection
-                                icon={<GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />}
-                                title={"Env/h"}
-                                value={priceHashMapOrDefault(nodeData[0], "golem.usage.duration_sec")}
-                                unit="GLM"
-                            />
-                            <EarningSection
-                                icon={<GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />}
-                                title={"Start"}
-                                value={
-                                    nodeData[0].runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"][
-                                        nodeData[0].runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"].length - 1
-                                    ]
-                                }
-                                unit="GLM"
-                            />
-                        </dl>
-                    </section>
-
-                    <section aria-labelledby="Node Earnings" className="lg:col-start-1 lg:col-span-12 col-span-12">
-                        <h2 id="Node Earnings" className="text-xl font-medium text-gray-900 dark:text-white">
-                            Earnings
-                        </h2>
-
-                        <dl className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2">
-                            {["24", "168", "720", "2160"].map((key) => (
-                                <EarningSection
-                                    key={key}
-                                    icon={<GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />}
-                                    title={(key === "24" && "Earnings (24h) ") || `Earnings (${Number(key) / 24}d)`}
-                                    value={updatedIncome[key]}
-                                    unit="GLM"
-                                />
-                            ))}
-                        </dl>
-                    </section>
-
-                    <div className="lg:col-start-1 lg:col-span-12 col-span-12">
-                        <NodeActivityChart nodeId={nodeData[0].node_id.toLowerCase()} />
-                    </div>
-                </div>
-            </main>
         </div>
     )
 }
@@ -344,8 +261,6 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 export async function getStaticProps({ params }: { params: { node_id: string } }) {
     try {
         const initialData = await fetcher(`v2/provider/node/${params.node_id.toLowerCase()}`)
-
-        const income = await fetcher(`v1/provider/node/${params.node_id.toLowerCase()}/earnings`)
 
         return { props: { initialData, income }, revalidate: 2880 }
     } catch (error) {
@@ -405,7 +320,7 @@ export async function getStaticProps({ params }: { params: { node_id: string } }
                                     wallet: "0x7ad8ce2f95f69be197d136e308303d2395e68379",
                                     "golem.com.scheme": "payu",
                                     "golem.inf.mem.gib": 8.0,
-                                    "golem.node.id.name": "fractal_02_0.h",
+                                    "golem.node.id.name": "unknown-node",
                                     "golem.runtime.name": "vm",
                                     "golem.inf.cpu.brand": "Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz",
                                     "golem.inf.cpu.cores": 8,

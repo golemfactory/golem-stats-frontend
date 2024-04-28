@@ -14,7 +14,6 @@ export const MetamaskDropDown = ({
     mobile?: boolean
     onAccountClick?: () => void
 }) => {
-    console.log("walletAddress", walletAddress)
     const shortenedAddress = walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4)
     const router = useRouter()
     return (

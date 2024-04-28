@@ -2,11 +2,122 @@
 @tailwind components;
 @tailwind utilities;
 
+input {
+    @apply bg-tremor-background-graygolem dark:bg-dark-tremor-background !important;
+}
+
+.golembutton {
+    @apply text-white px-5 py-3 flex items-center bg-golemblue transition duration-300 border border-golemblue;
+    @apply font-inter uppercase text-xs;
+    letter-spacing: 0.2em;
+    leading-trim: both;
+    font-weight: 600;
+    text-edge: cap;
+}
+.golembutton-noflex {
+    @apply text-white px-5 py-3 bg-golemblue transition duration-300 border border-golemblue;
+    @apply font-inter uppercase text-xs;
+    letter-spacing: 0.2em;
+    leading-trim: both;
+    font-weight: 600;
+    text-edge: cap;
+}
+
+.inverted-golembutton {
+    @apply text-golemblue px-5 py-3 flex items-center bg-white transition duration-300 border border-golemblue;
+    @apply font-inter uppercase text-xs;
+    letter-spacing: 0.2em;
+    leading-trim: both;
+    font-weight: 600;
+    text-edge: cap;
+}
+
+.inverted-golembutton-noflex {
+    @apply text-golemblue px-5 py-3 bg-white transition duration-300 border border-golemblue;
+    @apply font-inter uppercase text-xs;
+    letter-spacing: 0.2em;
+    leading-trim: both;
+    font-weight: 600;
+    text-edge: cap;
+}
+
+.inverted-golembutton:hover,
+.inverted-golembutton-noflex:hover {
+    @apply hover:bg-golemblue hover:text-white;
+}
+
+/* Apply hover styles only to the button being hovered over */
+.golembutton:hover,
+.golembutton-noflex:hover {
+    @apply hover:bg-white hover:text-tremor-brand-golemblue;
+}
+
+.golembutton .button-content {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.golembutton .button-content .icon {
+    @apply transition-all duration-300;
+}
+
+.golembutton .button-content .text {
+    @apply transition-all duration-300;
+    max-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    margin-left: -10px; /* Adjust as needed */
+}
+
+/* Apply hover styles only to the text of the button being hovered over */
+.golembutton:hover .button-content .text {
+    max-width: 200px; /* Adjust based on your text length */
+    opacity: 1;
+    visibility: visible;
+    margin-left: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-inter) !important;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 130%;
+    /* or 42px */
+    /* leading-trim and text-edge are draft CSS properties.
+
+Read more: https://drafts.csswg.org/css-inline-3/#leading-trim
+*/
+    leading-trim: both;
+    text-edge: cap;
+}
+
+p,
+a,
+span,
+div,
+input,
+select,
+option,
+label,
+textarea {
+    font-family: var(--font-roboto-mono);
+}
+
 html,
 body {
     @apply dark:bg-slate-900;
-    @apply bg-gray-100;
+    @apply bg-golembackground;
     min-height: 100vh;
+}
+.dark .react-loading-skeleton {
+    --base-color: #1a202c; /* Tailwind's gray-900 */
+    --highlight-color: #2d3748; /* A slightly lighter shade for highlight */
 }
 
 .rowspacing {

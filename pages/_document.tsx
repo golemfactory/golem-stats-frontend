@@ -8,6 +8,25 @@ export default function Document() {
                     strategy="beforeInteractive"
                     src={`https://cdn-cookieyes.com/client_data/8d9e86c3dd88742506b050d9/script.js`}
                 ></Script>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+      (function() {
+        // First, check for a saved theme in localStorage
+        const storedTheme = localStorage.getItem('theme');
+        // Use system preference as a fallback if no stored theme
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+        
+        // Apply the dark mode class if the resolved theme is 'dark'
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    `,
+                    }}
+                />
+
                 <title key="title">Golem Network Stats</title>
                 <link rel="shortcut icon" href="/favicon.ico" />
 

@@ -1,100 +1,62 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import useSWR from "swr"
-import dynamic from "next/dynamic"
+import { Card, Divider, DonutChart, List, ListItem } from "@tremor/react"
 import { fetcher } from "@/fetcher"
-import { ApexOptions } from "apexcharts"
 
-const DynamicApexChart = dynamic(() => import("react-apexcharts"), {
-    ssr: false,
-})
+const valueFormatter = (number) => number.toLocaleString()
 
-export const NetworkCPUArchitecture: React.FC = () => {
-    const { data: apiData } = useSWR("v2/network/online", fetcher, {
+const generateChartColor = (name) => {
+    switch (name) {
+        case "x86_64":
+            return "#22c55d"
+        default:
+            return "#8b07cd"
+    }
+}
+
+export const NetworkCpuArchitectureChart: React.FC = () => {
+    const { data: apiResponse } = useSWR("v2/network/stats/cpuarchitecture", fetcher, {
         refreshInterval: 10000,
     })
-    const [data, setData] = useState<number[]>([0, 0])
 
-    useEffect(() => {
-        const sortAPIData = () => {
-            let x86_64 = 0
-            let Aarch64 = 0
-
-            apiData.forEach((obj: any) => {
-                // Get the first runtime key from the runtimes object
-                const firstRuntimeKey = Object.keys(obj.runtimes)[0]
-
-                // Check if the first runtime has the required property
-                if (obj.runtimes[firstRuntimeKey].properties["golem.inf.cpu.architecture"]) {
-                    const architecture = obj.runtimes[firstRuntimeKey].properties["golem.inf.cpu.architecture"]
-
-                    // Increment the count based on the architecture type
-                    if (architecture === "x86_64") {
-                        x86_64++
-                    } else if (architecture === "aarch64") {
-                        Aarch64++
-                    }
-                }
-            })
-
-            setData([x86_64, Aarch64])
-        }
-
-        if (apiData) {
-            sortAPIData()
-        }
-    }, [apiData])
-
-    const chartOptions: ApexOptions = {
-        chart: {
-            id: "vendor-donut",
-            type: "donut",
-            zoom: {
-                autoScaleYaxis: true,
-            },
-        },
-        labels: ["x86_64", "Aarch64"],
-        tooltip: {
-            enabled: true,
-            x: {
-                show: true,
-                format: "HH:mm:ss",
-                formatter: undefined,
-            },
-        },
-        dataLabels: {
-            enabled: true,
-        },
-        colors: ["#0000F9", "#8E6BE1"],
-        markers: {
-            size: 0,
-        },
-        stroke: {
-            show: false,
-            width: 0,
-        },
-        fill: {
-            type: "gradient",
-            gradient: {
-                shadeIntensity: 0,
-                inverseColors: false,
-                opacityFrom: 1,
-                opacityTo: 1,
-                stops: [0, 90, 100],
-            },
-        },
-    }
+    const chartData = Object.entries(apiResponse || {}).map(([name, amount]) => ({
+        name,
+        amount,
+        color: generateChartColor(name),
+    }))
 
     return (
-        <div className="bg-white dark:bg-gray-800 h-full pt-5 px-4 sm:px-6 shadow rounded-lg overflow-hidden">
-            <div className="relative">
-                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300 animate-ping"></div>
-                <div className="absolute top-0 right-0 -mr-1 -mt-1 w-4 h-4 rounded-full bg-green-300"></div>
-                <h3 className="text-2xl mb-2 font-medium dark:text-gray-300">Network CPU Architecture</h3>
-                <span className="dark:text-gray-400">
-                    x86_64: <b className="mr-1">{data[0]}</b> Aarch64: <b>{data[1]}</b>
-                </span>
-                <DynamicApexChart className="py-3" width="100%" height="250" type="donut" options={chartOptions} series={data} />
+        <Card className="h-full">
+            <div className="px-6 mb-6">
+                <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network CPU Architecture</h1>
+                <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                    Distribution of CPU architectures across the network.
+                </p>
             </div>
-        </div>
+            <Divider />
+            <DonutChart
+                className="mt-8"
+                data={chartData}
+                category="amount"
+                index="name"
+                colors={["purple", "green"]}
+                showAnimation={true}
+                valueFormatter={valueFormatter}
+                showTooltip={true}
+            />
+            <List className="mt-2 px-6">
+                {chartData.map((item, index) => (
+                    <ListItem key={index} className="space-x-4 truncate">
+                        <div className="flex h-8 items-center truncate pl-4">
+                            <span className="rounded-full w-3 h-3" style={{ backgroundColor: item.color }}></span>
+                            <span className="truncate dark:text-dark-tremor-content-emphasis ml-2">{item.name}</span>
+                        </div>
+                        <span className="font-medium tabular-nums text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                            {valueFormatter(item.amount)}
+                        </span>
+                    </ListItem>
+                ))}
+            </List>
+        </Card>
     )
 }
