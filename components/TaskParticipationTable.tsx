@@ -79,6 +79,8 @@ const TaskParticipationTable = ({ nodeId }) => {
                 <TableHead>
                     <TableRow className="border-b border-tremor-border dark:border-dark-tremor-border">
                         <TableHeaderCell className="text-white dark:text-dark-tremor-content-strong">Task ID</TableHeaderCell>
+                        <TableHeaderCell className="text-white dark:text-dark-tremor-content-strong">Date</TableHeaderCell>
+
                         <TableHeaderCell className="text-white dark:text-dark-tremor-content-strong">Status</TableHeaderCell>
                         <TableHeaderCell className="text-right text-white dark:text-dark-tremor-content-strong">Error</TableHeaderCell>
                         <TableHeaderCell className="text-right text-white dark:text-dark-tremor-content-strong">Cost</TableHeaderCell>
@@ -89,6 +91,7 @@ const TaskParticipationTable = ({ nodeId }) => {
                         (paginatedData || []).map((item, index) => (
                             <TableRow key={index}>
                                 <TableCell>{item.task_id}</TableCell>
+                                <TableCell>{new Date(item.task_started_at * 1000).toLocaleString()}</TableCell>
                                 <TableCell>
                                     <span
                                         className={classNames(

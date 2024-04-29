@@ -6,7 +6,7 @@ import { useMemo, useCallback } from "react"
 import moment from "moment-timezone"
 import { TextInput, Select, SelectItem, Card } from "@tremor/react"
 import { Tooltip as ReactTooltip } from "react-tooltip"
-import { RiFilterLine, RiQuestionLine, RiTeamLine } from "@remixicon/react"
+import { RiFilterLine, RiQuestionLine, RiTeamLine, RiEyeLine, RiEyeOffLine } from "@remixicon/react"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 import VmRuntimeView from "./VmRuntimeView"
@@ -15,6 +15,7 @@ import { Accordion, AccordionBody, AccordionHeader, AccordionList } from "@tremo
 import HardwareFilterModal from "./HardwareFilterModal"
 import FilterDialog from "./FilterDialog"
 const ITEMS_PER_PAGE = 30
+import { useRouter } from "next/router"
 
 const displayPages = (currentPage: number, lastPage: number) => {
     const pages = []
@@ -94,7 +95,7 @@ export const isUpdateNeeded = (updatedAt) => {
 
 export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
     const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 60000, initialData })
-
+    const router = useRouter()
     const [filters, setFilters] = useState({ showOffline: false, runtime: "all" })
 
     const filterProvider = useCallback((provider, filters) => {
@@ -189,7 +190,20 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
         <>
             {rawData && (
                 <div className="flex flex-row justify-end">
-                    <div>
+                    <div className="flex gap-2">
+                        {router.pathname.includes("network/providers/operator") && (
+                            <button
+                                className="golembutton group flex gap-x-2 items-center"
+                                onClick={() => setFilters({ ...filters, showOffline: !filters.showOffline })}
+                            >
+                                {filters.showOffline ? (
+                                    <RiEyeOffLine className="icon h-5 w-5 -ml-2" />
+                                ) : (
+                                    <RiEyeLine className="icon h-5 w-5 -ml-2" />
+                                )}
+                                <span className="text">{filters.showOffline ? "Hide Offline" : "Show Offline"}</span>
+                            </button>
+                        )}
                         <button className="golembutton group flex gap-x-2 items-center" onClick={() => setIsFilterDialogOpen(true)}>
                             <RiFilterLine className="icon h-5 w-5 -ml-2" />
                             <span className="text">Filter</span>
