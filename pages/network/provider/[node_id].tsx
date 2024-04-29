@@ -262,8 +262,9 @@ export async function getStaticProps({ params }: { params: { node_id: string } }
     try {
         const initialData = await fetcher(`v2/provider/node/${params.node_id.toLowerCase()}`)
 
-        return { props: { initialData, income }, revalidate: 2880 }
+        return { props: { initialData }, revalidate: 2880 }
     } catch (error) {
+        console.error(error)
         return {
             props: {
                 initialData: [
