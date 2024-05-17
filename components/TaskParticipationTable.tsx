@@ -9,14 +9,52 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(" ")
 }
 
-const Title = () => (
-    <div className="p-6">
-        <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Reputation Tests</h3>
-        <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-            This table displays the results of reputation tests for this provider conducted on the network.
-        </p>
-    </div>
-)
+const Title = ({ nodeId }) => {
+    const { data: blacklistData, error: blacklistError } = useSWR(`v2/providers/check_blacklist?node_id=${nodeId}`, (url) =>
+        fetcher(url, { useReputationApi: true })
+    )
+
+    const isBlacklistedProvider = blacklistData?.is_blacklisted_provider ? "Yes" : "No"
+    const isBlacklistedWallet = blacklistData?.is_blacklisted_wallet ? "Yes" : "No"
+
+    const renderSkeletons = () => (
+        <div className="p-6">
+            <Skeleton count={1} height={30} />
+            <Skeleton count={1} height={20} />
+            <div className="flex mt-2">
+                <Skeleton count={1} height={30} width={150} />
+                <Skeleton count={1} height={30} width={150} className="ml-4" />
+            </div>
+        </div>
+    )
+
+    if (blacklistError || !blacklistData) {
+        return renderSkeletons()
+    }
+
+    return (
+        <div className="p-6">
+            <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Reputation Tests</h3>
+            <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                This table displays the results of reputation tests for this provider conducted on the network.
+            </p>
+            <div className="flex mt-2 gap-x-4  flex-wrap">
+                <span className="mt-4 inline-flex items-center gap-x-2.5 whitespace-nowrap rounded-tremor-small bg-tremor-background px-3 py-1 text-tremor-default text-tremor-content-emphasis shadow-tremor-input ring-1 flex-wrap ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content-emphasis dark:shadow-dark-tremor-input dark:ring-dark-tremor-ring md:mt-0">
+                    Blacklisted Provider:{" "}
+                    <span className={`font-semibold ${isBlacklistedProvider === "Yes" ? "text-red-500" : "text-green-500"}`}>
+                        {isBlacklistedProvider}
+                    </span>
+                </span>
+                <span className="mt-4 inline-flex flex-wrap items-center gap-x-2.5 whitespace-nowrap rounded-tremor-small bg-tremor-background px-3 py-1 text-tremor-default text-tremor-content-emphasis shadow-tremor-input ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content-emphasis dark:shadow-dark-tremor-input dark:ring-dark-tremor-ring md:mt-0">
+                    Blacklisted Operator:{" "}
+                    <span className={`font-semibold ${isBlacklistedWallet === "Yes" ? "text-red-500" : "text-green-500"}`}>
+                        {isBlacklistedWallet}
+                    </span>
+                </span>
+            </div>
+        </div>
+    )
+}
 
 const TaskParticipationTable = ({ nodeId }) => {
     const { data, error } = useSWR(`stats/provider/${nodeId}/details`, (url) => fetcher(url, { useReputationApi: true }))
@@ -27,7 +65,11 @@ const TaskParticipationTable = ({ nodeId }) => {
     const totalPages = useMemo(() => Math.ceil(data?.task_participation?.length / itemsPerPage), [data])
 
     const paginatedData = useMemo(
-        () => data?.task_participation?.sort((a, b) => b.task_id - a.task_id).slice((page - 1) * itemsPerPage, page * itemsPerPage),
+        () =>
+            data?.task_participation
+                ?.filter((item) => item.completion_status !== "Accepted offer, but the task was not started. Reason unknown.")
+                .sort((a, b) => b.task_id - a.task_id)
+                .slice((page - 1) * itemsPerPage, page * itemsPerPage),
         [data, page]
     )
 
@@ -51,7 +93,7 @@ const TaskParticipationTable = ({ nodeId }) => {
         console.log(error)
         return (
             <Card className="p-0 h-full">
-                <Title />
+                <Title nodeId={nodeId} />
                 <div className="border-t border-tremor-border  dark:border-dark-tremor-border" />
                 <div className="p-6">
                     <p className="text-tremor-content dark:text-dark-tremor-content">Failed to load data</p>
@@ -62,7 +104,7 @@ const TaskParticipationTable = ({ nodeId }) => {
     if (!data) {
         return (
             <Card className="p-0 h-full">
-                <Title />
+                <Title nodeId={nodeId} />
                 <div className="border-t border-tremor-border  dark:border-dark-tremor-border" />
                 <div className="p-6">
                     <Skeleton count={itemsPerPage} height={50} />
