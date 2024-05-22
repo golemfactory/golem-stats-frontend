@@ -7,7 +7,7 @@ import type { AppProps } from "next/app"
 import { useRouter } from "next/router"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
-import { GoogleAnalytics } from "nextjs-google-analytics"
+
 import { Inter, Roboto_Mono } from "next/font/google"
 
 const inter = Inter({
@@ -41,7 +41,6 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
         // <div className={`${robotoMono.variable} ${inter.variable}`}>
         <div>
             <PostHogProvider apiKey={process.env.NEXT_PUBLIC_POSTHOG_KEY}>
-                <GoogleAnalytics trackPageViews gaMeasurementId="GTM-5WPVB2J" />
                 <SessionProvider session={session} refetchInterval={5 * 58}>
                     <NextNProgress color="#ffffff" />
                     <Navbar />

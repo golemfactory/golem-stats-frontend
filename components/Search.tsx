@@ -2,7 +2,6 @@ import { useEffect, useState, Fragment, useRef, useId } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { useRouter } from "next/router"
 import { ArrowSmallUpIcon, ArrowSmallDownIcon } from "@heroicons/react/24/solid"
-import { event } from "nextjs-google-analytics"
 import Link from "next/link"
 
 function SearchIcon(props) {
@@ -233,11 +232,7 @@ export default function SearchComponent(fullWidth = false) {
     }
 
     const handleResultClick = (result) => {
-        event("search_article_click", {
-            article_url: result.url,
-            article_title: result.title,
-            search_query: query,
-        })
+
 
         if (result.address) {
             router.push(`/network/providers/operator/${result.address}`)
