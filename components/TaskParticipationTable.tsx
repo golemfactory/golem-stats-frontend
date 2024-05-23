@@ -9,7 +9,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(" ")
 }
 
-const Title = ({ nodeId }) => {
+const Title = ({ nodeId, reputationScore }) => {
     const { data: blacklistData, error: blacklistError } = useSWR(`v2/providers/check_blacklist?node_id=${nodeId}`, (url) =>
         fetcher(url, { useReputationApi: true })
     )
@@ -38,7 +38,18 @@ const Title = ({ nodeId }) => {
             <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
                 This table displays the results of reputation tests for this provider conducted on the network.
             </p>
+
             <div className="flex mt-2 gap-x-4  flex-wrap">
+                <span className="mt-4 inline-flex items-center gap-x-2.5 whitespace-nowrap rounded-tremor-small bg-tremor-background px-3 py-1 text-tremor-default text-tremor-content-emphasis shadow-tremor-input ring-1 flex-wrap ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content-emphasis dark:shadow-dark-tremor-input dark:ring-dark-tremor-ring md:mt-0">
+                    Success Rate
+                    <span
+                        className={`font-semibold ${
+                            reputationScore <= 40 ? "text-red-500" : reputationScore <= 75 ? "text-yellow-500" : "text-green-500"
+                        }`}
+                    >
+                        {reputationScore} %
+                    </span>
+                </span>
                 <span className="mt-4 inline-flex items-center gap-x-2.5 whitespace-nowrap rounded-tremor-small bg-tremor-background px-3 py-1 text-tremor-default text-tremor-content-emphasis shadow-tremor-input ring-1 flex-wrap ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content-emphasis dark:shadow-dark-tremor-input dark:ring-dark-tremor-ring md:mt-0">
                     Blacklisted Provider:{" "}
                     <span className={`font-semibold ${isBlacklistedProvider === "Yes" ? "text-red-500" : "text-green-500"}`}>
@@ -115,7 +126,7 @@ const TaskParticipationTable = ({ nodeId }) => {
 
     return (
         <Card className="p-0 h-full">
-            <Title />
+            <Title reputationScore={data.success_rate} />
             <div className="border-t border-tremor-border  dark:border-dark-tremor-border" />
             <Table className="p-6">
                 <TableHead>
