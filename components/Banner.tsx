@@ -10,7 +10,7 @@ const Banner = ({ title }: { title: string }) => {
 
     return (
         <div className="fixed inset-x-0 bottom-0 z-50">
-            <div className="bg-golemblue">
+            <div className="bg-golemmain">
                 <div className="mx-auto max-w-7xl px-3 py-3 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
                         <div className="flex w-0 flex-1 items-center">
@@ -23,7 +23,7 @@ const Banner = ({ title }: { title: string }) => {
                         <div className="order-2 flex-shrink-0 sm:order-3 sm:ml-3">
                             <button
                                 type="button"
-                                className="p-2 -mr-1 hover:bg-indigo-500 focus:ring-2 focus:ring-white focus:outline-none rounded-md sm:-mr-2"
+                                className="p-2 -mr-1 hover:bg-gray-700 focus:ring-2 focus:ring-white focus:outline-none rounded-md sm:-mr-2"
                                 onClick={() => setShowBanner(false)}
                             >
                                 <span className="sr-only">Dismiss</span>
