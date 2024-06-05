@@ -54,7 +54,6 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                         }}
                     >
                         <Component {...pageProps} />
-                        <Banner title="We are aware of a bug in the Network Activity chart and we are working on a solution." />
                     </div>
                 </SessionProvider>
             </PostHogProvider>
