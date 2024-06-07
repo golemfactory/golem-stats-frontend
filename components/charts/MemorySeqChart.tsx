@@ -51,7 +51,7 @@ const MemorySeqChart = ({ nodeId }) => {
                 </p>
             </div>
             <div className="border-t border-tremor-border p-6 dark:border-dark-tremor-border">
-                {isValidating || !formattedData.length ? (
+                {isValidating ? (
                     <Skeleton height={250} />
                 ) : (
                     <>
@@ -105,6 +105,7 @@ const MemorySeqChart = ({ nodeId }) => {
                             data={formattedData}
                             index="date"
                             autoMinValue={true}
+                            noDataText="No reputation data yet. Please check back later."
                             categories={["Read MB/s", "Write MB/s"]}
                             colors={["blue", "red"]}
                             showLegend={false}

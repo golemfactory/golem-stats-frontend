@@ -13,7 +13,6 @@ const AnalyticsBanner = ({ setPreviousConsent, setAskedForConsent, posthog }) =>
                             localStorage.setItem("GolemStatsAnalyticsConsent", "false")
                             setPreviousConsent(false)
                             setAskedForConsent(true)
-                            posthog.opt_out_capturing()
                         }}
                     >
                         Decline
@@ -24,7 +23,6 @@ const AnalyticsBanner = ({ setPreviousConsent, setAskedForConsent, posthog }) =>
                             localStorage.setItem("GolemStatsAnalyticsConsent", "true")
                             setPreviousConsent(true)
                             setAskedForConsent(true)
-                            posthog.opt_in_capturing()
                         }}
                     >
                         Accept

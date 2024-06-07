@@ -55,7 +55,7 @@ const CPUPerformanceChart = ({ nodeId }) => {
                 </p>
             </div>
             <div className="border-t border-tremor-border p-6 dark:border-dark-tremor-border">
-                {isValidating || formattedData.length === 0 ? (
+                {isValidating ? (
                     <Skeleton height={250} />
                 ) : (
                     <>
@@ -108,6 +108,7 @@ const CPUPerformanceChart = ({ nodeId }) => {
                         <AreaChart
                             data={formattedData}
                             index="date"
+                            noDataText="No reputation data yet. Please check back later."
                             autoMinValue={true}
                             categories={["Multi Thread", "Single Thread"]}
                             colors={["blue", "red"]}

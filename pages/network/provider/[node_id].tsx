@@ -221,9 +221,13 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                         </div>
                     </div>
                 </Card>
+
                 <div className="lg:col-span-8 col-span-12">
                     <NodeActivityChart nodeId={node_id} />
                 </div>
+                <h3 className="col-span-12 font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                    Reputation Benchmark Data
+                </h3>
                 <div className="lg:col-span-6 col-span-12">
                     <CPUPerformanceChart nodeId={node_id} />
                 </div>

@@ -50,7 +50,7 @@ const DiskFileIoRandChart = ({ nodeId }) => {
                 </p>
             </div>
             <div className="border-t border-tremor-border p-6 dark:border-dark-tremor-border">
-                {isValidating || !formattedData.length ? (
+                {isValidating? (
                     <Skeleton height={250} />
                 ) : (
                     <>
@@ -103,6 +103,7 @@ const DiskFileIoRandChart = ({ nodeId }) => {
                         <AreaChart
                             data={formattedData}
                             index="date"
+                            noDataText="No reputation data yet. Please check back later."
                             autoMinValue={true}
                             categories={["Read MB/s", "Write MB/s"]}
                             colors={["blue", "red"]}

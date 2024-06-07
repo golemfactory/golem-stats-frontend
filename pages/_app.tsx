@@ -5,9 +5,8 @@ import { Navbar } from "@/components/Navbar"
 import Banner from "@/components/Banner"
 import type { AppProps } from "next/app"
 import { useRouter } from "next/router"
-import posthog from "posthog-js"
-import { PostHogProvider } from "posthog-js/react"
-
+import { hotjar } from "react-hotjar"
+import { useEffect } from "react"
 import { Inter, Roboto_Mono } from "next/font/google"
 
 const inter = Inter({
@@ -22,41 +21,29 @@ const robotoMono = Roboto_Mono({
     variable: "--font-roboto-mono",
 })
 
-// Check that PostHog is client-side (used to handle Next.js SSR)
-if (typeof window !== "undefined") {
-    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-        api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-        capture_pageview: true, // Disable automatic pageview capture, as we capture manually
-        autocapture: true,
-        loaded: (posthog) => {
-            if (process.env.NODE_ENV === "development") posthog.debug()
-        },
-    })
-}
-
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
-    const clientrouter = useRouter()
+    useEffect(() => {
+        hotjar.initialize(5016081, 6)
+    }, [])
 
     return (
         // <div className={`${robotoMono.variable} ${inter.variable}`}>
         <div>
-            <PostHogProvider apiKey={process.env.NEXT_PUBLIC_POSTHOG_KEY}>
-                <SessionProvider session={session} refetchInterval={5 * 58}>
-                    <NextNProgress color="#ffffff" />
-                    <Navbar />
-                    <div
-                        className={`mx-auto px-4 sm:px-6 lg:px-8 pb-10  pt-5 `}
-                        style={{
-                            backgroundImage: `url('https://s3-alpha-sig.figma.com/img/2f86/eea7/2d86b0806d45143329fc351cc6f1b908?Expires=1710720000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=FysGzGf8Dz~3ja~3j6BtaKQN2j~3rG9Bb6eKKxNbW07VcJoHUOM~ifTaPQqqQlNgQmrEmwlt6-sFcy45CITu0pgzLrq4Bg~OMcJY5gjCXeC48cNIB54YP-Y1DbK~ZZEm11qcCi9L40gfDfQ500BMXw~vjCnz4DHrQ-N-yLFdjHctC7ycwxuZHPeMec-VdVuuUn2nf9YVBU96KhB6YBE2L4MT3N4r-BmVhscTINLO8xBJvtKWN7CyiKlANNABvNWoYWJKwWstllVWKfzRMJhUU1NQR4hKUTA3a~FfCnovqxXbaXY8fQpEmJnJszAhpCMluYH02V3YNBezA5~lsTH12w__')`,
-                            backgroundSize: "cover", // or 'contain' depending on your need
-                            backgroundPosition: "center center",
-                            backgroundRepeat: "no-repeat",
-                        }}
-                    >
-                        <Component {...pageProps} />
-                    </div>
-                </SessionProvider>
-            </PostHogProvider>
+            <SessionProvider session={session} refetchInterval={5 * 58}>
+                <NextNProgress color="#ffffff" />
+                <Navbar />
+                <div
+                    className={`mx-auto px-4 sm:px-6 lg:px-8 pb-10  pt-5 `}
+                    style={{
+                        backgroundImage: `url('https://s3-alpha-sig.figma.com/img/2f86/eea7/2d86b0806d45143329fc351cc6f1b908?Expires=1710720000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=FysGzGf8Dz~3ja~3j6BtaKQN2j~3rG9Bb6eKKxNbW07VcJoHUOM~ifTaPQqqQlNgQmrEmwlt6-sFcy45CITu0pgzLrq4Bg~OMcJY5gjCXeC48cNIB54YP-Y1DbK~ZZEm11qcCi9L40gfDfQ500BMXw~vjCnz4DHrQ-N-yLFdjHctC7ycwxuZHPeMec-VdVuuUn2nf9YVBU96KhB6YBE2L4MT3N4r-BmVhscTINLO8xBJvtKWN7CyiKlANNABvNWoYWJKwWstllVWKfzRMJhUU1NQR4hKUTA3a~FfCnovqxXbaXY8fQpEmJnJszAhpCMluYH02V3YNBezA5~lsTH12w__')`,
+                        backgroundSize: "cover", // or 'contain' depending on your need
+                        backgroundPosition: "center center",
+                        backgroundRepeat: "no-repeat",
+                    }}
+                >
+                    <Component {...pageProps} />
+                </div>
+            </SessionProvider>
         </div>
     )
 }

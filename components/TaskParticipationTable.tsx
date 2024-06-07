@@ -166,7 +166,7 @@ const TaskParticipationTable = ({ nodeId }) => {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={5} className="text-center">
-                                No data available
+                                We don't have any data from the reputation system yet. The reputation system will automatic
                             </TableCell>
                         </TableRow>
                     )}
