@@ -23,7 +23,7 @@ const robotoMono = Roboto_Mono({
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     useEffect(() => {
-        hotjar.initialize(5016081, 6)
+        hotjar.initialize({ id: 5016081, sv: 6 })
     }, [])
 
     return (
