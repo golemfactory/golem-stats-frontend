@@ -47,7 +47,7 @@ const Title = ({ nodeId, reputationScore }) => {
                             reputationScore <= 40 ? "text-red-500" : reputationScore <= 75 ? "text-yellow-500" : "text-green-500"
                         }`}
                     >
-                        {reputationScore !== undefined ? `${reputationScore.toFixed(2)} %` : "N/A"}
+                        {reputationScore !== null && reputationScore !== undefined ? `${reputationScore.toFixed(2)} %` : "N/A"}
                     </span>
                 </span>
                 <span className="mt-4 inline-flex items-center gap-x-2.5 whitespace-nowrap rounded-tremor-small bg-tremor-background px-3 py-1 text-tremor-default text-tremor-content-emphasis shadow-tremor-input ring-1 flex-wrap ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content-emphasis dark:shadow-dark-tremor-input dark:ring-dark-tremor-ring md:mt-0">
@@ -166,7 +166,7 @@ const TaskParticipationTable = ({ nodeId }) => {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={5} className="text-center">
-                                We don't have any data from the reputation system yet. The reputation system will automaticw
+                                We don't have any data from the reputation system yet. The reputation system will automatically start running tasks on your provider if it's not blacklisted.
                             </TableCell>
                         </TableRow>
                     )}
