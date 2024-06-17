@@ -27,6 +27,7 @@ import DiskFileIoSeqChart from "@/components/charts/DiskFileIoSeqChart"
 import DiskFileIoRandChart from "@/components/charts/DiskFileIoRandChart"
 import NetworkPerformanceChart from "@/components/charts/NetworkPerformanceChart"
 import TaskParticipationTable from "@/components/TaskParticipationTable"
+import GpuPerformanceChart from "@/components/charts/GPUPerformanceChart"
 
 export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: object; initialIncome: object }) => {
     const router = useRouter()
@@ -246,6 +247,11 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                 <div className="lg:col-span-6 col-span-12">
                     <NetworkPerformanceChart nodeId={node_id} />
                 </div>
+                {nodeData[0].runtimes["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"] && (
+                    <div className="lg:col-span-12 col-span-12">
+                        <GpuPerformanceChart nodeId={node_id} />
+                    </div>
+                )}
                 <div className="col-span-12">
                     <TaskParticipationTable nodeId={node_id} />
                 </div>
