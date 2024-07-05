@@ -80,7 +80,7 @@ const TaskParticipationTable = ({ nodeId }) => {
             data?.task_participation
                 ?.filter((item) => 
                     item.completion_status !== "Accepted offer, but the task was not started. Reason unknown." &&
-                    item.completion_status !== "Provider already benchmarked."
+                    item.error_message !== "Provider already benchmarked."
                 )
                 .sort((a, b) => b.task_id - a.task_id)
                 .slice((page - 1) * itemsPerPage, page * itemsPerPage),
