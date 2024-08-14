@@ -9,6 +9,7 @@ import { NetworkCTA, provider, network, providerCTA } from "@/lib/NavRoutes"
 import DarkModeToggle from "./DarkModeToggle"
 import GolemNavIcon from "./svg/GolemNavIcon"
 import SearchComponent from "./Search"
+import { hotjar } from 'react-hotjar'
 
 const NavItem = ({
     item,
@@ -57,6 +58,7 @@ const CTA = ({
         href={item.href}
         target="_blank"
         className="flex items-center justify-center gap-x-2.5 p-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700/80 dark:bg-gray-800 dark:text-gray-400 dark:border-top font-inter"
+        onClick={() => hotjar.event(`Navbar CTA Click: ${item.name}`)}
     >
         <item.icon className="h-5 w-5 flex-none text-gray-400" aria-hidden="true" />
         {item.name}

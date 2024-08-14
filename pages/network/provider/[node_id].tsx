@@ -28,6 +28,7 @@ import DiskFileIoRandChart from "@/components/charts/DiskFileIoRandChart"
 import NetworkPerformanceChart from "@/components/charts/NetworkPerformanceChart"
 import TaskParticipationTable from "@/components/TaskParticipationTable"
 import GpuPerformanceChart from "@/components/charts/GPUPerformanceChart"
+import { hotjar } from "react-hotjar"
 
 export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: object; initialIncome: object }) => {
     const router = useRouter()
@@ -88,11 +89,19 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
         return null // Return null or a default value if no valid runtime data is found
     }
 
+    const handleOperatorClick = () => {
+        hotjar.event("operator_button_clicked")
+    }
+
     return (
         <div className="min-h-full z-10 relative">
             <div className="fixed z-20 bottom-[70px] right-5">
                 <div className="flex justify-center">
-                    <Link href={`/network/providers/operator/${nodeData[0].wallet}`} className="golembutton group">
+                    <Link
+                        onClick={handleOperatorClick}
+                        href={`/network/providers/operator/${nodeData[0].wallet}`}
+                        className="golembutton group"
+                    >
                         <div className="button-content px-2 group-hover:gap-x-2">
                             <RiTeamLine className="icon h-5 w-5 -ml-2" />
                             <span className="text">Operator</span>

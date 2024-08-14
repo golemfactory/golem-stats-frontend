@@ -5,10 +5,14 @@ import { Card } from "@tremor/react"
 import Link from "next/link"
 import PolygonScanIcon from "@/components/svg/Polygonsscan"
 import Skeleton from "react-loading-skeleton"
+import { hotjar } from "react-hotjar" // Add this import
+
 import "react-loading-skeleton/dist/skeleton.css"
 const EarningsBlock = ({ walletAddress }) => {
     const { data: earningsData, error } = useSWR(walletAddress ? `v1/provider/node/${walletAddress}/earningsnew` : null, fetcher)
-
+    const handlePolygonscanClick = () => {
+        hotjar.event("provider_polygonscan_click")
+    }
     const earningsPeriods = [
         { period: "Today", key: "24" },
         { period: "7 Days", key: "168" },
@@ -43,6 +47,7 @@ const EarningsBlock = ({ walletAddress }) => {
                             href={`https://polygonscan.com/address/${walletAddress}#tokentxns`}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={handlePolygonscanClick} // Add this onClick handler
                         >
                             <PolygonScanIcon className="h-5 w-5 mr-2 -ml-2" />
                             Polygonscan

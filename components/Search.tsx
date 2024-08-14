@@ -3,6 +3,7 @@ import { Dialog, Transition } from "@headlessui/react"
 import { useRouter } from "next/router"
 import { ArrowSmallUpIcon, ArrowSmallDownIcon } from "@heroicons/react/24/solid"
 import Link from "next/link"
+import { hotjar } from "react-hotjar"
 
 function SearchIcon(props) {
     return (
@@ -167,10 +168,12 @@ export default function SearchComponent(fullWidth = false) {
             if ((event.metaKey || event.ctrlKey) && event.key === "k") {
                 event.preventDefault()
                 setIsOpen((prevIsOpen) => !prevIsOpen)
+                // Track search modal open/close
+                hotjar.event(prevIsOpen ? "search_modal_closed" : "search_modal_opened")
             }
         }
 
-        document.addEventListener("keydown", handleKeyDown)
+        document.addEventListener("search_modal_keydown", handleKeyDown)
 
         return () => {
             document.removeEventListener("keydown", handleKeyDown)
@@ -183,10 +186,12 @@ export default function SearchComponent(fullWidth = false) {
 
     function closeModal() {
         setIsOpen(false)
+        hotjar.event("search_modal_closed")
     }
 
     function openModal() {
         setIsOpen(true)
+        hotjar.event("search_modal_opened")
     }
 
     useEffect(() => {
@@ -202,10 +207,13 @@ export default function SearchComponent(fullWidth = false) {
                         providers: data.providers.slice(0, 3),
                     })
                     setSelectedIndex(0)
+                    // Track successful search
+                    hotjar.event(`search_performed: ${query}`)
                 })
                 .catch((error) => {
                     console.error("Failed to fetch data:", error)
-                    // Handle the error, e.g., show an error message to the user
+                    // Track failed search
+                    hotjar.event(`search_failed: ${query}`)
                 })
         } else {
             setResults({ wallets: [], providers: [] })
@@ -219,25 +227,28 @@ export default function SearchComponent(fullWidth = false) {
         if (event.key === "ArrowUp") {
             event.preventDefault()
             setSelectedIndex((prevIndex) => (prevIndex - 1 + totalResults) % totalResults)
+            hotjar.event("search_result_navigation_up")
         } else if (event.key === "ArrowDown") {
             event.preventDefault()
             setSelectedIndex((prevIndex) => (prevIndex + 1) % totalResults)
+            hotjar.event("search_result_navigation_down")
         } else if (event.key === "Enter") {
             event.preventDefault()
             const selectedResult = [...results.providers, ...results.wallets][selectedIndex]
             if (selectedResult) {
                 handleResultClick(selectedResult)
+                hotjar.event("search_result_selected")
             }
         }
     }
 
     const handleResultClick = (result) => {
-
-
         if (result.address) {
             router.push(`/network/providers/operator/${result.address}`)
+            hotjar.event("operator_result_clicked")
         } else if (result.id) {
             router.push(`/network/provider/${result.id}`)
+            hotjar.event("provider_result_clicked")
         }
         closeModal()
     }
@@ -245,7 +256,10 @@ export default function SearchComponent(fullWidth = false) {
     return (
         <>
             <button
-                onClick={openModal}
+                onClick={() => {
+                    openModal()
+                    hotjar.event("search_button_clicked")
+                }}
                 className={`
         group flex items-center justify-center w-auto h-auto flex-none rounded py-1.5 pl-4 pr-3.5 text-sm ring-1 hover:ring-primaryhover dark:ring-inset ring-slate-700 hover:ring-white/50`}
             >

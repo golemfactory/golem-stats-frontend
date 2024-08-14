@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { AreaChart, Card, Tab, TabGroup, TabList } from "@tremor/react"
 import Select from "react-select"
+import { hotjar } from 'react-hotjar' // Add this import
 
 function getProviderType(name) {
     return { "vm-nvidia": "GPU Provider (Beta)", vm: "CPU Provider", automatic: "AI Provider (Not released yet)" }[name] || name
@@ -153,9 +154,13 @@ const NetworkStats = ({ metricData }) => {
 
     const handleRuntimeChange = (selectedOption) => {
         setSelectedRuntime(selectedOption.value)
+        hotjar.event('Selected Runtime - ' + selectedOption.label)
     }
 
-    const handleTimeFrameChange = (frame) => setSelectedTimeFrame(frame)
+    const handleTimeFrameChange = (frame) => {
+        setSelectedTimeFrame(frame);
+        hotjar.event('HistoricalChart Selected Timeframe - ' + frame);
+    }
 
     const [tabs, setTabs] = useState([
         {

@@ -1,10 +1,18 @@
 import { MetamaskIcon } from "./MetaMaskIcon"
 import { FC } from "react"
+import { hotjar } from 'react-hotjar'
 
 export const ConnectMetamaskButton: FC<{
     onClick: () => void
     mobile?: boolean
 }> = ({ onClick, mobile = false }) => {
+    const handleClick = () => {
+        // Track the event with Hotjar
+        hotjar.event('connect_metamask_clicked')
+        // Call the original onClick handler
+        onClick()
+    }
+
     return (
         <div
             className={`
@@ -15,7 +23,7 @@ export const ConnectMetamaskButton: FC<{
                 dark:border-dark-tremor-border dark:text-dark-tremor-content-default 
                 dark:hover:bg-dark-tremor-background-subtle
             `}
-            onClick={onClick}
+            onClick={handleClick}
         >
             <MetamaskIcon className="inline-block fill-tremor-brand-default dark:fill-dark-tremor-brand-default" />
             <span className="inline-block font-medium">Connect with MetaMask</span>

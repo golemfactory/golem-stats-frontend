@@ -6,6 +6,7 @@ import { AccountMenu } from "./metamask/AccountMenu"
 import { Dialog, DialogPanel } from "@tremor/react"
 import { RiCloseCircleLine, RiHeartPulseLine } from "@remixicon/react"
 import PolygonScanIcon from "./svg/Polygonsscan"
+import { hotjar } from 'react-hotjar'
 
 type HealthCheckModalProps = {
     open: boolean
@@ -48,9 +49,13 @@ const StatusIndicator = ({ status }: { status: string }) => {
 }
 
 export const OpenHealthCheckModalButton: React.FC<OpenModalButtonProps> = ({ setOpen }) => {
+    const handleOpenModal = () => {
+        hotjar.event('open_healthcheck_modal_clicked')
+        setOpen(true)
+    }
     return (
         <div className="flex justify-center">
-            <button className="golembutton group" onClick={() => setOpen(true)}>
+            <button className="golembutton group" onClick={handleOpenModal}>
                 <div className="button-content px-2 group-hover:gap-x-2">
                     <RiHeartPulseLine className="icon h-5 w-5 -ml-2" />
                     <span className="text">Healthcheck</span>
@@ -101,6 +106,7 @@ export const HealthCheckModal: React.FC<HealthCheckModalProps> = ({ open, setOpe
             return
         }
         setIsChecking(true)
+        hotjar.event('healthcheck_started')
 
         try {
             setShowNoPermission(false)

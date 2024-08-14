@@ -3,6 +3,7 @@ import { Dialog, DialogPanel, TextInput, BarList, Button } from "@tremor/react"
 import { RiSearchLine } from "@remixicon/react"
 import HardwareBadge from "./HardwareBadge"
 import NvidiaIcon from "./svg/NvidiaIcon"
+import { hotjar } from "react-hotjar" // Add this import
 
 function HardwareFilterModal({ data, filters, setFilters, runtime }) {
     const [modalOpen, setModalOpen] = useState(false)
@@ -29,18 +30,47 @@ function HardwareFilterModal({ data, filters, setFilters, runtime }) {
             .map(([name, value]) => ({ name, value }))
             .sort((a, b) => b.value - a.value)
     }, [data, runtime])
-
+    const trackEvent = useCallback((eventName, eventData = {}) => {
+        const eventString = Object.entries(eventData).reduce((acc, [key, value]) => {
+            return `${acc}_${key}:${value}`
+        }, eventName)
+        hotjar.event(eventString)
+    }, [])
     const filteredAndFormattedData = useMemo(() => {
         return hardwareInfoList.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
     }, [hardwareInfoList, searchQuery])
 
-    const handleSelectHardware = (model) => {
-        const newSelectedHardware = selectedHardware.includes(model)
-            ? selectedHardware.filter((h) => h !== model)
-            : [...selectedHardware, model]
-        setSelectedHardware(newSelectedHardware)
-        setFilters((prev) => ({ ...prev, hardware: newSelectedHardware }))
-    }
+    const handleSelectHardware = useCallback(
+        (model) => {
+            const newSelectedHardware = selectedHardware.includes(model)
+                ? selectedHardware.filter((h) => h !== model)
+                : [...selectedHardware, model]
+            setSelectedHardware(newSelectedHardware)
+            setFilters((prev) => ({ ...prev, hardware: newSelectedHardware }))
+
+            // Track the hardware selection/deselection
+            trackEvent("hardware_selection", {
+                model,
+                action: selectedHardware.includes(model) ? "deselected" : "selected",
+            })
+        },
+        [selectedHardware, setFilters, trackEvent]
+    )
+
+    useEffect(() => {
+        if (modalOpen) {
+            trackEvent("hardware_modal_opened")
+        } else {
+            trackEvent("hardware_modal_closed")
+        }
+    }, [modalOpen, trackEvent])
+
+    // Track search queries
+    useEffect(() => {
+        if (searchQuery) {
+            trackEvent("hardware_search", { query: searchQuery })
+        }
+    }, [searchQuery, trackEvent])
 
     const getMaxValue = () => {
         return Math.max(...hardwareInfoList.map((item) => item.value))
@@ -53,7 +83,13 @@ function HardwareFilterModal({ data, filters, setFilters, runtime }) {
     return (
         <>
             <div className="grid grid-cols-1 gap-4">
-                <button className="golembutton-noflex" onClick={() => setModalOpen(true)}>
+                <button
+                    className="golembutton-noflex"
+                    onClick={() => {
+                        setModalOpen(true)
+                        trackEvent("hardware_modal_button_clicked")
+                    }}
+                >
                     Select Hardware
                 </button>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -84,6 +120,7 @@ function HardwareFilterModal({ data, filters, setFilters, runtime }) {
                 onClose={() => {
                     setModalOpen(false)
                     setSearchQuery("")
+                    trackEvent("hardware_modal_closed")
                 }}
                 static={true}
                 className="z-[100]"

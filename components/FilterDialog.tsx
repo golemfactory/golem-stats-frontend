@@ -3,11 +3,24 @@ import { RadioGroup } from "@headlessui/react"
 import { RiCloseLine, RiCheckboxCircleFill } from "@remixicon/react"
 import { useState, useCallback, useEffect, useMemo } from "react"
 import HardwareFilterModal from "./HardwareFilterModal"
+import { hotjar } from "react-hotjar" // Add this import
 
 function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineStatusButton = false }) {
     const [selectedRuntime, setSelectedRuntime] = useState(filters.runtime)
     const [presets, setPresets] = useState([])
     const [activePreset, setActivePreset] = useState()
+
+    const trackEvent = useCallback((eventName, eventData = {}) => {
+        hotjar.event(eventName, eventData)
+    }, [])
+
+    useEffect(() => {
+        if (isOpen) {
+            trackEvent("filter_dialog_opened")
+        } else {
+            trackEvent("filter_dialog_closed")
+        }
+    }, [isOpen, trackEvent])
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -27,6 +40,8 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
         }
     }, [activePreset, setFilters])
 
+
+
     const handleFilterChange = useCallback(
         (key, value) => {
             let val = typeof value === "string" ? value : value?.target?.value ?? ""
@@ -35,24 +50,33 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
             } else if (val === "") {
                 val = null
             }
-            setFilters((prevFilters) => ({ ...prevFilters, [key]: val }))
+            setFilters((prevFilters) => {
+                const newFilters = { ...prevFilters, [key]: val }
+                trackEvent("filter_changed", { key, value: val })
+                return newFilters
+            })
         },
-        [setFilters]
+        [setFilters, trackEvent]
     )
 
     useEffect(() => {
         handleFilterChange("runtime", selectedRuntime)
     }, [selectedRuntime, handleFilterChange])
 
-    const applyPreset = useCallback((preset) => {
-        setActivePreset(preset)
-    }, [])
+    const applyPreset = useCallback(
+        (preset) => {
+            setActivePreset(preset)
+            trackEvent("preset_applied", { presetName: preset.name })
+        },
+        [trackEvent]
+    )
 
     const updatePreset = useCallback(() => {
         const updatedPresets = presets.map((preset) => (preset.name === activePreset.name ? { ...activePreset, ...filters } : preset))
         setPresets(updatedPresets)
         localStorage.setItem("filterPresets", JSON.stringify(updatedPresets))
-    }, [activePreset, filters, presets])
+        trackEvent("preset_updated", { presetName: activePreset.name })
+    }, [activePreset, filters, presets, trackEvent])
 
     const createPreset = useCallback(() => {
         const presetName = prompt("Enter new preset name:")
@@ -61,8 +85,9 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
             setPresets(newPresets)
             localStorage.setItem("filterPresets", JSON.stringify(newPresets))
             setActivePreset(newPresets[newPresets.length - 1])
+            trackEvent("preset_created", { presetName })
         }
-    }, [filters, presets])
+    }, [filters, presets, trackEvent])
 
     const nodeName = useMemo(() => filters.nodeName ?? "", [filters.nodeName])
     const cores = useMemo(() => filters["golem.inf.cpu.threads"] ?? "", [filters])
@@ -77,14 +102,22 @@ function FilterDialog({ isOpen, onClose, filters, setFilters, data, showOfflineS
         setPresets(newPresets)
         localStorage.setItem("filterPresets", JSON.stringify(newPresets))
         if (newPresets.length === 0) {
-            setFilters({ runtime: "all" }) // Reset filters to default if all presets are deleted
+            setFilters({ runtime: "all" })
         } else {
             setActivePreset(newPresets[0])
         }
-    }, [activePreset, presets, setFilters])
+        trackEvent("preset_removed", { presetName: activePreset.name })
+    }, [activePreset, presets, setFilters, trackEvent])
 
     return (
-        <Dialog open={isOpen} onClose={onClose} className="z-[100] ">
+        <Dialog
+            open={isOpen}
+            onClose={() => {
+                onClose()
+                trackEvent("filter_dialog_closed")
+            }}
+            className="z-[100] "
+        >
             <DialogPanel className="overflow-visible p-0 sm:max-w-6xl bg-transparent ring-none ring-0">
                 <div className="absolute right-0 top-0 pr-3 pt-1">
                     <button
