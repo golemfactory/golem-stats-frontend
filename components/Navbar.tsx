@@ -57,6 +57,8 @@ const CTA = ({
     <Link
         href={item.href}
         target="_blank"
+        rel="noopener noreferrer"
+        referrerPolicy="origin"
         className="flex items-center justify-center gap-x-2.5 p-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700/80 dark:bg-gray-800 dark:text-gray-400 dark:border-top font-inter"
         onClick={() => hotjar.event(`Navbar CTA Click: ${item.name}`)}
     >
