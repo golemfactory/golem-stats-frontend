@@ -14,8 +14,10 @@ import VmNvidiaRuntimeView from "./VmNvidiaRuntimeView"
 import { Accordion, AccordionBody, AccordionHeader, AccordionList } from "@tremor/react"
 import HardwareFilterModal from "./HardwareFilterModal"
 import FilterDialog from "./FilterDialog"
-const ITEMS_PER_PAGE = 30
+
 import { useRouter } from "next/router"
+
+const ITEMS_PER_PAGE = 10
 
 const displayPages = (currentPage: number, lastPage: number) => {
     const pages = []
