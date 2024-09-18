@@ -41,7 +41,6 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                         backgroundRepeat: "no-repeat",
                     }}
                 >
-                    <Banner title="We are upgrading our reputation database. The reputation and benchmark scores are currently unavailable." />
                     <Component {...pageProps} />
                 </div>
             </SessionProvider>
