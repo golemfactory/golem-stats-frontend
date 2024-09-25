@@ -42,7 +42,6 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                     }}
                 >
                     <Component {...pageProps} />
-                    <Banner title="We're performing live maintenance on our database. The stats page may not work as expected meanwhile." />
                 </div>
             </SessionProvider>
         </div>
