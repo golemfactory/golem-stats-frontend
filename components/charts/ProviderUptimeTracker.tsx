@@ -88,7 +88,7 @@ const Tracker = React.forwardRef(({ data = [], className, ...props }, forwardedR
 })
 
 const colorMapping = {
-    unregistered: "bg-gray-500",
+    unregistered: "bg-gray-400 dark:bg-gray-500",
     outage: "bg-yellow-500",
     offline: "bg-red-500",
     online: "bg-emerald-500",
