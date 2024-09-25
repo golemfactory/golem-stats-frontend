@@ -88,9 +88,10 @@ const Tracker = React.forwardRef(({ data = [], className, ...props }, forwardedR
 })
 
 const colorMapping = {
-    online: "bg-emerald-500",
-    offline: "bg-red-500",
+    unregistered: "bg-gray-500",
     outage: "bg-yellow-500",
+    offline: "bg-red-500",
+    online: "bg-emerald-500",
 }
 
 interface UptimeTracker {
