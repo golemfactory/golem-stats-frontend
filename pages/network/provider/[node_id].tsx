@@ -29,8 +29,6 @@ import NetworkPerformanceChart from "@/components/charts/NetworkPerformanceChart
 import TaskParticipationTable from "@/components/TaskParticipationTable"
 import GpuPerformanceChart from "@/components/charts/GPUPerformanceChart"
 import { hotjar } from "react-hotjar"
-import HardwareBadge from "@/components/HardwareBadge"
-import { CpuChipIcon, Square3Stack3DIcon, CircleStackIcon } from "@heroicons/react/24/solid"
 import NvidiaIcon from "@/components/svg/NvidiaIcon"
 import IntelIcon from "@/components/svg/IntelIcon"
 import AMDIcon from "@/components/svg/AMDIcon"
