@@ -216,7 +216,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
             <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong mt-4">Runtime Settings</h3>
             <div className="grid grid-cols-12 gap-4">
                 {Object.values(nodeData[0].runtimes).map((runtime: any) => (
-                    <div className="lg:col-span-4 col-span-4 ">{renderRuntimeSection(runtime)}</div>
+                    <div className="lg:col-span-4 md:col-span-6 col-span-12 ">{renderRuntimeSection(runtime)}</div>
                 ))}
             </div>
             <div className="grid grid-cols-12 gap-4 ">
