@@ -29,6 +29,92 @@ import NetworkPerformanceChart from "@/components/charts/NetworkPerformanceChart
 import TaskParticipationTable from "@/components/TaskParticipationTable"
 import GpuPerformanceChart from "@/components/charts/GPUPerformanceChart"
 import { hotjar } from "react-hotjar"
+import HardwareBadge from "@/components/HardwareBadge"
+import { CpuChipIcon, Square3Stack3DIcon, CircleStackIcon } from "@heroicons/react/24/solid"
+import NvidiaIcon from "@/components/svg/NvidiaIcon"
+import IntelIcon from "@/components/svg/IntelIcon"
+import AMDIcon from "@/components/svg/AMDIcon"
+
+function priceHashMapOrDefault(runtime: any, usage: Usage): any {
+    if (!runtime) return "N/A"
+    if (usage === "start") {
+        const coeffs = runtime.properties["golem.com.pricing.model.linear.coeffs"]
+        return coeffs ? coeffs[coeffs.length - 1] : "N/A"
+    }
+    return PriceHashmap(runtime.properties, usage)
+}
+
+function renderRuntimeSection(runtime: any) {
+    if (!runtime) return null
+
+    const cpuPrice = priceHashMapOrDefault(runtime, "golem.usage.cpu_sec")
+    const envPrice = priceHashMapOrDefault(runtime, "golem.usage.duration_sec")
+    const startPrice = priceHashMapOrDefault(runtime, "start")
+    const cpuVendor = runtime.properties["golem.inf.cpu.vendor"]
+    const CpuIconComponent = cpuVendor === "GenuineIntel" ? IntelIcon : cpuVendor === "AuthenticAMD" ? AMDIcon : CpuChipIcon
+
+    return (
+        <Card className="mt-4 h-full">
+            <h4 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong mb-2">
+                <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">{runtime.runtime}</h3>
+            </h4>
+            <Divider>Hardware</Divider>
+            <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-center mt-2">
+                <HardwareBadge
+                    title="CPU"
+                    value={runtime.properties["golem.inf.cpu.threads"]}
+                    icon={<CpuChipIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
+                />
+                <HardwareBadge
+                    title="Memory"
+                    value={RoundingFunction(runtime.properties["golem.inf.mem.gib"], 2)}
+                    icon={<Square3Stack3DIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
+                />
+                <HardwareBadge
+                    title="Disk"
+                    value={RoundingFunction(runtime.properties["golem.inf.storage.gib"], 2)}
+                    icon={<CircleStackIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
+                />
+                {runtime.properties["golem.!exp.gap-35.v1.inf.gpu.model"] && (
+                    <HardwareBadge
+                        title="GPU"
+                        value={runtime.properties["golem.!exp.gap-35.v1.inf.gpu.model"]}
+                        icon={<NvidiaIcon className="h-4 w-4 shrink-0" />}
+                    />
+                )}
+            </div>
+            <Divider className="mt-4">Pricing</Divider>
+            <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-center mt-2">
+                <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-3 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
+                    CPU/h
+                    <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
+                    <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">{cpuPrice}</span>
+                    <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
+                        GLM
+                    </span>
+                </span>
+                <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-3 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
+                    Env/h
+                    <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
+                    <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">{envPrice}</span>
+                    <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
+                        GLM
+                    </span>
+                </span>
+                <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-3 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
+                    Start
+                    <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
+                    <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">
+                        {startPrice}
+                    </span>
+                    <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
+                        GLM
+                    </span>
+                </span>
+            </div>
+        </Card>
+    )
+}
 
 export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: object; initialIncome: object }) => {
     const router = useRouter()
@@ -57,37 +143,6 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
     }
 
     type Usage = "golem.usage.cpu_sec" | "golem.usage.duration_sec"
-
-    // Assuming PriceHashmap returns a specific type, replace 'any' with that type
-    function priceHashMapOrDefault(provider: Provider, usage: Usage): any {
-        const runtime = provider.runtimes.vm || provider.runtimes["vm-nvidia"] || provider.runtimes.automatic || provider.runtimes.wasmtime
-        if (!runtime) return "N/A"
-        return PriceHashmap(runtime.properties, usage)
-    }
-
-    function renderPricingCoeff() {
-        const runtimes = nodeData[0].runtimes
-
-        if (runtimes.vm?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
-            return runtimes.vm.properties["golem.com.pricing.model.linear.coeffs"][
-                runtimes.vm.properties["golem.com.pricing.model.linear.coeffs"].length - 1
-            ]
-        } else if (runtimes["vm-nvidia"]?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
-            return runtimes["vm-nvidia"].properties["golem.com.pricing.model.linear.coeffs"][
-                runtimes["vm-nvidia"].properties["golem.com.pricing.model.linear.coeffs"].length - 1
-            ]
-        } else if (runtimes.wasmtime?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
-            return runtimes.wasmtime.properties["golem.com.pricing.model.linear.coeffs"][
-                runtimes.wasmtime.properties["golem.com.pricing.model.linear.coeffs"].length - 1
-            ]
-        } else if (runtimes.automatic?.properties["golem.com.pricing.model.linear.coeffs"]?.length > 0) {
-            return runtimes.automatic.properties["golem.com.pricing.model.linear.coeffs"][
-                runtimes.automatic.properties["golem.com.pricing.model.linear.coeffs"].length - 1
-            ]
-        }
-
-        return null // Return null or a default value if no valid runtime data is found
-    }
 
     const handleOperatorClick = () => {
         hotjar.event("operator_button_clicked")
@@ -152,90 +207,20 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                     <EarningsBlock walletAddress={nodeData[0].wallet} />
                 </div>
             </div>
-            <div className="grid grid-cols-12 gap-4">
-                <Card className="lg:col-span-4 col-span-12 flex flex-col">
-                    <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Provider Settings</h3>
-                    <div className="flex-1">
-                        <Divider>Hardware</Divider>
-                        <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-center mt-2">
-                            <HardwareBadge
-                                title="CPU"
-                                value={
-                                    nodeData[0].runtimes.vm?.properties["golem.inf.cpu.threads"] ||
-                                    nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.cpu.threads"] ||
-                                    nodeData[0].runtimes.wasmtime?.properties["golem.inf.cpu.threads"] ||
-                                    nodeData[0].runtimes.automatic?.properties["golem.inf.cpu.threads"]
-                                }
-                                icon={<CpuChipIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
-                            />
 
-                            <HardwareBadge
-                                title="Memory"
-                                value={
-                                    RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.mem.gib"], 2) ||
-                                    RoundingFunction(nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.mem.gib"], 2) ||
-                                    RoundingFunction(nodeData[0].runtimes.wasmtime?.properties["golem.inf.mem.gib"], 2) ||
-                                    RoundingFunction(nodeData[0].runtimes.automatic?.properties["golem.inf.mem.gib"], 2)
-                                }
-                                icon={<Square3Stack3DIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
-                            />
-
-                            <HardwareBadge
-                                title="Disk"
-                                value={
-                                    RoundingFunction(nodeData[0].runtimes.vm?.properties["golem.inf.storage.gib"], 2) ||
-                                    RoundingFunction(nodeData[0].runtimes["vm-nvidia"]?.properties["golem.inf.storage.gib"], 2) ||
-                                    RoundingFunction(nodeData[0].runtimes.wasmtime?.properties["golem.inf.storage.gib"], 2) ||
-                                    RoundingFunction(nodeData[0].runtimes.automatic?.properties["golem.inf.storage.gib"], 2)
-                                }
-                                icon={<CircleStackIcon className="h-4 w-4 shrink-0" aria-hidden={true} />}
-                            />
-                        </div>
-                    </div>{" "}
-                    <div className="flex-1">
-                        <Divider>Pricing</Divider>
-                        <div className="flex flex-wrap gap-2 sm:gap-4 items-center justify-center mt-2">
-                            <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-3 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
-                                CPU/h
-                                <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
-                                <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">
-                                    {priceHashMapOrDefault(nodeData[0], "golem.usage.cpu_sec")}
-                                </span>
-                                <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
-                                    {" "}
-                                    GLM
-                                </span>
-                            </span>
-                            <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-3 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
-                                Env/h
-                                <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
-                                <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">
-                                    {priceHashMapOrDefault(nodeData[0], "golem.usage.duration_sec")}
-                                </span>
-                                <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
-                                    {" "}
-                                    GLM
-                                </span>
-                            </span>
-                            <span className="inline-flex items-center gap-x-2.5 rounded-tremor-full bg-tremor-background py-1 pl-2.5 pr-3 text-tremor-label text-tremor-content ring-1 ring-tremor-ring dark:bg-dark-tremor-background dark:text-dark-tremor-content dark:ring-dark-tremor-ring">
-                                Start
-                                <span className="h-4 w-px bg-tremor-ring dark:bg-dark-tremor-ring" />
-                                <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-emphasis mr-1.5">
-                                    {renderPricingCoeff()}
-                                </span>
-                                <span className="-ml-1.5 text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue flex h-5 w-5 items-center justify-center rounded-tremor-full hover:bg-tremor-background-subtle hover:text-tremor-content-emphasis dark:text-dark-tremor-content dark:hover:bg-dark-tremor-background-subtle dark:hover:text-dark-tremor-content-emphasis">
-                                    {" "}
-                                    GLM
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                </Card>
-
-                <div className="lg:col-span-8 col-span-12">
+            <div className="grid grid-cols-12 gap-4 mt-6">
+                <div className="lg:col-span-12 col-span-12">
                     <NodeActivityChart nodeId={node_id} />
                 </div>
-                <h3 className="col-span-12 font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+            </div>
+            <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong mt-4">Runtime Settings</h3>
+            <div className="grid grid-cols-12 gap-4">
+                {Object.values(nodeData[0].runtimes).map((runtime: any) => (
+                    <div className="lg:col-span-4 col-span-4 ">{renderRuntimeSection(runtime)}</div>
+                ))}
+            </div>
+            <div className="grid grid-cols-12 gap-4 ">
+                <h3 className="col-span-12 mt-8 font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
                     Reputation Benchmark Data
                 </h3>
                 <div className="lg:col-span-6 col-span-12">
