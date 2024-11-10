@@ -78,11 +78,12 @@ const TaskParticipationTable = ({ nodeId }) => {
     const paginatedData = useMemo(
         () =>
             data?.task_participation
-                ?.filter((item) => 
-                    item.completion_status !== "Accepted offer, but the task was not started. Reason unknown." &&
-                    item.error_message !== "Provider already benchmarked."
+                ?.filter(
+                    (item) =>
+                        item.completion_status !== "Accepted offer, but the task was not started. Reason unknown." &&
+                        item.error_message !== "Provider already benchmarked."
                 )
-                .sort((a, b) => b.task_id - a.task_id)
+                .sort((a, b) => b.task_started_at - a.task_started_at) // Changed sorting to use task_started_at
                 .slice((page - 1) * itemsPerPage, page * itemsPerPage),
         [data, page]
     )
@@ -169,7 +170,8 @@ const TaskParticipationTable = ({ nodeId }) => {
                     ) : (
                         <TableRow>
                             <TableCell colSpan={5} className="text-center">
-                                We don't have any data from the reputation system yet. The reputation system will automatically start running tasks on your provider if it's not blacklisted.
+                                We don't have any data from the reputation system yet. The reputation system will automatically start
+                                running tasks on your provider if it's not blacklisted.
                             </TableCell>
                         </TableRow>
                     )}
