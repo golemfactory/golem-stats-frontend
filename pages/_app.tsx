@@ -42,7 +42,6 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                     }}
                 >
                     <Component {...pageProps} />
-                    <Banner title={"We are currently optimizing our database. The stats page might be unresponsive."} />
                 </div>
             </SessionProvider>
         </div>
