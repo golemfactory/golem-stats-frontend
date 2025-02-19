@@ -31,7 +31,7 @@ export default function Index() {
     })
 
     const timePeriods = [
-        { period: "6 Hours", earnings: networkEarnings?.network_earnings_6h?.total_earnings || "" },
+        { period: "6 Hours", earnings: networkEarnings?.network_earnings_6h?.total_earnings || null },
         { period: "24 Hours", earnings: networkEarnings?.network_earnings_24h?.total_earnings || null },
         { period: "7 Days", earnings: networkEarnings?.network_earnings_168h?.total_earnings || null },
         { period: "30 Days", earnings: networkEarnings?.network_earnings_720h?.total_earnings || null },
@@ -46,33 +46,25 @@ export default function Index() {
             <div className="grid grid-cols-12 gap-4 ">
                 <div className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid gap-4 col-span-12">
                     <StatCard
-                        title="
-                        Network earnings (6h)
-                    "
+                        title="Network earnings (6h)"
                         value={timePeriods[0].earnings}
                         unit="GLM"
                         loading={!networkEarnings}
                     />
                     <StatCard
-                        title="
-                        Network earnings (24h)
-                    "
+                        title="Network earnings (24h)"
                         value={timePeriods[1].earnings}
                         unit="GLM"
                         loading={!networkEarnings}
                     />
                     <StatCard
-                        title="
-                        Network earnings (7d)
-                    "
+                        title="Network earnings (7d)"
                         value={timePeriods[2].earnings}
                         unit="GLM"
                         loading={!networkEarnings}
                     />
                     <StatCard
-                        title="
-                        Network total earnings
-                    "
+                        title="Network total earnings"
                         value={networkEarnings?.network_total_earnings?.total_earnings}
                         unit="GLM"
                         loading={!networkEarnings}

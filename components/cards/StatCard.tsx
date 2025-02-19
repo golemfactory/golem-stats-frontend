@@ -2,26 +2,29 @@ import { Card } from "@tremor/react"
 import { GolemIcon } from "../svg/GolemIcon"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
-export const StatCard = ({ title, value, unit, loading }: { title: string; value: number; unit: string; loading: boolean }) => {
+export const StatCard = ({ title, value, unit, loading }: { title: string; value: number | null | undefined; unit: string; loading: boolean }) => {
+    const isLoading = loading || value === null || value === undefined
+
     return (
         <Card className="relative bg-white dark:bg-gray-900 ">
             <dt>
                 <div className="absolute bg-golemblue  p-3">
                     <GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />
                 </div>
-                {loading ? (
+                {isLoading ? (
                     <div className="ml-16">
-                        <Skeleton width={160} />{" "}
+                        <Skeleton width={160} />
                     </div>
                 ) : (
                     <p className="ml-16 text-sm font-medium text-gray-500 dark:text-gray-400 truncate">{title}</p>
                 )}
             </dt>
             <dd className="ml-16 flex items-baseline ">
-                {loading ? (
-                    <>
+                {isLoading ? (
+                    <div className="flex items-baseline">
                         <Skeleton width={100} />
-                    </>
+                        <Skeleton width={30} className="ml-2" />
+                    </div>
                 ) : (
                     <>
                         <p className="text-2xl font-semibold text-gray-900 dark:text-gray-300">
@@ -37,8 +40,7 @@ export const StatCard = ({ title, value, unit, loading }: { title: string; value
                                 return strValue // Return the number if it doesn't have a decimal point
                             })()}
                         </p>
-
-                        <p className="ml-2 flex items-baseline text-sm font-semibold text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue ">
+                        <p className="ml-2 flex items-baseline text-sm font-semibold text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
                             {unit}
                         </p>
                     </>
