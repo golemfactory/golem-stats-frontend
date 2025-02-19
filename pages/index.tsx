@@ -30,12 +30,18 @@ export default function Index() {
         refreshInterval: 10000,
     })
 
-    const timePeriods = [
-        { period: "6 Hours", earnings: networkEarnings?.network_earnings_6h?.total_earnings || null },
-        { period: "24 Hours", earnings: networkEarnings?.network_earnings_24h?.total_earnings || null },
-        { period: "7 Days", earnings: networkEarnings?.network_earnings_168h?.total_earnings || null },
-        { period: "30 Days", earnings: networkEarnings?.network_earnings_720h?.total_earnings || null },
-        { period: "90 Days", earnings: networkEarnings?.network_earnings_2160h?.total_earnings || null },
+    const timePeriods = networkEarnings ? [
+        { period: "6 Hours", earnings: networkEarnings.network_earnings_6h.total_earnings },
+        { period: "24 Hours", earnings: networkEarnings.network_earnings_24h.total_earnings },
+        { period: "7 Days", earnings: networkEarnings.network_earnings_168h.total_earnings },
+        { period: "30 Days", earnings: networkEarnings.network_earnings_720h.total_earnings },
+        { period: "90 Days", earnings: networkEarnings.network_earnings_2160h.total_earnings },
+    ] : [
+        { period: "6 Hours", earnings: undefined },
+        { period: "24 Hours", earnings: undefined },
+        { period: "7 Days", earnings: undefined },
+        { period: "30 Days", earnings: undefined },
+        { period: "90 Days", earnings: undefined },
     ]
     return (
         <div className="grid gap-y-4">

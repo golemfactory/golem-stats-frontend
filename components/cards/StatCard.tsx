@@ -2,9 +2,10 @@ import { Card } from "@tremor/react"
 import { GolemIcon } from "../svg/GolemIcon"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
-export const StatCard = ({ title, value, unit, loading }: { title: string; value: number | null | undefined; unit: string; loading: boolean }) => {
-    const isLoading = loading || value === null || value === undefined
 
+export const StatCard = ({ title, value, unit, loading }: { title: string; value: number | undefined; unit: string; loading: boolean }) => {
+    const isLoading = loading || value === undefined
+    
     return (
         <Card className="relative bg-white dark:bg-gray-900 ">
             <dt>
