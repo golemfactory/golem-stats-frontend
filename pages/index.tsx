@@ -18,7 +18,7 @@ import { TxTypeCountAnalysis } from "@/components/charts/TxSingleVSBatched"
 import { TxAverageValueAnalysis } from "@/components/charts/TxAverageValue"
 import { StatCard } from "@/components/cards/StatCard"
 import { HistoricalComputingChart } from "@/components/charts/HistoricalComputing"
-import Banner from "@/components/Banner"
+
 export default function Index() {
     const { data: metricsData, error } = useSWR("v2/network/historical/stats", fetcher, {
         refreshInterval: 1000,
@@ -30,33 +30,45 @@ export default function Index() {
         refreshInterval: 10000,
     })
 
-    const timePeriods = networkEarnings
-        ? [
-              { period: "6 Hours", earnings: networkEarnings.network_earnings_6h.total_earnings },
-              { period: "24 Hours", earnings: networkEarnings.network_earnings_24h.total_earnings },
-              { period: "7 Days", earnings: networkEarnings.network_earnings_168h.total_earnings },
-              { period: "30 Days", earnings: networkEarnings.network_earnings_720h.total_earnings },
-              { period: "90 Days", earnings: networkEarnings.network_earnings_2160h.total_earnings },
-          ]
-        : [
-              { period: "6 Hours", earnings: undefined },
-              { period: "24 Hours", earnings: undefined },
-              { period: "7 Days", earnings: undefined },
-              { period: "30 Days", earnings: undefined },
-              { period: "90 Days", earnings: undefined },
-          ]
+    const timePeriods = networkEarnings ? [
+        { period: "6 Hours", earnings: networkEarnings.network_earnings_6h.total_earnings },
+        { period: "24 Hours", earnings: networkEarnings.network_earnings_24h.total_earnings },
+        { period: "7 Days", earnings: networkEarnings.network_earnings_168h.total_earnings },
+        { period: "30 Days", earnings: networkEarnings.network_earnings_720h.total_earnings },
+        { period: "90 Days", earnings: networkEarnings.network_earnings_2160h.total_earnings },
+    ] : [
+        { period: "6 Hours", earnings: undefined },
+        { period: "24 Hours", earnings: undefined },
+        { period: "7 Days", earnings: undefined },
+        { period: "30 Days", earnings: undefined },
+        { period: "90 Days", earnings: undefined },
+    ]
     return (
         <div className="grid gap-y-4">
-            <Banner title="We're currently investigating an issue with the network earnings stats." />
             {/* <div className="grid grid-cols-4">
                 <OnlineStats />
             </div> */}
             {/* New parent grid for NetworkActivity and NetworkStats */}
             <div className="grid grid-cols-12 gap-4 ">
                 <div className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid gap-4 col-span-12">
-                    <StatCard title="Network earnings (6h)" value={timePeriods[0].earnings} unit="GLM" loading={!networkEarnings} />
-                    <StatCard title="Network earnings (24h)" value={timePeriods[1].earnings} unit="GLM" loading={!networkEarnings} />
-                    <StatCard title="Network earnings (7d)" value={timePeriods[2].earnings} unit="GLM" loading={!networkEarnings} />
+                    <StatCard
+                        title="Network earnings (6h)"
+                        value={timePeriods[0].earnings}
+                        unit="GLM"
+                        loading={!networkEarnings}
+                    />
+                    <StatCard
+                        title="Network earnings (24h)"
+                        value={timePeriods[1].earnings}
+                        unit="GLM"
+                        loading={!networkEarnings}
+                    />
+                    <StatCard
+                        title="Network earnings (7d)"
+                        value={timePeriods[2].earnings}
+                        unit="GLM"
+                        loading={!networkEarnings}
+                    />
                     <StatCard
                         title="Network total earnings"
                         value={networkEarnings?.network_total_earnings?.total_earnings}
