@@ -47,7 +47,7 @@ export default function Index() {
           ]
     return (
         <div className="grid gap-y-4">
-            <Banner title="We're performing live upgrade of our metrics system. The stats page might be degraded." />
+            {/* <Banner title="We're performing live upgrade of our metrics system. The stats page might be degraded." /> */}
             {/* <div className="grid grid-cols-4">
                 <OnlineStats />
             </div> */}
