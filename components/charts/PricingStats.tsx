@@ -8,23 +8,35 @@ import "react-loading-skeleton/dist/skeleton.css"
 import { MultiSelect, MultiSelectItem, SearchSelect, SearchSelectItem, SelectItem } from "@tremor/react"
 
 interface MetricCardSummaryProps {
-    unit: string;
+    unit: string
 }
 
 interface TimeFrameFormatOptions {
-    month: "short";
-    day: "numeric";
-    year?: "numeric";
+    month: "short"
+    day: "numeric"
+    year?: "numeric"
 }
 
 interface PricingDataItem {
-    date: number;
-    median_cpu: number;
-    average_cpu: number;
-    median_env: number;
-    average_env: number;
-    median_start: number;
-    average_start: number;
+    date: number
+    median_cpu: number
+    average_cpu: number
+    median_env: number
+    average_env: number
+    median_start: number
+    average_start: number
+}
+
+function formatPriceValue(value: number): string {
+    if (!value || isNaN(value)) return "0"
+    if (Math.abs(value) >= 0.01) {
+        return value.toFixed(2)
+    } else if (Math.abs(value) >= 0.0001) {
+        return value.toFixed(4).replace(/\.?0+$/, "")
+    } else {
+        // Show up to 8 decimals, trim trailing zeros
+        return value.toFixed(8).replace(/\.?0+$/, "")
+    }
 }
 
 const PricingStats = () => {
@@ -40,7 +52,6 @@ const PricingStats = () => {
     const isValidNumber = (value: number) => {
         return typeof value === "number" && !isNaN(value)
     }
-    console.log(metricData)
     // Initialize values to a default (e.g., null or 0)
     let cpuValue = null
     let envValue = null
@@ -78,9 +89,9 @@ const PricingStats = () => {
         const date = new Date(dateString * 1000)
         let formatOptions: TimeFrameFormatOptions = {
             month: "short",
-            day: "numeric"
+            day: "numeric",
         }
-        
+
         if (["6m", "1y", "All"].includes(timeFrame)) {
             formatOptions.year = "numeric"
         }
@@ -95,7 +106,7 @@ const PricingStats = () => {
                     <div className="flex gap-4">
                         <div className="flex items-baseline space-x-2">
                             <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
-                                {isValidNumber(cpuValue) ? RoundingFunction(cpuValue, 3) : "0"}
+                                {isValidNumber(cpuValue) ? formatPriceValue(cpuValue) : "0"}
                             </span>
                             <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
                                 CPU/h
@@ -103,7 +114,7 @@ const PricingStats = () => {
                         </div>
                         <div className="flex items-baseline space-x-2">
                             <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
-                                {isValidNumber(envValue) ? RoundingFunction(envValue, 3) : "0"}
+                                {isValidNumber(envValue) ? formatPriceValue(envValue) : "0"}
                             </span>
                             <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
                                 Env/h
@@ -111,7 +122,7 @@ const PricingStats = () => {
                         </div>
                         <div className="flex items-baseline space-x-2">
                             <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
-                                {isValidNumber(startValue) ? RoundingFunction(startValue, 3) : "0"}
+                                {isValidNumber(startValue) ? formatPriceValue(startValue) : "0"}
                             </span>
                             <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
                                 Start Price
@@ -175,15 +186,17 @@ const PricingStats = () => {
                                 </div>
                             </div>
                             <AreaChart
-                                data={(metricData && metricData[network] && metricData[network][selectedTimeFrame] 
-                                    ? metricData[network][selectedTimeFrame].map((item: PricingDataItem) => ({
-                                        ...item,
-                                        date: formatDate(item.date, selectedTimeFrame),
-                                        "CPU/h": selectedMetric === "Median" ? item.median_cpu : item.average_cpu,
-                                        "Env/h": selectedMetric === "Median" ? item.median_env : item.average_env,
-                                        "Start Price": selectedMetric === "Median" ? item.median_start : item.average_start,
-                                    }))
-                                    : [])}
+                                data={
+                                    metricData && metricData[network] && metricData[network][selectedTimeFrame]
+                                        ? metricData[network][selectedTimeFrame].map((item: PricingDataItem) => ({
+                                              ...item,
+                                              date: formatDate(item.date, selectedTimeFrame),
+                                              "CPU/h": selectedMetric === "Median" ? item.median_cpu : item.average_cpu,
+                                              "Env/h": selectedMetric === "Median" ? item.median_env : item.average_env,
+                                              "Start Price": selectedMetric === "Median" ? item.median_start : item.average_start,
+                                          }))
+                                        : []
+                                }
                                 autoMinValue={true}
                                 index="date"
                                 categories={["CPU/h", "Env/h", "Start Price"]}
@@ -192,7 +205,12 @@ const PricingStats = () => {
                                 showGradient={false}
                                 showAnimation={true}
                                 yAxisWidth={38}
-                                valueFormatter={(number) => `${Intl.NumberFormat("us").format(number)}`}
+                                valueFormatter={(number) =>
+                                    Intl.NumberFormat("en-US", {
+                                        minimumFractionDigits: 6,
+                                        maximumFractionDigits: 8,
+                                    }).format(number)
+                                }
                                 className="h-72"
                             />
                         </TabPanel>
