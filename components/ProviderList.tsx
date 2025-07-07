@@ -171,13 +171,13 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
 
     const filteredData = useMemo(() => {
         return rawData
-            ? rawData.filter((provider) => {
-                  const isProviderFiltered = filterProvider(provider, filters)
-
-                  const hasRequiredRuntime = provider.runtimes && (filters.runtime === "all" || provider.runtimes[filters.runtime])
-
-                  return isProviderFiltered && hasRequiredRuntime
-              })
+            ? rawData
+                  .filter((provider) => provider.runtimes && Object.keys(provider.runtimes).length > 0)
+                  .filter((provider) => {
+                      const isProviderFiltered = filterProvider(provider, filters)
+                      const hasRequiredRuntime = filters.runtime === "all" || provider.runtimes[filters.runtime]
+                      return isProviderFiltered && hasRequiredRuntime
+                  })
             : []
     }, [rawData, filters, filterProvider])
 
