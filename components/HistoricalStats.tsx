@@ -63,7 +63,8 @@ const formatDate = (dateString, timeFrame) => {
 }
 
 const MetricCardSummary = ({ metricData, metric, selectedRuntime, unit }) => {
-    const latestDataPoint = metricData[selectedRuntime]["1d"][metricData[selectedRuntime]["1d"].length - 1] || {}
+    const dailyData = metricData[selectedRuntime]?.["1d"] || []
+    const latestDataPoint = dailyData[dailyData.length - 1] || {}
     const value = `${Intl.NumberFormat("us").format(latestDataPoint[metric] || 0)}`
     return (
         <div className={`flex justify-between`}>
@@ -81,6 +82,9 @@ const MetricCardSummary = ({ metricData, metric, selectedRuntime, unit }) => {
 }
 
 const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, selectedTimeFrame, onTimeFrameChange, description }) => {
+    if (!metricData[selectedRuntime]) {
+        return null
+    }
     const timeFrames = Object.keys(metricData[selectedRuntime])
     return (
         <Card>
@@ -191,8 +195,9 @@ const NetworkStats = ({ metricData }) => {
 
     useEffect(() => {
         // Aggregate check across all timeframes for any non-zero GPU count
+        if (!metricData[selectedRuntime]) return
         const hasGPUData = ["1d", "7d", "1m", "1y", "All"].some((timeframe) =>
-            metricData[selectedRuntime][timeframe].some((entry) => entry.gpus > 0)
+            metricData[selectedRuntime][timeframe]?.some((entry) => entry.gpus > 0)
         )
 
         // Update tabs based on whether GPU data is available
