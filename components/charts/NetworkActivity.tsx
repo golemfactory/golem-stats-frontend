@@ -15,9 +15,9 @@ export const NetworkActivity: React.FC = () => {
         refreshInterval: 1000,
     })
 
-    const extractChartData = (apiData) => {
+    const extractChartData = (apiData: any) => {
         if (!apiData || !apiData.data || !apiData.data.result || !apiData.data.result[0]) return []
-        return apiData.data.result[0].values.map(([x, y]) => ({
+        return apiData.data.result[0].values.map(([x, y]: [number, string]) => ({
             date: new Date(x * 1000).toLocaleTimeString(navigator.language, {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -66,7 +66,7 @@ export const NetworkActivity: React.FC = () => {
                                 </h3>
                                 <div className="flex items-baseline space-x-2">
                                     <span className={`text-tremor-metric font-semibold font-inter ${colorClass}`}>
-                                        {loaded ? data[data.length - 1]["Providers computing"] : <Skeleton width={40} height={30} />}
+                                        {loaded ? (data.length > 0 ? data[data.length - 1]["Providers computing"] : 0) : <Skeleton width={40} height={30} />}
                                     </span>
                                     <span className="text-tremor-default font-medium text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue">
                                         Providers
@@ -83,7 +83,6 @@ export const NetworkActivity: React.FC = () => {
                                 categories={["Providers computing"]}
                                 colors={["blue"]}
                                 yAxisWidth={30}
-                                showAnimation={true}
                                 showAnimation={true}
                             />
                         )}
