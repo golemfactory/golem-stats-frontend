@@ -2,6 +2,7 @@ import { Card, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import { useState, useMemo } from "react"
+import { useNetwork } from "./NetworkContext"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
@@ -10,8 +11,10 @@ function classNames(...classes) {
 }
 
 const Title = ({ nodeId, reputationScore }) => {
-    const { data: blacklistData, error: blacklistError } = useSWR(`v2/providers/check_blacklist?node_id=${nodeId}`, (url) =>
-        fetcher(url, { useReputationApi: true })
+    const { network } = useNetwork()
+    const { data: blacklistData, error: blacklistError } = useSWR(
+        [`v2/providers/check_blacklist?node_id=${nodeId}`, network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl, { useReputationApi: true })
     )
 
     const isBlacklistedProvider = blacklistData?.is_blacklisted_provider ? "Yes" : "No"
@@ -68,7 +71,11 @@ const Title = ({ nodeId, reputationScore }) => {
 }
 
 const TaskParticipationTable = ({ nodeId }) => {
-    const { data, error } = useSWR(`stats/provider/${nodeId}/details`, (url) => fetcher(url, { useReputationApi: true }))
+    const { network } = useNetwork()
+    const { data, error } = useSWR(
+        [`stats/provider/${nodeId}/details`, network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl, { useReputationApi: true })
+    )
 
     const [page, setPage] = useState(1)
     const itemsPerPage = 10

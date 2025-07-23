@@ -2,13 +2,19 @@ import React from "react"
 import useSWR from "swr"
 import { Card, Divider, DonutChart, List, ListItem, Color } from "@tremor/react"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 
 const valueFormatter = (number) => number.toString()
 
 export const NetworkCPUVendorDistribution: React.FC = () => {
-    const { data: apiResponse } = useSWR("v2/network/stats/cpuvendor", fetcher, {
-        refreshInterval: 10000,
-    })
+    const { network } = useNetwork()
+    const { data: apiResponse } = useSWR(
+        ["v2/network/stats/cpuvendor", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 10000,
+        }
+    )
 
     const chartData = Object.entries(apiResponse || {}).map(([name, amount]) => ({
         name: name === "GenuineIntel" ? "Intel" : name === "AuthenticAMD" ? "AMD" : "Other",

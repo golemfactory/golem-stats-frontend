@@ -11,37 +11,41 @@ type AvgEarningsData = {
   average_earnings: string;
 };
 
-import { fetcher } from "@/fetcher";
-
-import { RoundingFunction } from "@/lib/RoundingFunction";
-import EarningsCard from "./Earnings";
+import { fetcher } from "@/fetcher"
+import { useNetwork } from "./NetworkContext"
+import { RoundingFunction } from "@/lib/RoundingFunction"
+import EarningsCard from "./Earnings"
 
 const NetworkStats: React.FC = () => {
-  const { data: data6h, isLoading: data1Loading } = useSWR<EarningsData>(
-    "v1/network/earnings/6",
-    fetcher,
-    {
-      refreshInterval: 10000,
-    }
-  );
-  const { data: data24h, isLoading: data24Loading } = useSWR<EarningsData>(
-    "v1/network/earnings/24",
-    fetcher,
-    {
-      refreshInterval: 10000,
-    }
-  );
-  const { data: data90d, isLoading: data90dLoading } = useSWR<EarningsData>(
-    "v1/network/earnings/90d",
-    fetcher,
-    {
-      refreshInterval: 10000,
-    }
-  );
-  const { data: avgEarningsData, isLoading: avgEarningsDataLoading } =
-    useSWR<AvgEarningsData>("v1/network/provider/average/earnings", fetcher, {
-      refreshInterval: 10000,
-    });
+    const { network } = useNetwork()
+    const { data: data6h, isLoading: data1Loading } = useSWR<EarningsData>(
+        ["v1/network/earnings/6", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 10000,
+        }
+    )
+    const { data: data24h, isLoading: data24Loading } = useSWR<EarningsData>(
+        ["v1/network/earnings/24", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 10000,
+        }
+    )
+    const { data: data90d, isLoading: data90dLoading } = useSWR<EarningsData>(
+        ["v1/network/earnings/90d", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 10000,
+        }
+    )
+    const { data: avgEarningsData, isLoading: avgEarningsDataLoading } = useSWR<AvgEarningsData>(
+        ["v1/network/provider/average/earnings", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 10000,
+        }
+    )
 
   const [earnings6h, setEarnings6h] = useState(0);
   const [earnings24h, setEarnings24h] = useState(0);

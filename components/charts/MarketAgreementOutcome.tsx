@@ -3,14 +3,20 @@ import dynamic from "next/dynamic"
 import useSWR from "swr"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import { ApexOptions } from "apexcharts"
 
 const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false })
 
 export const MarketAgreementOutcome = () => {
-    const { data, error } = useSWR("v1/network/market/agreement/termination/reasons", fetcher, {
-        refreshInterval: 10000,
-    })
+    const { network } = useNetwork()
+    const { data, error } = useSWR(
+        ["v1/network/market/agreement/termination/reasons", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 10000,
+        }
+    )
     const [series, setSeries] = useState([] as number[])
 
     useEffect(() => {

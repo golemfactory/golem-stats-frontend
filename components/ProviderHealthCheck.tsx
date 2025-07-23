@@ -2,6 +2,7 @@ import { Fragment, useRef, useState, useEffect } from "react"
 import { HeartIcon } from "@heroicons/react/24/outline"
 import { useSession } from "next-auth/react"
 import useSWR from "swr"
+import { useNetwork } from "./NetworkContext"
 import { AccountMenu } from "./metamask/AccountMenu"
 import { Dialog, DialogPanel } from "@tremor/react"
 import { RiCloseCircleLine, RiHeartPulseLine } from "@remixicon/react"
@@ -91,9 +92,10 @@ export const HealthCheckModal: React.FC<HealthCheckModalProps> = ({ open, setOpe
     const [taskId, setTaskId] = useState(null)
     const [isChecking, setIsChecking] = useState(false)
     const [showNoPermission, setShowNoPermission] = useState(false)
+    const { network } = useNetwork()
     const { data: statusData, error: statusError } = useSWR(
-        taskId ? [process.env.NEXT_PUBLIC_API_URL + "v2/healthcheck/frontend/status", taskId, session?.user.accessToken] : null,
-        fetcher,
+        taskId ? [network.apiUrl + "v2/healthcheck/frontend/status", taskId, session?.user.accessToken] : null,
+        (args) => fetcher(args),
         { refreshInterval: 2000 }
     )
 
