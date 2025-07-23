@@ -2,12 +2,14 @@ import { useState, useEffect } from "react"
 import { Card, SparkAreaChart } from "@tremor/react"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 import { classNames } from "@/lib/classNames"
 
 const OnlineStats = () => {
-    const { data, error } = useSWR("v2/network/stats/online", fetcher)
+    const { network } = useNetwork()
+    const { data, error } = useSWR(["v2/network/stats/online", network.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl))
 
     if (error) return <div>Failed to load</div>
 

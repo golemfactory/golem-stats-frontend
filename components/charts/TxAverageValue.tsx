@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import { Card, Tab, TabGroup, TabList, LineChart } from "@tremor/react"
 import Skeleton from "react-loading-skeleton"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 
 export const TxAverageValueAnalysis = () => {
+    const { network } = useNetwork()
     const [selectedTimeFrame, setSelectedTimeFrame] = useState("1y")
-    const { data, error, isValidating } = useSWR("v2/network/transactions/average-value", fetcher, {})
+    const { data, error, isValidating } = useSWR(
+        ["v2/network/transactions/average-value", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {}
+    )
     const [formattedData, setFormattedData] = useState([])
 
     useEffect(() => {

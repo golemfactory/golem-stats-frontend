@@ -2,6 +2,7 @@ import React from "react"
 import useSWR from "swr"
 import { Card, Divider, DonutChart, List, ListItem } from "@tremor/react"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 
 const valueFormatter = (number) => number.toLocaleString()
 
@@ -15,9 +16,14 @@ const generateChartColor = (name) => {
 }
 
 export const NetworkCpuArchitectureChart: React.FC = () => {
-    const { data: apiResponse } = useSWR("v2/network/stats/cpuarchitecture", fetcher, {
-        refreshInterval: 10000,
-    })
+    const { network } = useNetwork()
+    const { data: apiResponse } = useSWR(
+        ["v2/network/stats/cpuarchitecture", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 10000,
+        }
+    )
 
     const chartData = Object.entries(apiResponse || {}).map(([name, amount]) => ({
         name,

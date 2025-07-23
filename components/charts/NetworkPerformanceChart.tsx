@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import { Card, AreaChart } from "@tremor/react"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 
 const NetworkPerformanceChart = ({ nodeId }) => {
-    const { data, isValidating } = useSWR(`stats/benchmark/network/${nodeId}`, (url) => fetcher(url, { useReputationApi: true }), {})
+    const { network } = useNetwork()
+    const { data, isValidating } = useSWR(
+        [`stats/benchmark/network/${nodeId}`, network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl, { useReputationApi: true }),
+        {}
+    )
 
     const formatData = (apiData) => {
         if (!apiData || !apiData.data) return []

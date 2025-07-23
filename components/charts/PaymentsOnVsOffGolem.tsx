@@ -1,12 +1,18 @@
 import { useState } from "react"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import { AreaChart, Card, Tab, TabGroup, TabList } from "@tremor/react"
 import Skeleton from "react-loading-skeleton"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 export const TxAnalysis = () => {
+    const { network } = useNetwork()
     const [selectedTimeFrame, setSelectedTimeFrame] = useState("1y")
-    const { data, isValidating } = useSWR("v2/network/token/golemvschain", fetcher, {})
+    const { data, isValidating } = useSWR(
+        ["v2/network/token/golemvschain", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {}
+    )
 
     const formatData = (apiData) =>
         apiData[selectedTimeFrame].map(({ date, on_golem, not_golem }) => ({

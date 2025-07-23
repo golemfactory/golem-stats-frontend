@@ -3,6 +3,7 @@ import useSWR from "swr"
 import { RiArrowRightSLine } from "@remixicon/react"
 import { Card, DonutChart, List, ListItem, Tab, TabGroup, TabList, TabPanel, TabPanels } from "@tremor/react"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(" ")
@@ -13,7 +14,8 @@ const currencyFormatter = (number) => {
 }
 
 const ProviderUptimeDonut = () => {
-    const { data, error } = useSWR("v2/network/online/donut", fetcher)
+    const { network } = useNetwork()
+    const { data, error } = useSWR(["v2/network/online/donut", network.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl))
     const [networkSummary, setNetworkSummary] = useState([])
 
     useEffect(() => {

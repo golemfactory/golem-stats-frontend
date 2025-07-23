@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import { Card, AreaChart } from "@tremor/react"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 
 const DiskFileIoSeqChart = ({ nodeId }) => {
+    const { network } = useNetwork()
     const { data, isValidating } = useSWR(
-        `stats/benchmark/disk/fileio_seq/${nodeId}`,
-        (url) => fetcher(url, { useReputationApi: true }),
+        [`stats/benchmark/disk/fileio_seq/${nodeId}`, network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl, { useReputationApi: true }),
         {}
     )
 

@@ -2,12 +2,18 @@ import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { AreaChart, Card } from "@tremor/react"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import Skeleton from "react-loading-skeleton"
 
 const NodeActivityChart = ({ nodeId }) => {
-    const { data, error } = useSWR(`v1/provider/node/${nodeId}/activity`, fetcher, {
-        refreshInterval: 30000,
-    })
+    const { network } = useNetwork()
+    const { data, error } = useSWR(
+        [`v1/provider/node/${nodeId}/activity`, network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 30000,
+        }
+    )
     const [chartData, setChartData] = useState([])
 
     useEffect(() => {

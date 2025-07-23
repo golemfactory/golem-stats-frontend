@@ -9,6 +9,7 @@ import { NetworkCTA, provider, network, providerCTA } from "@/lib/NavRoutes"
 import DarkModeToggle from "./DarkModeToggle"
 import GolemNavIcon from "./svg/GolemNavIcon"
 import SearchComponent from "./Search"
+import { NetworkSelector } from "./NetworkSelector"
 import { hotjar } from 'react-hotjar'
 
 const NavItem = ({
@@ -167,8 +168,9 @@ export const Navbar: React.FC = () => {
                     >
                         Discover Golem
                     </Link> */}
-                    <SearchComponent />
+                    <SearchComponent fullWidth={false} />
                     <DarkModeToggle />
+                    <NetworkSelector />
                 </div>
             </nav>
             <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
@@ -230,7 +232,7 @@ export const Navbar: React.FC = () => {
                                                 ))}
                                             </Disclosure.Panel>
                                             <div className="w-64 mt-4 ml-3">
-                                                <SearchComponent />
+                                                <SearchComponent fullWidth={true} />
                                             </div>
                                         </>
                                     )}

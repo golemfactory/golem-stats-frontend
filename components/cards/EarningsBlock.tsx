@@ -1,5 +1,6 @@
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 import { Card } from "@tremor/react"
 import Link from "next/link"
@@ -9,7 +10,11 @@ import { hotjar } from "react-hotjar" // Add this import
 
 import "react-loading-skeleton/dist/skeleton.css"
 const EarningsBlock = ({ walletAddress }) => {
-    const { data: earningsData, error } = useSWR(walletAddress ? `v1/provider/node/${walletAddress}/earningsnew` : null, fetcher)
+    const { network } = useNetwork()
+    const { data: earningsData, error } = useSWR(
+        walletAddress ? [`v1/provider/node/${walletAddress}/earningsnew`, network.apiUrl] : null,
+        ([url, apiUrl]) => fetcher(url, apiUrl)
+    )
     const handlePolygonscanClick = () => {
         hotjar.event("provider_polygonscan_click")
     }

@@ -2,6 +2,7 @@
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import { useState } from "react"
+import { useNetwork } from "./NetworkContext"
 import { useMemo, useCallback } from "react"
 import moment from "moment-timezone"
 import { TextInput, Select, SelectItem, Card } from "@tremor/react"
@@ -96,7 +97,11 @@ export const isUpdateNeeded = (updatedAt) => {
 }
 
 export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes = false }) => {
-    const { data: rawData, error } = useSWR(endpoint, fetcher, { refreshInterval: 60000, initialData })
+    const { network } = useNetwork()
+    const { data: rawData, error } = useSWR([endpoint, network.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl), {
+        refreshInterval: 60000,
+        initialData,
+    })
     const router = useRouter()
     const [filters, setFilters] = useState({ showOffline: false, runtime: "all" })
 

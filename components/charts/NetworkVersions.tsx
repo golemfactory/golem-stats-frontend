@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react"
 import useSWR from "swr"
 import { BarChart, Card, Divider } from "@tremor/react"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import Skeleton from "react-loading-skeleton"
 
 export const NetworkVersionAdoption: React.FC = () => {
+    const { network } = useNetwork()
     const [chartData, setChartData] = useState([])
-    const { data } = useSWR("v1/network/versions", fetcher, {
+    const { data } = useSWR(["v1/network/versions", network.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl), {
         refreshInterval: 10000,
     })
     const { data: latestYagnaVersion, error: latestYagnaVersionError } = useSWR(

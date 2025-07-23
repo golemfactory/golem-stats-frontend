@@ -3,6 +3,7 @@ import dynamic from "next/dynamic"
 import useSWR from "swr"
 import { ApexOptions } from "apexcharts"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 import { Card } from "@tremor/react"
 
@@ -100,9 +101,12 @@ export const HistoricalPriceChart: React.FC<HistoricalPriceProps> = ({ endpoint,
             xaxis: [],
         },
     })
-
-    const { data: apiResponse } = useSWR(endpoint, fetcher)
-    const { data: releaseData, error: releaseDataError } = useSWR("v1/api/yagna/releases", fetcher)
+    const { network } = useNetwork()
+    const { data: apiResponse } = useSWR([endpoint, network.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl))
+    const { data: releaseData, error: releaseDataError } = useSWR(
+        ["v1/api/yagna/releases", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl)
+    )
 
     useEffect(() => {
         if (releaseData) {

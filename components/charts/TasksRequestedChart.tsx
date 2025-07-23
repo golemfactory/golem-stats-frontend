@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import useSWR from "swr"
 import { BarChart, Card, Tab, TabGroup, TabList, TabPanel, TabPanels } from "@tremor/react"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 
 const displayOptions = {
     Top10: 10,
@@ -10,7 +11,8 @@ const displayOptions = {
 }
 
 export const TasksRequestedChart: React.FC = () => {
-    const { data: apiResponse } = useSWR("v1/requestors", fetcher, {
+    const { network } = useNetwork()
+    const { data: apiResponse } = useSWR(["v1/requestors", network.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl), {
         refreshInterval: 10000,
     })
     const [selectedCount, setSelectedCount] = useState(displayOptions.Top10)

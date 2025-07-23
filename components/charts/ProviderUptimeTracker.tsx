@@ -2,6 +2,7 @@ import { RiCheckboxCircleFill, RiBarChartFill } from "@remixicon/react"
 import { Accordion, AccordionBody, AccordionHeader, Card, List, ListItem } from "@tremor/react"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
 import { RiCloseFill } from "@remixicon/react"
 import StatusIndicator from "../StatusIndicator"
 import Skeleton from "react-loading-skeleton"
@@ -122,9 +123,14 @@ export const ProviderUptimeTrackerComponent: React.FC<ProviderUptimeTrackerProps
     version,
     subnet,
 }) => {
-    const { data, error } = useSWR<UptimeTrackerResponse>(`v2/provider/uptime/${nodeId}`, fetcher, {
-        refreshInterval: 60000,
-    })
+    const { network } = useNetwork()
+    const { data, error } = useSWR<UptimeTrackerResponse>(
+        [`v2/provider/uptime/${nodeId}`, network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 60000,
+        }
+    )
 
     if (error)
         return (
