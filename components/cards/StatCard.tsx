@@ -34,8 +34,8 @@ export const StatCard = ({ title, value, unit, loading }: { title: string; value
                                 const decimalIndex = strValue.indexOf(".")
                                 if (decimalIndex !== -1) {
                                     // Check if there are at least 5 digits after the decimal
-                                    return strValue.length > decimalIndex + 5
-                                        ? strValue.substring(0, decimalIndex + 6) // Include up to the 5th digit after the decimal
+                                    return strValue.length > decimalIndex + 2
+                                        ? strValue.substring(0, decimalIndex + 3) // Include up to the 5th digit after the decimal
                                         : strValue // If fewer than 5 digits, return the whole number
                                 }
                                 return strValue // Return the number if it doesn't have a decimal point
