@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { fetcher } from "@/fetcher"
 import useSWR from "swr"
+import { useNetwork } from "../NetworkContext"
 import { GlobeAltIcon } from "@heroicons/react/24/solid"
 import { Card, Tab, TabGroup, TabList, TabPanel, TabPanels, AreaChart } from "@tremor/react"
 
@@ -10,8 +11,9 @@ export const NetworkActivity: React.FC = () => {
     const [data, setData] = useState([])
     const [loaded, setLoaded] = useState<boolean>(false)
     const [colorClass, setColorClass] = useState("dark:text-dark-tremor-content-metric")
+    const { network } = useNetwork()
 
-    const response = useSWR("v1/network/utilization", fetcher, {
+    const response = useSWR(["v1/network/utilization", network.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl), {
         refreshInterval: 1000,
     })
 

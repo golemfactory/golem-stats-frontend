@@ -3,10 +3,15 @@ import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import { Card, Tab, TabGroup, TabList, TabPanel, TabPanels, AreaChart } from "@tremor/react"
 import { RoundingFunction } from "@/lib/RoundingFunction"
-
+import { useNetwork } from "../NetworkContext"
 export const HistoricalComputingChart: React.FC = () => {
+    const { network } = useNetwork()
     const [selectedTimeFrame, setSelectedTimeFrame] = useState("All")
-    const { data, error, isValidating } = useSWR("v2/network/historical/computing", fetcher, {})
+    const { data, error, isValidating } = useSWR(
+        typeof window !== "undefined" ? ["v2/network/historical/computing", network.apiUrl] : null,
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {}
+    )
     const [formattedData, setFormattedData] = useState([])
 
     useEffect(() => {

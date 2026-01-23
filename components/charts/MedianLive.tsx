@@ -1,6 +1,7 @@
 import { fetcher } from "@/fetcher"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 import useSWR from "swr"
+import { useNetwork } from "../NetworkContext"
 import { GolemIcon } from "../svg/GolemIcon"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
@@ -25,7 +26,8 @@ const PricingColumn = ({ title, value }: { title: string; value: number }) => {
 }
 
 const MedianLive = () => {
-    const { data, error } = useSWR("v2/network/pricing/median/1h", fetcher, {
+    const { network } = useNetwork()
+    const { data, error } = useSWR(["v2/network/pricing/median/1h", network.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl), {
         refreshInterval: 10000,
     })
 

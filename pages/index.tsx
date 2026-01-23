@@ -4,6 +4,7 @@ import NetworkStats from "@/components/HistoricalStats"
 import { NetworkActivity } from "@/components/charts/NetworkActivity"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
+import { useNetwork } from "@/components/NetworkContext"
 import EarningsCard from "@/components/Earnings"
 import EC2vsGolemPricing from "@/components/cards/EC2ComparePricing"
 import Skeleton from "react-loading-skeleton"
@@ -20,15 +21,28 @@ import { StatCard } from "@/components/cards/StatCard"
 import { HistoricalComputingChart } from "@/components/charts/HistoricalComputing"
 import Banner from "@/components/Banner"
 export default function Index() {
-    const { data: metricsData, error } = useSWR("v2/network/historical/stats", fetcher, {
-        refreshInterval: 1000,
-    })
-    const { data: networkEarnings, error: networkEarningsError } = useSWR("v1/network/earnings/overviewnew", fetcher, {
-        refreshInterval: 10000,
-    })
-    const { data: overview, error: overviewError } = useSWR("v2/network/comparison", fetcher, {
-        refreshInterval: 10000,
-    })
+    const { network } = useNetwork()
+    const { data: metricsData, error } = useSWR(
+        typeof window !== "undefined" ? ["v2/network/historical/stats", network.apiUrl] : null,
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 1000,
+        }
+    )
+    const { data: networkEarnings, error: networkEarningsError } = useSWR(
+        typeof window !== "undefined" ? ["v1/network/earnings/overviewnew", network.apiUrl] : null,
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 10000,
+        }
+    )
+    const { data: overview, error: overviewError } = useSWR(
+        typeof window !== "undefined" ? ["v2/network/comparison", network.apiUrl] : null,
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 10000,
+        }
+    )
 
     const timePeriods = networkEarnings
         ? [
@@ -47,7 +61,9 @@ export default function Index() {
           ]
     return (
         <div className="grid gap-y-4">
-            {/* <Banner title="We're performing live upgrade of our metrics system. The stats page might be degraded." /> */}
+            {network.name === "Old marketplace" && (
+                <Banner title="You are viewing the old marketplace. To see the latest data, please select the 'New marketplace' from the network selector in the top-right corner." />
+            )}
             {/* <div className="grid grid-cols-4">
                 <OnlineStats />
             </div> */}
@@ -118,6 +134,3 @@ export default function Index() {
     )
 }
 
-export async function getStaticProps({}) {
-    return { props: {} }
-}

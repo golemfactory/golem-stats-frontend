@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { RoundingFunction } from "@/lib/RoundingFunction";
-import { fetcher } from "@/fetcher";
-import { ApexOptions } from "apexcharts";
-import useSWR from "swr";
+import { fetcher } from "@/fetcher"
+import { useNetwork } from "../NetworkContext"
+import { ApexOptions } from "apexcharts"
+import useSWR from "swr"
 import dynamic from "next/dynamic";
 
 const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -48,11 +49,12 @@ export const InvoicesPaid: React.FC = () => {
       lineCap: "round",
     },
   });
-  const [series, setSeries] = useState<number[]>([]);
+  const [series, setSeries] = useState<number[]>([])
+  const { network } = useNetwork()
 
-  const { data, error } = useSWR("v1/network/market/invoice/paid/1h", fetcher, {
-    refreshInterval: 10000,
-  });
+  const { data, error } = useSWR(["v1/network/market/invoice/paid/1h", network.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl), {
+      refreshInterval: 10000,
+  })
 
   useEffect(() => {
     if (data && !error) {

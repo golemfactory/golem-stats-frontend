@@ -5,7 +5,7 @@ import { ArrowSmallUpIcon, ArrowSmallDownIcon } from "@heroicons/react/24/solid"
 import Link from "next/link"
 import { hotjar } from "react-hotjar"
 
-function SearchIcon(props) {
+const SearchIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
     return (
         <svg aria-hidden="true" viewBox="0 0 20 20" {...props}>
             <path d="M16.293 17.707a1 1 0 0 0 1.414-1.414l-1.414 1.414ZM9 14a5 5 0 0 1-5-5H2a7 7 0 0 0 7 7v-2ZM4 9a5 5 0 0 1 5-5V2a7 7 0 0 0-7 7h2Zm5-5a5 5 0 0 1 5 5h2a7 7 0 0 0-7-7v2Zm8.707 12.293-3.757-3.757-1.414 1.414 3.757 3.757 1.414-1.414ZM14 9a4.98 4.98 0 0 1-1.464 3.536l1.414 1.414A6.98 6.98 0 0 0 16 9h-2Zm-1.464 3.536A4.98 4.98 0 0 1 9 14v2a6.98 6.98 0 0 0 4.95-2.05l-1.414-1.414Z" />
@@ -13,7 +13,7 @@ function SearchIcon(props) {
     )
 }
 
-function LoadingIcon(props) {
+const LoadingIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
     let id = useId()
 
     return (
@@ -30,7 +30,25 @@ function LoadingIcon(props) {
     )
 }
 
-function SearchResult({ result, autocomplete, collection, query, type, isSelected, onResultClick }) {
+interface SearchResultType {
+    id?: string
+    address?: string
+    provider_name?: string
+    provider_count?: number
+    wallet?: string
+}
+
+interface SearchResultProps {
+    result: SearchResultType
+    autocomplete: any
+    collection: { source?: any; items: SearchResultType[] }
+    query: string
+    type: "provider" | "wallet"
+    isSelected: boolean
+    onResultClick: (result: SearchResultType) => void
+}
+
+const SearchResult: React.FC<SearchResultProps> = ({ result, autocomplete, collection, query, type, isSelected, onResultClick }) => {
     let id = useId()
     let router = useRouter()
 
@@ -92,9 +110,16 @@ function SearchResult({ result, autocomplete, collection, query, type, isSelecte
     )
 }
 
-function SearchResults({ autocomplete, query, wallets, providers, selectedIndex, onResultClick }) {
-    const allResults = [...providers, ...wallets]
+interface SearchResultsProps {
+    autocomplete: any
+    query: string
+    wallets: SearchResultType[]
+    providers: SearchResultType[]
+    selectedIndex: number
+    onResultClick: (result: SearchResultType) => void
+}
 
+const SearchResults: React.FC<SearchResultsProps> = ({ autocomplete, query, wallets, providers, selectedIndex, onResultClick }) => {
     return (
         <>
             <section className="border-t border-slate-200 bg-white py-3 empty:hidden dark:border-slate-400/10 dark:bg-dark-tremor-background">
@@ -152,7 +177,11 @@ function SearchResults({ autocomplete, query, wallets, providers, selectedIndex,
     )
 }
 
-export default function SearchComponent(fullWidth = false) {
+interface SearchComponentProps {
+    fullWidth?: boolean
+}
+
+export default function SearchComponent({ fullWidth = false }: SearchComponentProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [query, setQuery] = useState("")
     const [results, setResults] = useState({ wallets: [], providers: [] })
@@ -160,23 +189,24 @@ export default function SearchComponent(fullWidth = false) {
     const inputRef = useRef(null)
     const panelRef = useRef(null)
     const formRef = useRef(null)
-    let [modifierKey, setModifierKey] = useState()
+    let [modifierKey, setModifierKey] = useState<string>()
     const router = useRouter()
 
     useEffect(() => {
-        const handleKeyDown = (event) => {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if ((event.metaKey || event.ctrlKey) && event.key === "k") {
                 event.preventDefault()
-                setIsOpen((prevIsOpen) => !prevIsOpen)
-                // Track search modal open/close
-                hotjar.event(prevIsOpen ? "search_modal_closed" : "search_modal_opened")
+                setIsOpen((prevIsOpen) => {
+                    hotjar.event(!prevIsOpen ? "search_modal_opened" : "search_modal_closed")
+                    return !prevIsOpen
+                })
             }
         }
 
-        document.addEventListener("search_modal_keydown", handleKeyDown)
+        document.addEventListener("keydown", handleKeyDown as EventListener)
 
         return () => {
-            document.removeEventListener("keydown", handleKeyDown)
+            document.removeEventListener("keydown", handleKeyDown as EventListener)
         }
     }, [])
 
@@ -221,7 +251,7 @@ export default function SearchComponent(fullWidth = false) {
         }
     }, [query])
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: React.KeyboardEvent) => {
         const totalResults = results.providers.length + results.wallets.length
 
         if (event.key === "ArrowUp") {
@@ -242,7 +272,7 @@ export default function SearchComponent(fullWidth = false) {
         }
     }
 
-    const handleResultClick = (result) => {
+    const handleResultClick = (result: SearchResultType) => {
         if (result.address) {
             router.push(`/network/providers/operator/${result.address}`)
             hotjar.event("operator_result_clicked")

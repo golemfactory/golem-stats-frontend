@@ -1,6 +1,7 @@
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import { useState } from "react"
+import { useNetwork } from "../NetworkContext"
 import { AreaChart, Card, Tab, TabGroup, TabList, TabPanel, TabPanels, Select } from "@tremor/react"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 import Skeleton from "react-loading-skeleton"
@@ -40,9 +41,14 @@ function formatPriceValue(value: number): string {
 }
 
 const PricingStats = () => {
+    const { network: networkContext } = useNetwork()
     const [network, setNetwork] = useState("mainnet")
-    const { data: metricData } = useSWR("v2/network/pricing/historical", fetcher, { refreshInterval: 60000 })
-    const { data, error } = useSWR("v2/network/pricing/1h", fetcher, {
+    const { data: metricData } = useSWR(
+        ["v2/network/pricing/historical", networkContext.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        { refreshInterval: 60000 }
+    )
+    const { data, error } = useSWR(["v2/network/pricing/1h", networkContext.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl), {
         refreshInterval: 10000,
     })
     const [selectedTimeFrame, setSelectedTimeFrame] = useState("7d")

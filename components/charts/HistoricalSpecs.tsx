@@ -5,6 +5,7 @@ import { fetcher } from "@/fetcher"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 import { ApexOptions } from "apexcharts"
 import useSWR from "swr"
+import { useNetwork } from "../NetworkContext"
 import { Card } from "@tremor/react"
 
 const DynamicApexChart = dynamic(() => import("react-apexcharts"), {
@@ -129,12 +130,17 @@ export const HistoricalSpecs: React.FC<Props> = ({ endpoint, title, colors, yaxi
     })
 
     const [series, setSeries] = useState<any[]>([])
-    const { data: apiResponse } = useSWR<any[]>(endpoint, fetcher, {
+    const { network } = useNetwork()
+    const { data: apiResponse } = useSWR<any[]>([endpoint, network.apiUrl], ([url, apiUrl]) => fetcher(url, apiUrl), {
         refreshInterval: 10000,
     })
-    const { data: releaseData, error: releaseDataError } = useSWR("v1/api/yagna/releases", fetcher, {
-        refreshInterval: 10000,
-    })
+    const { data: releaseData, error: releaseDataError } = useSWR(
+        ["v1/api/yagna/releases", network.apiUrl],
+        ([url, apiUrl]) => fetcher(url, apiUrl),
+        {
+            refreshInterval: 10000,
+        }
+    )
 
     useEffect(() => {
         apiResponse && setSeries(processData(apiResponse, yaxisLabel))
