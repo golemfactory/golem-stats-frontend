@@ -17,7 +17,7 @@ interface FormattedDataPoint {
 export const SaladHistoricalComputingChart: React.FC = () => {
   const { data, error, isLoading } = useSWR<ComputingDataPoint[]>(
     "v2/partner/salad/network/historical/computing",
-    fetcher
+    fetcher,
   );
 
   const formattedData = useMemo<FormattedDataPoint[]>(() => {
@@ -39,7 +39,7 @@ export const SaladHistoricalComputingChart: React.FC = () => {
     const yesterdaysData = formattedData.filter((d) => d.date === yesterday);
     return yesterdaysData.reduce(
       (max, curr) => Math.max(max, curr["Simultaneous providers computing"]),
-      0
+      0,
     );
   }, [data, formattedData]);
 
@@ -49,7 +49,7 @@ export const SaladHistoricalComputingChart: React.FC = () => {
     <Card className="h-full px-6">
       <div className="px-6 mb-6">
         <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">
-          Salad Historical Computing Chart
+          Historical Computing Chart
         </h1>
         <p className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
           This chart visualizes the historical number of simultaneous Salad

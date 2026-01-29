@@ -78,7 +78,7 @@ export const SaladNetworkActivity: React.FC = () => {
     <Card className="h-full px-6">
       <div className="px-6 mb-6">
         <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">
-          Salad Network Activity
+          Network Activity
         </h1>
         <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
           Real-time tracking of Salad providers on the Golem Network who are
