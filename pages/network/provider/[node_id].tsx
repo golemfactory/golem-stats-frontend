@@ -18,16 +18,7 @@ import Link from "next/link"
 import HardwareBadge from "@/components/HardwareBadge"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
-import TaskStatusChart from "@/components/charts/TaskStatusChart"
 import EarningsBlock from "@/components/cards/EarningsBlock"
-import CPUPerformanceChart from "@/components/charts/CPUPerformanceChart"
-import MemorySeqChart from "@/components/charts/MemorySeqChart"
-import MemoryRandMultiChart from "@/components/charts/MemoryRandMultiChart"
-import DiskFileIoSeqChart from "@/components/charts/DiskFileIoSeqChart"
-import DiskFileIoRandChart from "@/components/charts/DiskFileIoRandChart"
-import NetworkPerformanceChart from "@/components/charts/NetworkPerformanceChart"
-import TaskParticipationTable from "@/components/TaskParticipationTable"
-import GpuPerformanceChart from "@/components/charts/GPUPerformanceChart"
 import { hotjar } from "react-hotjar"
 import NvidiaIcon from "@/components/svg/NvidiaIcon"
 import IntelIcon from "@/components/svg/IntelIcon"
@@ -216,40 +207,6 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                 {Object.values(nodeData[0].runtimes).map((runtime: any) => (
                     <div className="lg:col-span-4 md:col-span-6 col-span-12 ">{renderRuntimeSection(runtime)}</div>
                 ))}
-            </div>
-            <div className="grid grid-cols-12 gap-4 ">
-                <h3 className="col-span-12 mt-8 font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                    Reputation Benchmark Data
-                </h3>
-                <div className="lg:col-span-6 col-span-12">
-                    <CPUPerformanceChart nodeId={node_id} />
-                </div>
-                <div className="lg:col-span-6 col-span-12">
-                    <MemorySeqChart nodeId={node_id} />
-                </div>
-                <div className="lg:col-span-6 col-span-12">
-                    <MemoryRandMultiChart nodeId={node_id} />
-                </div>
-                <div className="lg:col-span-6 col-span-12">
-                    <DiskFileIoSeqChart nodeId={node_id} />
-                </div>
-                <div className="lg:col-span-6 col-span-12">
-                    <DiskFileIoRandChart nodeId={node_id} />
-                </div>
-                <div className="lg:col-span-6 col-span-12">
-                    <NetworkPerformanceChart nodeId={node_id} />
-                </div>
-                {nodeData[0].runtimes["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"] && (
-                    <div className="lg:col-span-12 col-span-12">
-                        <GpuPerformanceChart nodeId={node_id} />
-                    </div>
-                )}
-                <div className="col-span-12">
-                    <TaskParticipationTable nodeId={node_id} />
-                </div>
-                {/* <div className="lg:col-span-6 col-span-12">
-                    <TaskStatusChart nodeId={node_id} />
-                </div> */}
             </div>
             <SEO
                 title={`${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]} | Golem Network Stats`}
