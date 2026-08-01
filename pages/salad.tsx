@@ -20,13 +20,13 @@ export default function SaladPage() {
   const { data: metricsData } = useSWR(
     "v2/partner/salad/network/historical/stats",
     fetcher,
-    { refreshInterval: 1000 }
+    { refreshInterval: 15000 }
   );
 
   const { data: networkEarnings } = useSWR<EarningsData>(
     "v2/partner/salad/network/earnings/overview",
     fetcher,
-    { refreshInterval: 10000 }
+    { refreshInterval: 60000 }
   );
 
   const earnings = useMemo(

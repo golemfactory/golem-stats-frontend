@@ -11,7 +11,7 @@ const displayOptions = {
 
 export const TasksRequestedChart: React.FC = () => {
     const { data: apiResponse } = useSWR("v1/requestors", fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 60000,
     })
     const [selectedCount, setSelectedCount] = useState(displayOptions.Top10)
     const [chartData, setChartData] = useState([])

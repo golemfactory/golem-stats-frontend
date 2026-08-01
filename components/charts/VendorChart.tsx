@@ -7,7 +7,7 @@ const valueFormatter = (number) => number.toString()
 
 export const NetworkCPUVendorDistribution: React.FC = () => {
     const { data: apiResponse } = useSWR("v2/network/stats/cpuvendor", fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 60000,
     })
 
     const chartData = Object.entries(apiResponse || {}).map(([name, amount]) => ({

@@ -26,7 +26,7 @@ const PricingColumn = ({ title, value }: { title: string; value: number }) => {
 
 const MedianLive = () => {
     const { data, error } = useSWR("v2/network/pricing/median/1h", fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 60000,
     })
 
     return (

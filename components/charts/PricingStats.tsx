@@ -43,7 +43,7 @@ const PricingStats = () => {
     const [network, setNetwork] = useState("mainnet")
     const { data: metricData } = useSWR("v2/network/pricing/historical", fetcher, { refreshInterval: 60000 })
     const { data, error } = useSWR("v2/network/pricing/1h", fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 60000,
     })
     const [selectedTimeFrame, setSelectedTimeFrame] = useState("7d")
     const [selectedMetric, setSelectedMetric] = useState("Median")

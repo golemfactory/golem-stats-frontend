@@ -21,13 +21,13 @@ import { HistoricalComputingChart } from "@/components/charts/HistoricalComputin
 import Banner from "@/components/Banner"
 export default function Index() {
     const { data: metricsData, error } = useSWR("v2/network/historical/stats", fetcher, {
-        refreshInterval: 1000,
+        refreshInterval: 15000,
     })
     const { data: networkEarnings, error: networkEarningsError } = useSWR("v1/network/earnings/overviewnew", fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 60000,
     })
     const { data: overview, error: overviewError } = useSWR("v2/network/comparison", fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 60000,
     })
 
     const timePeriods = networkEarnings

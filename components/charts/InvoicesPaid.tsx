@@ -51,7 +51,7 @@ export const InvoicesPaid: React.FC = () => {
   const [series, setSeries] = useState<number[]>([]);
 
   const { data, error } = useSWR("v1/network/market/invoice/paid/1h", fetcher, {
-    refreshInterval: 10000,
+    refreshInterval: 60000,
   });
 
   useEffect(() => {

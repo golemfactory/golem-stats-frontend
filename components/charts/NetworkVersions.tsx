@@ -7,7 +7,7 @@ import Skeleton from "react-loading-skeleton"
 export const NetworkVersionAdoption: React.FC = () => {
     const [chartData, setChartData] = useState([])
     const { data } = useSWR("v1/network/versions", fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 60000,
     })
     const { data: yagnaReleases, error: latestYagnaVersionError } = useSWR("v1/api/yagna/releases", fetcher, {})
     const latestYagnaVersion = yagnaReleases?.[0]

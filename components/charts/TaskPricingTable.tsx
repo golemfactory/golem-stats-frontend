@@ -17,7 +17,7 @@ export default function TaskPricingTable() {
     const { data, error } = useSWR(
         `v2/network/pricing/dump?network=${selectedNetwork}&from=${selectedDateRange.from?.toISOString()}&to=${selectedDateRange.to?.toISOString()}&page=${page}&per_page=${itemsPerPage}`,
         fetcher,
-        { refreshInterval: 10000 }
+        { refreshInterval: 60000 }
     )
 
     useEffect(() => {

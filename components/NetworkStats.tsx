@@ -21,26 +21,26 @@ const NetworkStats: React.FC = () => {
     "v1/network/earnings/6",
     fetcher,
     {
-      refreshInterval: 10000,
+      refreshInterval: 60000,
     }
   );
   const { data: data24h, isLoading: data24Loading } = useSWR<EarningsData>(
     "v1/network/earnings/24",
     fetcher,
     {
-      refreshInterval: 10000,
+      refreshInterval: 60000,
     }
   );
   const { data: data90d, isLoading: data90dLoading } = useSWR<EarningsData>(
     "v1/network/earnings/90d",
     fetcher,
     {
-      refreshInterval: 10000,
+      refreshInterval: 60000,
     }
   );
   const { data: avgEarningsData, isLoading: avgEarningsDataLoading } =
     useSWR<AvgEarningsData>("v1/network/provider/average/earnings", fetcher, {
-      refreshInterval: 10000,
+      refreshInterval: 60000,
     });
 
   const [earnings6h, setEarnings6h] = useState(0);

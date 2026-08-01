@@ -130,10 +130,10 @@ export const HistoricalSpecs: React.FC<Props> = ({ endpoint, title, colors, yaxi
 
     const [series, setSeries] = useState<any[]>([])
     const { data: apiResponse } = useSWR<any[]>(endpoint, fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 60000,
     })
     const { data: releaseData, error: releaseDataError } = useSWR("v1/api/yagna/releases", fetcher, {
-        refreshInterval: 10000,
+        refreshInterval: 60000,
     })
 
     useEffect(() => {

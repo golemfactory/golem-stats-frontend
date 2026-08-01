@@ -30,7 +30,7 @@ export const SaladNetworkActivity: React.FC = () => {
   const { data, isLoading } = useSWR<UtilizationData>(
     "v2/partner/salad/network/utilization",
     fetcher,
-    { refreshInterval: 1000 }
+    { refreshInterval: 15000 }
   );
 
   const previousValueRef = useRef<number | null>(null);

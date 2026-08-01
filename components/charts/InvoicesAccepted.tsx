@@ -51,7 +51,7 @@ export const InvoicesAccepted: React.FC = () => {
     "v1/network/market/provider/invoice/accepted/1h",
     fetcher,
     {
-      refreshInterval: 10000,
+      refreshInterval: 60000,
     }
   );
 

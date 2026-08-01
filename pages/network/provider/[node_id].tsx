@@ -119,7 +119,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
 
     const { data: nodeData = initialData, error: nodeError } = useSWR(node_id ? `v2/provider/node/${node_id}` : null, fetcher, {
         initialData: initialData,
-        refreshInterval: 10000,
+        refreshInterval: 60000,
     })
 
     type Provider = {
