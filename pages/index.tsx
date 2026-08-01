@@ -19,10 +19,36 @@ import { TxAverageValueAnalysis } from "@/components/charts/TxAverageValue"
 import { StatCard } from "@/components/cards/StatCard"
 import { HistoricalComputingChart } from "@/components/charts/HistoricalComputing"
 import Banner from "@/components/Banner"
+import { useMemo } from "react"
+
+// The compressed endpoint is columnar: {runtime: {timeframe: {field: [values]}}}.
+// Charts expect rows: {runtime: {timeframe: [{date, online, ...}]}}. Arrays are
+// passed through untouched so the old row format keeps working too.
+function columnarToRows(data: any) {
+    if (!data) return data
+    const out: any = {}
+    for (const [runtime, frames] of Object.entries<any>(data)) {
+        out[runtime] = {}
+        for (const [frame, cols] of Object.entries<any>(frames)) {
+            if (Array.isArray(cols)) {
+                out[runtime][frame] = cols
+                continue
+            }
+            const fields = Object.keys(cols)
+            const n = cols.date?.length ?? 0
+            out[runtime][frame] = Array.from({ length: n }, (_, i) =>
+                Object.fromEntries(fields.map((f) => [f, cols[f][i]]))
+            )
+        }
+    }
+    return out
+}
+
 export default function Index() {
-    const { data: metricsData, error } = useSWR("v2/network/historical/stats", fetcher, {
+    const { data: rawMetricsData, error } = useSWR("v2/network/historical/stats/compressed", fetcher, {
         refreshInterval: 15000,
     })
+    const metricsData = useMemo(() => columnarToRows(rawMetricsData), [rawMetricsData])
     const { data: networkEarnings, error: networkEarningsError } = useSWR("v1/network/earnings/overviewnew", fetcher, {
         refreshInterval: 60000,
     })
