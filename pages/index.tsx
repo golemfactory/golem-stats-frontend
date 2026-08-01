@@ -21,6 +21,18 @@ import { HistoricalComputingChart } from "@/components/charts/HistoricalComputin
 import Banner from "@/components/Banner"
 import { useMemo } from "react"
 
+// Flat columnar payload ({field: [values]}) to a list of row objects.
+// Arrays pass through untouched so the old row format keeps working too.
+function columnsToRowList(data: any) {
+    if (!data || Array.isArray(data)) return data
+    const fields = Object.keys(data)
+    if (!fields.length) return []
+    const n = data[fields[0]]?.length ?? 0
+    return Array.from({ length: n }, (_, i) =>
+        Object.fromEntries(fields.map((f) => [f, data[f][i]]))
+    )
+}
+
 // The compressed endpoint is columnar: {runtime: {timeframe: {field: [values]}}}.
 // Charts expect rows: {runtime: {timeframe: [{date, online, ...}]}}. Arrays are
 // passed through untouched so the old row format keeps working too.
@@ -52,9 +64,10 @@ export default function Index() {
     const { data: networkEarnings, error: networkEarningsError } = useSWR("v1/network/earnings/overviewnew", fetcher, {
         refreshInterval: 60000,
     })
-    const { data: overview, error: overviewError } = useSWR("v2/network/comparison", fetcher, {
+    const { data: rawOverview, error: overviewError } = useSWR("v2/network/comparison/compressed", fetcher, {
         refreshInterval: 60000,
     })
+    const overview = useMemo(() => columnsToRowList(rawOverview), [rawOverview])
 
     const timePeriods = networkEarnings
         ? [
