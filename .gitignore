@@ -35,3 +35,5 @@ yarn-error.log*
 next-env.d.ts
 public/sitemap-0.xml
 public/sitemap.xml
+.env.production
+Dockerfile
