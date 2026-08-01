@@ -9,7 +9,6 @@ import { NetworkCTA, network, provider, providerCTA } from "@/lib/NavRoutes";
 import DarkModeToggle from "./DarkModeToggle";
 import SearchComponent from "./Search";
 import GolemNavIcon from "./svg/GolemNavIcon";
-import SaladIcon from "./svg/SaladIcon";
 
 const NavItem = ({
   item,
@@ -171,12 +170,6 @@ export const Navbar: React.FC = () => {
           <PopoverGroup>
             <PopoverArea title="Provider" items={provider} CTAs={providerCTA} />
           </PopoverGroup>
-          <Link
-            href={"/salad"}
-            className="hidden lg:flex"
-          >
-            <SaladIcon className="h-10 w-auto relative bottom-1" />
-          </Link>
         </div>
         <div className="hidden lg:flex lg:flex-1 gap-x-4 lg:justify-end items-center">
           {/* <Link
