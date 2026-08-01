@@ -1,7 +1,5 @@
 import type * as React from "react";
-export const GolemIcon = (
-  props: React.SVGProps<SVGSVGElement> & { variant?: "golem" | "salad" },
-) => (
+export const GolemIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     data-name="Layer 1"
@@ -20,7 +18,7 @@ export const GolemIcon = (
       cy={468.73}
       r={86.09}
       style={{
-        fill: props.variant === "salad" ? "#53a626" : "#0c14d4",
+        fill: "#0c14d4",
       }}
     />
     <circle
@@ -28,7 +26,7 @@ export const GolemIcon = (
       cy={171.35}
       r={86.09}
       style={{
-        fill: props.variant === "salad" ? "#53a626" : "#0c14d4",
+        fill: "#0c14d4",
       }}
       transform="rotate(-88.76 127.118 169.377)"
     />

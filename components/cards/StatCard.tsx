@@ -8,31 +8,22 @@ export const StatCard = ({
   value,
   unit,
   loading,
-  variant = "golem",
 }: {
   title: string;
   value: number | undefined;
   unit: string;
   loading: boolean;
-  variant?: "golem" | "salad";
 }) => {
   const isLoading = loading || value === undefined;
 
   const unitTextClass =
-    variant === "golem"
-      ? "text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue"
-      : "text-saladGreen dark:text-dark-saladGreen";
-  const glmIconBgClass = variant === "salad" ? "bg-saladGreen" : "bg-golemblue";
+    "text-tremor-brand-golemblue dark:text-dark-tremor-brand-golemblue";
 
   return (
     <Card className="relative bg-white dark:bg-gray-900 ">
       <dt>
-        <div className={`absolute ${glmIconBgClass} p-3`}>
-          <GolemIcon
-            className="h-6 w-6 text-white"
-            aria-hidden="true"
-            variant={variant}
-          />
+        <div className="absolute bg-golemblue p-3">
+          <GolemIcon className="h-6 w-6 text-white" aria-hidden="true" />
         </div>
         {isLoading ? (
           <div className="ml-16">

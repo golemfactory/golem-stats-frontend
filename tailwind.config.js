@@ -17,7 +17,6 @@ module.exports = {
                 golemmain: "#171f2e",
                 golemblue: "#181ea9",
                 golembackground: "#f6f8fc",
-                saladGreen: "#53a626",
                 tremor: {
                     brand: {
                         faint: "#181ea9",
