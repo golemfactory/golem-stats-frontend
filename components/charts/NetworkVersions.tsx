@@ -9,11 +9,8 @@ export const NetworkVersionAdoption: React.FC = () => {
     const { data } = useSWR("v1/network/versions", fetcher, {
         refreshInterval: 10000,
     })
-    const { data: latestYagnaVersion, error: latestYagnaVersionError } = useSWR(
-        "https://api.github.com/repos/golemfactory/yagna/releases/latest",
-        fetcher,
-        {}
-    )
+    const { data: yagnaReleases, error: latestYagnaVersionError } = useSWR("v1/api/yagna/releases", fetcher, {})
+    const latestYagnaVersion = yagnaReleases?.[0]
 
     const customTooltip = (props) => {
         const { payload, active } = props
@@ -85,7 +82,7 @@ export const NetworkVersionAdoption: React.FC = () => {
                     <div className="flex items-baseline space-x-2">
                         {latestYagnaVersion ? (
                             <span className="text-tremor-metric font-semibold dark:text-dark-tremor-content-metric font-inter">
-                                {latestYagnaVersion.name}
+                                {latestYagnaVersion.tag_name}
                             </span>
                         ) : (
                             <Skeleton width={250} height={30} />
