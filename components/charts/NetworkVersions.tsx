@@ -102,8 +102,8 @@ export const NetworkVersionAdoption: React.FC = () => {
                         colors={SERIES_COLORS}
                         stack={true}
                         maxValue={100}
-                        valueFormatter={(value: number) => `${value.toFixed(1)}%`}
-                        yAxisWidth={40}
+                        valueFormatter={(value: number) => `${Math.round(value)}%`}
+                        yAxisWidth={48}
                         showAnimation={true}
                     />
                 ) : (
