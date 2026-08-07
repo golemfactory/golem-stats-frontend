@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
-import { Card, Tab, TabGroup, TabList, AreaChart } from "@tremor/react"
+import { Card, AreaChart } from "@tremor/react"
+import { useTimeFrame } from "@/components/TimeFrameContext"
+import { TimeFrameTabs } from "@/components/TimeFrameTabs"
 
 export const HistoricalComputingChart: React.FC = () => {
-    const [selectedTimeFrame, setSelectedTimeFrame] = useState("7d")
+    const { timeFrame: selectedTimeFrame } = useTimeFrame()
     const { data, error } = useSWR("v2/network/historical/computing/combined", fetcher, {
         refreshInterval: 60000,
     })
     const [formattedData, setFormattedData] = useState([])
-
-    const timeFrames = ["24h", "7d"]
 
     const formatLabel = (isoDate: string, timeFrame: string) => {
         const date = new Date(isoDate)
@@ -80,16 +80,7 @@ export const HistoricalComputingChart: React.FC = () => {
                     </ul>
 
                     <div className="order-1 md:order-2">
-                        <TabGroup
-                            index={timeFrames.findIndex((frame) => frame === selectedTimeFrame)}
-                            onIndexChange={(index) => setSelectedTimeFrame(timeFrames[index])}
-                        >
-                            <TabList variant="solid" className="flex flex-wrap justify-center md:justify-start w-full md:w-fit">
-                                {timeFrames.map((frame) => (
-                                    <Tab key={frame}>{frame}</Tab>
-                                ))}
-                            </TabList>
-                        </TabGroup>
+                        <TimeFrameTabs />
                     </div>
                 </div>
             </div>

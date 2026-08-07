@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react"
-import { AreaChart, Card, Tab, TabGroup, TabList } from "@tremor/react"
+import { AreaChart, Card } from "@tremor/react"
 import Select from "react-select"
 import { hotjar } from 'react-hotjar' // Add this import
+import { useTimeFrame } from "@/components/TimeFrameContext"
+import { TimeFrameTabs } from "@/components/TimeFrameTabs"
 
 function getProviderType(name) {
     return { "vm-nvidia": "GPU Provider (Beta)", vm: "CPU Provider", automatic: "AI Provider (Not released yet)" }[name] || name
@@ -78,11 +80,10 @@ const MetricCardSummary = ({ metricData, metric, selectedRuntime, unit }) => {
     )
 }
 
-const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, selectedTimeFrame, onTimeFrameChange, description }) => {
+const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, selectedTimeFrame, description }) => {
     if (!metricData[selectedRuntime]) {
         return null
     }
-    const timeFrames = Object.keys(metricData[selectedRuntime])
     return (
         <Card>
             <div className="flex relative flex-col md:flex-row justify-between items-start border-b border-tremor-border dark:border-dark-tremor-border">
@@ -105,25 +106,7 @@ const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, sel
             <div className="grid md:flex md:items-start md:justify-between px-6 pt-4">
                 <MetricCardSummary metricData={metricData} metric={metric} selectedRuntime={selectedRuntime} unit={unit} />
                 <div className="order-1 md:order-2">
-                    <TabGroup
-                        index={timeFrames.findIndex((frame) => frame === selectedTimeFrame)}
-                        onIndexChange={(index) => onTimeFrameChange(timeFrames[index])}
-                    >
-                        <TabList variant="solid" className="w-full md:w-fit">
-                            {timeFrames.map((frame) => (
-                                <Tab
-                                    key={frame}
-                                    className={`w-full justify-center py-1 ${
-                                        selectedTimeFrame === frame
-                                            ? "ui-selected:text-tremor-content-strong ui-selected:dark:text-dark-tremor-content-strong"
-                                            : ""
-                                    } md:w-fit md:justify-start`}
-                                >
-                                    {frame}
-                                </Tab>
-                            ))}
-                        </TabList>
-                    </TabGroup>
+                    <TimeFrameTabs />
                 </div>
             </div>
 
@@ -147,7 +130,7 @@ const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, sel
 
 const NetworkStats = ({ metricData }) => {
     const [selectedRuntime, setSelectedRuntime] = useState(Object.keys(metricData).includes("vm") ? "vm" : Object.keys(metricData)[0])
-    const [selectedTimeFrame, setSelectedTimeFrame] = useState("7d")
+    const { timeFrame: selectedTimeFrame } = useTimeFrame()
 
     const runtimeOptions = Object.keys(metricData)
         .sort((a, b) => getProviderType(a).localeCompare(getProviderType(b)))
@@ -156,11 +139,6 @@ const NetworkStats = ({ metricData }) => {
     const handleRuntimeChange = (selectedOption) => {
         setSelectedRuntime(selectedOption.value)
         hotjar.event('Selected Runtime - ' + selectedOption.label)
-    }
-
-    const handleTimeFrameChange = (frame) => {
-        setSelectedTimeFrame(frame);
-        hotjar.event('HistoricalChart Selected Timeframe - ' + frame);
     }
 
     const [tabs, setTabs] = useState([
@@ -247,7 +225,6 @@ const NetworkStats = ({ metricData }) => {
                         unit={tab.unit}
                         selectedRuntime={selectedRuntime}
                         selectedTimeFrame={selectedTimeFrame}
-                        onTimeFrameChange={handleTimeFrameChange}
                         description={tab.description}
                     />
                 ))}

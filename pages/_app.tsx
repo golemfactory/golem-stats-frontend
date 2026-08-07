@@ -2,6 +2,7 @@ import "@/styles/globals.css"
 import { SessionProvider } from "next-auth/react"
 import NextNProgress from "nextjs-progressbar"
 import { Navbar } from "@/components/Navbar"
+import { TimeFrameProvider } from "@/components/TimeFrameContext"
 import Banner from "@/components/Banner"
 import type { AppProps } from "next/app"
 import { useRouter } from "next/router"
@@ -30,6 +31,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
         // <div className={`${robotoMono.variable} ${inter.variable}`}>
         <div>
             <SessionProvider session={session} refetchInterval={5 * 58}>
+                <TimeFrameProvider>
                 <NextNProgress color="#ffffff" />
                 <Navbar />
                 <div
@@ -43,6 +45,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                 >
                     <Component {...pageProps} />
                 </div>
+                </TimeFrameProvider>
             </SessionProvider>
         </div>
     )

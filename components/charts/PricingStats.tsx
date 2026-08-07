@@ -2,6 +2,8 @@ import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import { useState } from "react"
 import { AreaChart, Card, Tab, TabGroup, TabList, TabPanel, TabPanels, Select } from "@tremor/react"
+import { useTimeFrame } from "@/components/TimeFrameContext"
+import { TimeFrameTabs } from "@/components/TimeFrameTabs"
 import { RoundingFunction } from "@/lib/RoundingFunction"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
@@ -46,7 +48,7 @@ const PricingStats = () => {
     const { data, error } = useSWR("v2/network/pricing/1h", fetcher, {
         refreshInterval: 60000,
     })
-    const [selectedTimeFrame, setSelectedTimeFrame] = useState("7d")
+    const { timeFrame: selectedTimeFrame } = useTimeFrame()
     const [selectedMetric, setSelectedMetric] = useState("Median")
     const tabs = [{ name: "Median" }, { name: "Average" }]
 
@@ -85,7 +87,6 @@ const PricingStats = () => {
         )
     }
 
-    const timeFrames = metricData && metricData[network] ? Object.keys(metricData[network]) : []
     const formatDate = (dateString: number, timeFrame: string): string => {
         const date = new Date(dateString * 1000)
         let formatOptions: TimeFrameFormatOptions =
@@ -167,19 +168,7 @@ const PricingStats = () => {
                             <div className="grid md:flex md:items-start md:justify-between">
                                 <MetricCardSummary unit={selectedMetric} />
                                 <div className="order-1 md:order-2 pb-8 pt-4">
-                                    <TabGroup>
-                                        <TabList variant="solid" className="w-full md:w-fit">
-                                            {timeFrames.map((frame) => (
-                                                <Tab
-                                                    key={frame}
-                                                    onClick={() => setSelectedTimeFrame(frame)}
-                                                    className="w-full justify-center py-1 ui-selected:text-tremor-content-strong ui-selected:dark:text-dark-tremor-content-strong md:w-fit md:justify-start"
-                                                >
-                                                    {frame}
-                                                </Tab>
-                                            ))}
-                                        </TabList>
-                                    </TabGroup>
+                                    <TimeFrameTabs />
                                 </div>
                             </div>
                             <AreaChart
