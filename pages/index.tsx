@@ -1,7 +1,6 @@
 import Image from "next/image"
 import { Inter } from "next/font/google"
 import NetworkStats from "@/components/HistoricalStats"
-import { NetworkActivity } from "@/components/charts/NetworkActivity"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
 import EarningsCard from "@/components/Earnings"
@@ -90,7 +89,6 @@ export default function Index() {
             {/* <div className="grid grid-cols-4">
                 <OnlineStats />
             </div> */}
-            {/* New parent grid for NetworkActivity and NetworkStats */}
             <div className="grid grid-cols-12 gap-4 ">
                 <div className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid gap-4 col-span-12">
                     <StatCard title="Network earnings (6h)" value={timePeriods[0].earnings} unit="GLM" loading={!networkEarnings} />
@@ -105,9 +103,6 @@ export default function Index() {
                 </div>
                 <div className="lg:col-span-12 col-span-12">
                     {metricsData ? <NetworkStats metricData={metricsData} /> : <Skeleton height={580} />}
-                </div>
-                <div className="lg:col-span-12 col-span-12 ">
-                    <NetworkActivity />
                 </div>
                 <div className="col-span-12">
                     <NetworkVersionAdoption />
