@@ -6,8 +6,8 @@ import Skeleton from "react-loading-skeleton"
 import { useTimeFrame } from "@/components/TimeFrameContext"
 import { TimeFrameTabs } from "@/components/TimeFrameTabs"
 
-// Fixed CVD-validated hue order; a version keeps its slot (and color) as
-// long as it stays in the top six. "Other" is the deliberately-gray tail.
+// Fixed CVD-validated hue order; versions are assigned newest-first so a
+// version keeps its slot (and color) as adoption shifts.
 const SERIES_COLORS = ["blue", "emerald", "violet", "amber", "cyan", "rose", "gray"]
 
 export const NetworkVersionAdoption: React.FC = () => {
@@ -42,8 +42,8 @@ export const NetworkVersionAdoption: React.FC = () => {
             <div className="px-6 mb-6">
                 <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Network Version Adoption</h1>
                 <p className="text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                    The share of nodes running each Yagna version over time, based on nodes reporting telemetry. The six most-adopted
-                    versions are shown individually; the rest are grouped as Other.
+                    The number of nodes running each Yagna version over time, based on nodes reporting telemetry. Versions older than
+                    0.17.7 are no longer allowed on the network and are not shown.
                 </p>
             </div>
             <div className="border-t border-tremor-border p-6 dark:border-dark-tremor-border">
@@ -77,7 +77,7 @@ export const NetworkVersionAdoption: React.FC = () => {
                                                 {topVersion}
                                             </span>
                                             <span className="text-tremor-default font-medium text-tremor-brand dark:text-dark-tremor-brand-golemblue">
-                                                {Math.round(latest[topVersion])}% of nodes
+                                                {latest[topVersion]} nodes
                                             </span>
                                         </>
                                     ) : (
@@ -101,8 +101,7 @@ export const NetworkVersionAdoption: React.FC = () => {
                         categories={versions}
                         colors={SERIES_COLORS}
                         stack={true}
-                        maxValue={100}
-                        valueFormatter={(value: number) => `${Math.round(value)}%`}
+                        valueFormatter={(value: number) => Intl.NumberFormat("us").format(value)}
                         yAxisWidth={48}
                         showAnimation={true}
                     />
