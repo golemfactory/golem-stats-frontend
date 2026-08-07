@@ -56,7 +56,7 @@ function columnarToRows(data: any) {
 }
 
 export default function Index() {
-    const { data: rawMetricsData, error } = useSWR("v2/network/historical/stats/compressed", fetcher, {
+    const { data: rawMetricsData, error } = useSWR("v2/network/historical/stats/combined", fetcher, {
         refreshInterval: 15000,
     })
     const metricsData = useMemo(() => columnarToRows(rawMetricsData), [rawMetricsData])

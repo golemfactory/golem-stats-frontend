@@ -12,9 +12,10 @@ interface MetricCardSummaryProps {
 }
 
 interface TimeFrameFormatOptions {
-    month: "short"
-    day: "numeric"
-    year?: "numeric"
+    month?: "short"
+    day?: "numeric"
+    hour?: "2-digit"
+    minute?: "2-digit"
 }
 
 interface PricingDataItem {
@@ -41,7 +42,7 @@ function formatPriceValue(value: number): string {
 
 const PricingStats = () => {
     const [network, setNetwork] = useState("mainnet")
-    const { data: metricData } = useSWR("v2/network/pricing/historical", fetcher, { refreshInterval: 60000 })
+    const { data: metricData } = useSWR("v2/network/pricing/historical/combined", fetcher, { refreshInterval: 60000 })
     const { data, error } = useSWR("v2/network/pricing/1h", fetcher, {
         refreshInterval: 60000,
     })
@@ -87,14 +88,10 @@ const PricingStats = () => {
     const timeFrames = metricData && metricData[network] ? Object.keys(metricData[network]) : []
     const formatDate = (dateString: number, timeFrame: string): string => {
         const date = new Date(dateString * 1000)
-        let formatOptions: TimeFrameFormatOptions = {
-            month: "short",
-            day: "numeric",
-        }
-
-        if (["6m", "1y", "All"].includes(timeFrame)) {
-            formatOptions.year = "numeric"
-        }
+        let formatOptions: TimeFrameFormatOptions =
+            timeFrame === "24h"
+                ? { hour: "2-digit", minute: "2-digit" }
+                : { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }
         return date.toLocaleString("en-US", formatOptions)
     }
 

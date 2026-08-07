@@ -53,17 +53,14 @@ const formatDate = (dateString, timeFrame) => {
     const date = new Date(dateString * 1000)
     const options =
         {
-            "1d": { hour: "2-digit", minute: "2-digit" },
-            "7d": { month: "short", day: "numeric" },
-            "1m": { month: "short", day: "numeric", year: "numeric" },
-            "1y": { month: "short", day: "numeric", year: "numeric" },
-            All: { year: "numeric", month: "short", day: "numeric" },
+            "24h": { hour: "2-digit", minute: "2-digit" },
+            "7d": { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" },
         }[timeFrame] || {}
     return date.toLocaleString(navigator.language, options)
 }
 
 const MetricCardSummary = ({ metricData, metric, selectedRuntime, unit }) => {
-    const dailyData = metricData[selectedRuntime]?.["1d"] || []
+    const dailyData = metricData[selectedRuntime]?.["24h"] || []
     const latestDataPoint = dailyData[dailyData.length - 1] || {}
     const value = `${Intl.NumberFormat("us").format(latestDataPoint[metric] || 0)}`
     return (
@@ -150,7 +147,7 @@ const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, sel
 
 const NetworkStats = ({ metricData }) => {
     const [selectedRuntime, setSelectedRuntime] = useState(Object.keys(metricData).includes("vm") ? "vm" : Object.keys(metricData)[0])
-    const [selectedTimeFrame, setSelectedTimeFrame] = useState("1y")
+    const [selectedTimeFrame, setSelectedTimeFrame] = useState("7d")
 
     const runtimeOptions = Object.keys(metricData)
         .sort((a, b) => getProviderType(a).localeCompare(getProviderType(b)))
@@ -196,7 +193,7 @@ const NetworkStats = ({ metricData }) => {
     useEffect(() => {
         // Aggregate check across all timeframes for any non-zero GPU count
         if (!metricData[selectedRuntime]) return
-        const hasGPUData = ["1d", "7d", "1m", "1y", "All"].some((timeframe) =>
+        const hasGPUData = ["24h", "7d"].some((timeframe) =>
             metricData[selectedRuntime][timeframe]?.some((entry) => entry.gpus > 0)
         )
 
