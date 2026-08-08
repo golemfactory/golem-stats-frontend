@@ -43,7 +43,9 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                         backgroundRepeat: "no-repeat",
                     }}
                 >
-                    <Component {...pageProps} />
+                    <div className="mx-auto max-w-[1920px]">
+                        <Component {...pageProps} />
+                    </div>
                 </div>
                 </TimeFrameProvider>
             </SessionProvider>

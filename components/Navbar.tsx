@@ -134,7 +134,7 @@ export const Navbar: React.FC = () => {
   return (
     <header className="relative isolate bg-golemmain text-white z-50">
       <nav
-        className="mx-auto items-center grid grid-cols-4 lg:flex p-6 lg:px-8"
+        className="mx-auto max-w-[1920px] items-center grid grid-cols-4 lg:flex p-6 lg:px-8"
         aria-label="Global"
       >
         <div className="flex lg:flex-1 col-span-3">
