@@ -130,6 +130,37 @@ function VanityStatsStat({ title, value }: { title: string; value: any }) {
     )
 }
 
+const vanityFaq: { q: string; a: string }[] = [
+    {
+        q: "What is Vanity Market?",
+        a: "Vanity Market is a requestor on the Golem Network that pays providers GLM to compute vanity-address hashes. It continuously measures how much work each provider delivers for the price it charges and runs its own reputation system on top of those measurements.",
+    },
+    {
+        q: "Where do these numbers come from?",
+        a: "They are measured by the requestor itself during the current billing window (d1 = the last 24 hours) — agreements it made with this provider, hours it was billed for, GLM it paid, and the hashing work it received in return. This is the requestor's view of the provider, refreshed every few minutes.",
+    },
+    {
+        q: "What does Efficiency (TH/GLM) mean?",
+        a: "Terahashes of work delivered per GLM billed — the requestor's price/performance measure. It is the number that decides whether a provider is worth hiring: a provider can be slow but cheap, or fast but expensive, and still hit the target. Staying below the enforced target leads to price-too-high warnings and eventually temporary bans; sustained work at 2x the target or better earns an automatically relaxed target.",
+    },
+    {
+        q: "What does Avg speed (H/s) mean?",
+        a: "Average hashes per second delivered while under agreement — the raw performance measure, independent of price. Falling below the speed target triggers a speed-below-target warning: the hardware is too slow for this workload even if the price is right.",
+    },
+    {
+        q: "What do the categories and score mean?",
+        a: "The score (0-100) summarizes measured reliability and efficiency. Categories bucket it: trusted and reliable providers consistently meet targets, average and underperformer are at or below the edge, new providers have little history yet, and softbanned/banned providers are temporarily excluded after repeated misses. Bans escalate in duration within a 24-hour window and expire automatically.",
+    },
+    {
+        q: "My provider is online — why is it not earning here?",
+        a: "Being online only means being reachable on the market. If the asking price is too high for the delivered speed (efficiency below target), requestors stop agreeing or the reputation system softbans the provider. Check the hints above: they state the exact reason and, for pricing issues, the suggested price cut.",
+    },
+    {
+        q: "How can I improve my standing?",
+        a: "Either deliver more work per GLM (better/faster hardware, no thermal throttling, no competing load) or charge less for the same work (lower CPU/h and Env/h pricing). After a price change, the effect shows up in the next billing windows as new agreements are measured.",
+    },
+]
+
 function renderVanityMarketStats(reputation: any) {
     if (!reputation || !reputation.category) return null
 
@@ -210,6 +241,20 @@ function renderVanityMarketStats(reputation: any) {
                         </Card>
                     </div>
                 )}
+                <div className="col-span-12">
+                    <Card className="mt-2">
+                        <Divider>FAQ</Divider>
+                        {vanityFaq.map((item) => (
+                            <details key={item.q} className="group py-2 border-b border-tremor-border dark:border-dark-tremor-border last:border-b-0">
+                                <summary className="cursor-pointer list-none flex items-center justify-between text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                                    {item.q}
+                                    <span className="ml-2 text-tremor-content transition-transform group-open:rotate-90">›</span>
+                                </summary>
+                                <p className="mt-2 text-tremor-label text-tremor-content dark:text-dark-tremor-content">{item.a}</p>
+                            </details>
+                        ))}
+                    </Card>
+                </div>
             </div>
         </>
     )
