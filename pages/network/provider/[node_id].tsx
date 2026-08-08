@@ -159,6 +159,10 @@ const vanityFaq: { q: string; a: string }[] = [
         q: "How can I improve my standing?",
         a: "Either deliver more work per GLM (better/faster hardware, no thermal throttling, no competing load) or charge less for the same work (lower CPU/h and Env/h pricing). After a price change, the effect shows up in the next billing windows as new agreements are measured.",
     },
+    {
+        q: "Are these numbers guaranteed?",
+        a: "No. Golem is a decentralized network of independent providers and requestors, so we cannot offer 100% reliability or promise specific numbers that will always work. Measurements vary with network conditions, demand, and other providers' pricing. We urge you to experiment — and to try setting your prices low, so requestors can make use of more of your resources.",
+    },
 ]
 
 function renderVanityMarketStats(reputation: any) {
