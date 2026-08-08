@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react"
 import { HealthCheckModal, OpenHealthCheckModalButton } from "@/components/ProviderHealthCheck"
 import { isUpdateNeeded } from "@/components/ProviderList"
 import { ProviderUptimeTrackerComponent } from "@/components/charts/ProviderUptimeTracker"
-import { Button, Card, Divider } from "@tremor/react"
+import { Badge, Button, Card, Divider } from "@tremor/react"
 import { RiSearch2Line, RiTeamLine } from "@remixicon/react"
 import Link from "next/link"
 import HardwareBadge from "@/components/HardwareBadge"
@@ -102,6 +102,116 @@ function renderRuntimeSection(runtime: any) {
                 </span>
             </div>
         </Card>
+    )
+}
+
+const categoryColor: Record<string, string> = {
+    trusted: "emerald",
+    reliable: "emerald",
+    average: "yellow",
+    underperformer: "orange",
+    new: "blue",
+    softbanned: "red",
+    banned: "red",
+}
+
+const hintColor: Record<string, string> = {
+    critical: "red",
+    warning: "yellow",
+    info: "blue",
+}
+
+function VanityStatsStat({ title, value }: { title: string; value: any }) {
+    return (
+        <div className="text-center">
+            <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content">{title}</p>
+            <p className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">{value}</p>
+        </div>
+    )
+}
+
+function renderVanityMarketStats(reputation: any) {
+    if (!reputation || !reputation.category) return null
+
+    const perf = reputation.performance
+    const targets = reputation.targets
+    const hints = reputation.hints || []
+
+    return (
+        <>
+            <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong mt-6">Vanity Market Stats</h3>
+            <div className="grid grid-cols-12 gap-4">
+                <div className="lg:col-span-6 col-span-12">
+                    <Card className="mt-4 h-full">
+                        <Divider>Status</Divider>
+                        <div className="flex flex-wrap gap-2 items-center justify-center mt-2">
+                            <Badge color={categoryColor[reputation.category] ?? "gray"}>{reputation.category}</Badge>
+                            {reputation.taskReputation !== null && (
+                                <Badge color="gray">Score {RoundingFunction(reputation.taskReputation, 1)}/100</Badge>
+                            )}
+                        </div>
+                        {reputation.softbanned && reputation.softbannedReason && (
+                            <p className="text-tremor-label text-red-500 text-center mt-2">{reputation.softbannedReason}</p>
+                        )}
+                        <div className="flex flex-wrap gap-4 items-center justify-center mt-4">
+                            <VanityStatsStat title="Active agreements" value={reputation.activeAgreements ?? "N/A"} />
+                            <VanityStatsStat title="Bans (24h)" value={reputation.bansLast24h ?? "N/A"} />
+                        </div>
+                        {hints.length > 0 && (
+                            <>
+                                <Divider className="mt-4">Hints</Divider>
+                                <div className="mt-2 space-y-2">
+                                    {hints.map((hint: any) => (
+                                        <div key={hint.id} className="flex items-start gap-2">
+                                            <Badge color={hintColor[hint.severity] ?? "gray"}>{hint.severity}</Badge>
+                                            <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content">
+                                                {hint.message}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </Card>
+                </div>
+                {perf && (
+                    <div className="lg:col-span-6 col-span-12">
+                        <Card className="mt-4 h-full">
+                            <Divider>Measured performance ({perf.window})</Divider>
+                            <div className="flex flex-wrap gap-4 items-center justify-center mt-2">
+                                <VanityStatsStat title="Agreements" value={perf.agreements} />
+                                <VanityStatsStat title="Compute hours" value={RoundingFunction(perf.hours, 1)} />
+                                <VanityStatsStat title="Billed" value={`${RoundingFunction(perf.costGlm, 3)} GLM`} />
+                                <VanityStatsStat title="Avg cost/h" value={`${RoundingFunction(perf.avgCostPerHourGlm, 4)} GLM`} />
+                            </div>
+                            <div className="flex flex-wrap gap-4 items-center justify-center mt-4">
+                                <VanityStatsStat
+                                    title="Efficiency (TH/GLM)"
+                                    value={
+                                        targets?.efficiencyTarget
+                                            ? `${RoundingFunction(perf.efficiencyThPerGlm, 4)} / target ${targets.efficiencyTarget}`
+                                            : RoundingFunction(perf.efficiencyThPerGlm, 4)
+                                    }
+                                />
+                                <VanityStatsStat
+                                    title="Avg speed (H/s)"
+                                    value={
+                                        targets?.speedTarget
+                                            ? `${Math.round(perf.avgSpeedHps).toLocaleString()} / target ${targets.speedTarget.toLocaleString()}`
+                                            : Math.round(perf.avgSpeedHps).toLocaleString()
+                                    }
+                                />
+                            </div>
+                            {reputation.updatedAt && (
+                                <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content text-center mt-4">
+                                    Updated {new Date(reputation.updatedAt).toLocaleString()}
+                                </p>
+                            )}
+                        </Card>
+                    </div>
+                )}
+            </div>
+        </>
     )
 }
 
@@ -208,6 +318,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                     <div className="lg:col-span-4 md:col-span-6 col-span-12 ">{renderRuntimeSection(runtime)}</div>
                 ))}
             </div>
+            {renderVanityMarketStats(nodeData[0].reputation)}
             <SEO
                 title={`${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]} | Golem Network Stats`}
                 description={`Detailed Golem Network statistics for provider with name ${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}`}
