@@ -175,9 +175,9 @@ function renderVanityMarketStats(reputation: any) {
     return (
         <>
             <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong mt-6">Vanity Market Stats</h3>
-            <div className="grid grid-cols-12 gap-4">
-                <div className="lg:col-span-6 col-span-12">
-                    <Card className="mt-4 h-full">
+            <Card className="mt-4">
+                <div className="grid grid-cols-12 gap-x-8">
+                    <div className={perf ? "lg:col-span-6 col-span-12" : "col-span-12"}>
                         <Divider>Status</Divider>
                         <div className="flex flex-wrap gap-2 items-center justify-center mt-2">
                             <Badge color={categoryColor[reputation.category] ?? "gray"}>{reputation.category}</Badge>
@@ -192,26 +192,9 @@ function renderVanityMarketStats(reputation: any) {
                             <VanityStatsStat title="Active agreements" value={reputation.activeAgreements ?? "N/A"} />
                             <VanityStatsStat title="Bans (24h)" value={reputation.bansLast24h ?? "N/A"} />
                         </div>
-                        {hints.length > 0 && (
-                            <>
-                                <Divider className="mt-4">Hints</Divider>
-                                <div className="mt-2 space-y-2">
-                                    {hints.map((hint: any) => (
-                                        <div key={hint.id} className="flex items-start gap-2">
-                                            <Badge color={hintColor[hint.severity] ?? "gray"}>{hint.severity}</Badge>
-                                            <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content">
-                                                {hint.message}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
-                        )}
-                    </Card>
-                </div>
-                {perf && (
-                    <div className="lg:col-span-6 col-span-12">
-                        <Card className="mt-4 h-full">
+                    </div>
+                    {perf && (
+                        <div className="lg:col-span-6 col-span-12">
                             <Divider>Measured performance ({perf.window})</Divider>
                             <div className="flex flex-wrap gap-4 items-center justify-center mt-2">
                                 <VanityStatsStat title="Agreements" value={perf.agreements} />
@@ -237,29 +220,40 @@ function renderVanityMarketStats(reputation: any) {
                                     }
                                 />
                             </div>
-                            {reputation.updatedAt && (
-                                <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content text-center mt-4">
-                                    Updated {new Date(reputation.updatedAt).toLocaleString()}
-                                </p>
-                            )}
-                        </Card>
-                    </div>
-                )}
-                <div className="col-span-12">
-                    <Card className="mt-2">
-                        <Divider>FAQ</Divider>
-                        {vanityFaq.map((item) => (
-                            <details key={item.q} className="group py-2 border-b border-tremor-border dark:border-dark-tremor-border last:border-b-0">
-                                <summary className="cursor-pointer list-none flex items-center justify-between text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                                    {item.q}
-                                    <span className="ml-2 text-tremor-content transition-transform group-open:rotate-90">›</span>
-                                </summary>
-                                <p className="mt-2 text-tremor-label text-tremor-content dark:text-dark-tremor-content">{item.a}</p>
-                            </details>
-                        ))}
-                    </Card>
+                        </div>
+                    )}
                 </div>
-            </div>
+                {hints.length > 0 && (
+                    <>
+                        <Divider className="mt-4">Hints</Divider>
+                        <div className="mt-2 space-y-2">
+                            {hints.map((hint: any) => (
+                                <div key={hint.id} className="flex items-start gap-2">
+                                    <Badge color={hintColor[hint.severity] ?? "gray"}>{hint.severity}</Badge>
+                                    <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content">
+                                        {hint.message}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+                <Divider className="mt-4">FAQ</Divider>
+                {vanityFaq.map((item) => (
+                    <details key={item.q} className="group py-2 border-b border-tremor-border dark:border-dark-tremor-border last:border-b-0">
+                        <summary className="cursor-pointer list-none flex items-center justify-between text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                            {item.q}
+                            <span className="ml-2 text-tremor-content transition-transform group-open:rotate-90">›</span>
+                        </summary>
+                        <p className="mt-2 text-tremor-label text-tremor-content dark:text-dark-tremor-content">{item.a}</p>
+                    </details>
+                ))}
+                {reputation.updatedAt && (
+                    <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content text-center mt-4">
+                        Updated {new Date(reputation.updatedAt).toLocaleString()}
+                    </p>
+                )}
+            </Card>
         </>
     )
 }
