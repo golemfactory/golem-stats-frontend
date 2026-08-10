@@ -3,7 +3,7 @@ import { GolemIcon } from "@/components/svg/GolemIcon"
 import { fetcher } from "@/fetcher"
 import { PriceHashmap } from "@/lib/PriceHashmap"
 import { RoundingFunction } from "@/lib/RoundingFunction"
-import { CircleStackIcon, CpuChipIcon, Square3Stack3DIcon } from "@heroicons/react/24/solid"
+import { ArrowTopRightOnSquareIcon, CircleStackIcon, CpuChipIcon, Square3Stack3DIcon } from "@heroicons/react/24/solid"
 import { useRouter } from "next/router"
 import useSWR from "swr"
 import { useState } from "react"
@@ -133,7 +133,7 @@ function VanityStatsStat({ title, value }: { title: string; value: any }) {
 const vanityFaq: { q: string; a: string }[] = [
     {
         q: "What is Vanity Market?",
-        a: "Vanity Market is a requestor on the Golem Network that pays providers GLM to compute vanity-address hashes. It continuously measures how much work each provider delivers for the price it charges and runs its own reputation system on top of those measurements.",
+        a: "Vanity Market is a partner project — an independent requestor that pays providers GLM to compute vanity-address hashes. It is a customer of the Golem Network, not a component of it: it continuously measures how much work each provider delivers for the price it charges and runs its own reputation system on top of those measurements. The full profile lives on vanity.market, linked above.",
     },
     {
         q: "Where do these numbers come from?",
@@ -165,7 +165,7 @@ const vanityFaq: { q: string; a: string }[] = [
     },
 ]
 
-function renderVanityMarketStats(reputation: any) {
+function renderVanityMarketStats(reputation: any, nodeId: string) {
     if (!reputation || !reputation.category) return null
 
     const perf = reputation.performance
@@ -174,7 +174,22 @@ function renderVanityMarketStats(reputation: any) {
 
     return (
         <>
-            <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong mt-6">Vanity Market Stats</h3>
+            <div className="flex flex-wrap items-center justify-between gap-2 mt-6">
+                <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Vanity Market Stats</h3>
+                <Link
+                    className="golembutton"
+                    href={`https://vanity.market/provider/info/${nodeId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    View on Vanity Market
+                    <ArrowTopRightOnSquareIcon className="h-4 w-4 ml-2 -mr-1" />
+                </Link>
+            </div>
+            <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content mt-2">
+                Vanity Market is a partner of ours and a customer of the network — not a part of it. It shops on Golem like any other
+                requestor, so what you see below is one buyer&apos;s scorecard of this provider, not the network&apos;s verdict.
+            </p>
             <Card className="mt-4">
                 <div className="grid grid-cols-12 gap-x-8">
                     <div className={perf ? "lg:col-span-6 col-span-12" : "col-span-12"}>
@@ -361,7 +376,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                     <div className="lg:col-span-4 md:col-span-6 col-span-12 ">{renderRuntimeSection(runtime)}</div>
                 ))}
             </div>
-            {renderVanityMarketStats(nodeData[0].reputation)}
+            {renderVanityMarketStats(nodeData[0].reputation, node_id)}
             <SEO
                 title={`${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]} | Golem Network Stats`}
                 description={`Detailed Golem Network statistics for provider with name ${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}`}
