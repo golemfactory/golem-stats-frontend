@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react"
 import { HealthCheckModal, OpenHealthCheckModalButton } from "@/components/ProviderHealthCheck"
 import { isUpdateNeeded } from "@/components/ProviderList"
 import { ProviderUptimeTrackerComponent } from "@/components/charts/ProviderUptimeTracker"
-import { Badge, Button, Card, Divider } from "@tremor/react"
+import { Button, Card, Divider } from "@tremor/react"
 import { RiSearch2Line, RiTeamLine } from "@remixicon/react"
 import Link from "next/link"
 import HardwareBadge from "@/components/HardwareBadge"
@@ -21,6 +21,7 @@ import "react-loading-skeleton/dist/skeleton.css"
 import EarningsBlock from "@/components/cards/EarningsBlock"
 import { hotjar } from "react-hotjar"
 import NvidiaIcon from "@/components/svg/NvidiaIcon"
+import { VanityMarketIcon } from "@/components/svg/VanityMarketIcon"
 import IntelIcon from "@/components/svg/IntelIcon"
 import AMDIcon from "@/components/svg/AMDIcon"
 
@@ -105,169 +106,30 @@ function renderRuntimeSection(runtime: any) {
     )
 }
 
-const categoryColor: Record<string, string> = {
-    trusted: "emerald",
-    reliable: "emerald",
-    average: "yellow",
-    underperformer: "orange",
-    new: "blue",
-    softbanned: "red",
-    banned: "red",
-}
-
-const hintColor: Record<string, string> = {
-    critical: "red",
-    warning: "yellow",
-    info: "blue",
-}
-
-function VanityStatsStat({ title, value }: { title: string; value: any }) {
-    return (
-        <div className="text-center">
-            <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content">{title}</p>
-            <p className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">{value}</p>
-        </div>
-    )
-}
-
-const vanityFaq: { q: string; a: string }[] = [
-    {
-        q: "What is Vanity Market?",
-        a: "Vanity Market is a partner project — an independent requestor that pays providers GLM to compute vanity-address hashes. It is a customer of the Golem Network, not a component of it: it continuously measures how much work each provider delivers for the price it charges and runs its own reputation system on top of those measurements. The full profile lives on vanity.market, linked above.",
-    },
-    {
-        q: "Where do these numbers come from?",
-        a: "They are measured by the requestor itself during the current billing window (d1 = the last 24 hours) — agreements it made with this provider, hours it was billed for, GLM it paid, and the hashing work it received in return. This is the requestor's view of the provider, refreshed every few minutes.",
-    },
-    {
-        q: "What does Efficiency (TH/GLM) mean?",
-        a: "Terahashes of work delivered per GLM billed — the requestor's price/performance measure. It is the number that decides whether a provider is worth hiring: a provider can be slow but cheap, or fast but expensive, and still hit the target. Staying below the enforced target leads to price-too-high warnings and eventually temporary bans; sustained work at 2x the target or better earns an automatically relaxed target.",
-    },
-    {
-        q: "What does Avg speed (H/s) mean?",
-        a: "Average hashes per second delivered while under agreement — the raw performance measure, independent of price. Falling below the speed target triggers a speed-below-target warning: the hardware is too slow for this workload even if the price is right.",
-    },
-    {
-        q: "What do the categories and score mean?",
-        a: "The score (0-100) summarizes measured reliability and efficiency. Categories bucket it: trusted and reliable providers consistently meet targets, average and underperformer are at or below the edge, new providers have little history yet, and softbanned/banned providers are temporarily excluded after repeated misses. Bans escalate in duration within a 24-hour window and expire automatically.",
-    },
-    {
-        q: "My provider is online — why is it not earning here?",
-        a: "Being online only means being reachable on the market. If the asking price is too high for the delivered speed (efficiency below target), requestors stop agreeing or the reputation system softbans the provider. Check the hints above: they state the exact reason and, for pricing issues, the suggested price cut.",
-    },
-    {
-        q: "How can I improve my standing?",
-        a: "Either deliver more work per GLM (better/faster hardware, no thermal throttling, no competing load) or charge less for the same work (lower CPU/h and Env/h pricing). After a price change, the effect shows up in the next billing windows as new agreements are measured.",
-    },
-    {
-        q: "Are these numbers guaranteed?",
-        a: "No. Golem is a decentralized network of independent providers and requestors, so we cannot offer 100% reliability or promise specific numbers that will always work. Measurements vary with network conditions, demand, and other providers' pricing. We urge you to experiment — and to try setting your prices low, so requestors can make use of more of your resources.",
-    },
-]
-
-function renderVanityMarketStats(reputation: any, nodeId: string) {
+function renderVanityMarketPanel(reputation: any, nodeId: string) {
     if (!reputation || !reputation.category) return null
-
-    const perf = reputation.performance
-    const targets = reputation.targets
-    const hints = reputation.hints || []
 
     return (
         <>
-            <div className="flex flex-wrap items-center justify-between gap-2 mt-6">
-                <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Vanity Market Stats</h3>
-                <Link
-                    className="golembutton"
-                    href={`https://vanity.market/provider/info/${nodeId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    View on Vanity Market
-                    <ArrowTopRightOnSquareIcon className="h-4 w-4 ml-2 -mr-1" />
-                </Link>
-            </div>
-            <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content mt-2">
-                Vanity Market is a partner of ours and a customer of the network — not a part of it. It shops on Golem like any other
-                requestor, so what you see below is one buyer&apos;s scorecard of this provider, not the network&apos;s verdict.
-            </p>
+            <h3 className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong mt-6">Vanity Market</h3>
             <Card className="mt-4">
-                <div className="grid grid-cols-12 gap-x-8">
-                    <div className={perf ? "lg:col-span-6 col-span-12" : "col-span-12"}>
-                        <Divider>Status</Divider>
-                        <div className="flex flex-wrap gap-2 items-center justify-center mt-2">
-                            <Badge color={categoryColor[reputation.category] ?? "gray"}>{reputation.category}</Badge>
-                            {reputation.taskReputation !== null && (
-                                <Badge color="gray">Score {RoundingFunction(reputation.taskReputation, 1)}/100</Badge>
-                            )}
-                        </div>
-                        {reputation.softbanned && reputation.softbannedReason && (
-                            <p className="text-tremor-label text-red-500 text-center mt-2">{reputation.softbannedReason}</p>
-                        )}
-                        <div className="flex flex-wrap gap-4 items-center justify-center mt-4">
-                            <VanityStatsStat title="Active agreements" value={reputation.activeAgreements ?? "N/A"} />
-                            <VanityStatsStat title="Bans (24h)" value={reputation.bansLast24h ?? "N/A"} />
-                        </div>
-                    </div>
-                    {perf && (
-                        <div className="lg:col-span-6 col-span-12">
-                            <Divider>Measured performance ({perf.window})</Divider>
-                            <div className="flex flex-wrap gap-4 items-center justify-center mt-2">
-                                <VanityStatsStat title="Agreements" value={perf.agreements} />
-                                <VanityStatsStat title="Compute hours" value={RoundingFunction(perf.hours, 1)} />
-                                <VanityStatsStat title="Billed" value={`${RoundingFunction(perf.costGlm, 3)} GLM`} />
-                                <VanityStatsStat title="Avg cost/h" value={`${RoundingFunction(perf.avgCostPerHourGlm, 4)} GLM`} />
-                            </div>
-                            <div className="flex flex-wrap gap-4 items-center justify-center mt-4">
-                                <VanityStatsStat
-                                    title="Efficiency (TH/GLM)"
-                                    value={
-                                        targets?.efficiencyTarget
-                                            ? `${RoundingFunction(perf.efficiencyThPerGlm, 4)} / target ${targets.efficiencyTarget}`
-                                            : RoundingFunction(perf.efficiencyThPerGlm, 4)
-                                    }
-                                />
-                                <VanityStatsStat
-                                    title="Avg speed (H/s)"
-                                    value={
-                                        targets?.speedTarget
-                                            ? `${Math.round(perf.avgSpeedHps).toLocaleString()} / target ${targets.speedTarget.toLocaleString()}`
-                                            : Math.round(perf.avgSpeedHps).toLocaleString()
-                                    }
-                                />
-                            </div>
-                        </div>
-                    )}
-                </div>
-                {hints.length > 0 && (
-                    <>
-                        <Divider className="mt-4">Hints</Divider>
-                        <div className="mt-2 space-y-2">
-                            {hints.map((hint: any) => (
-                                <div key={hint.id} className="flex items-start gap-2">
-                                    <Badge color={hintColor[hint.severity] ?? "gray"}>{hint.severity}</Badge>
-                                    <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content">
-                                        {hint.message}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                )}
-                <Divider className="mt-4">FAQ</Divider>
-                {vanityFaq.map((item) => (
-                    <details key={item.q} className="group py-2 border-b border-tremor-border dark:border-dark-tremor-border last:border-b-0">
-                        <summary className="cursor-pointer list-none flex items-center justify-between text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                            {item.q}
-                            <span className="ml-2 text-tremor-content transition-transform group-open:rotate-90">›</span>
-                        </summary>
-                        <p className="mt-2 text-tremor-label text-tremor-content dark:text-dark-tremor-content">{item.a}</p>
-                    </details>
-                ))}
-                {reputation.updatedAt && (
-                    <p className="text-tremor-label text-tremor-content dark:text-dark-tremor-content text-center mt-4">
-                        Updated {new Date(reputation.updatedAt).toLocaleString()}
+                <div className="flex flex-wrap items-center gap-4">
+                    <VanityMarketIcon className="h-10 w-10 shrink-0 text-tremor-content-strong dark:text-dark-tremor-content-strong" />
+                    <p className="flex-1 min-w-[16rem] text-tremor-label text-tremor-content dark:text-dark-tremor-content">
+                        Vanity Market is a partner of ours and a customer of the network — not a part of it. It hires providers on Golem
+                        like any other requestor and keeps its own scorecard of the ones it hires: agreements, speed, efficiency and
+                        standing all live over on their side of the fence.
                     </p>
-                )}
+                    <Link
+                        className="golembutton shrink-0"
+                        href={`https://vanity.market/provider/info/${nodeId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        View this provider
+                        <ArrowTopRightOnSquareIcon className="h-4 w-4 ml-2 -mr-1" />
+                    </Link>
+                </div>
             </Card>
         </>
     )
@@ -376,7 +238,7 @@ export const ProviderDetailed = ({ initialData, initialIncome }: { initialData: 
                     <div className="lg:col-span-4 md:col-span-6 col-span-12 ">{renderRuntimeSection(runtime)}</div>
                 ))}
             </div>
-            {renderVanityMarketStats(nodeData[0].reputation, node_id)}
+            {renderVanityMarketPanel(nodeData[0].reputation, node_id)}
             <SEO
                 title={`${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]} | Golem Network Stats`}
                 description={`Detailed Golem Network statistics for provider with name ${nodeData[0].runtimes.vm?.properties["golem.node.id.name"]}`}
