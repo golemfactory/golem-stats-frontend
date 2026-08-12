@@ -110,9 +110,9 @@ export const ProviderList = ({ endpoint, initialData, enableShowingOfflineNodes 
 
         if (filters.hardware && filters.hardware.length) {
             const hardwareMatched = filters.hardware.some((hardware) => {
-                const hasHardwareInVm = provider.runtimes?.vm?.properties["golem.inf.cpu.brand"] === hardware
+                const hasHardwareInVm = provider.runtimes?.vm?.properties?.["golem.inf.cpu.brand"] === hardware
                 const hasHardwareInVmNvidia =
-                    provider.runtimes?.["vm-nvidia"]?.properties["golem.!exp.gap-35.v1.inf.gpu.model"] === hardware
+                    provider.runtimes?.["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"] === hardware
                 return hasHardwareInVm || hasHardwareInVmNvidia
             })
             if (!hardwareMatched) return false

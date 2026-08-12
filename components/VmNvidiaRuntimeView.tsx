@@ -1,4 +1,5 @@
 import { RoundingFunction } from "@/lib/RoundingFunction"
+import { formatOrUnknown } from "@/lib/Unknown"
 
 import IntelIcon from "./svg/IntelIcon"
 import AMDIcon from "./svg/AMDIcon"
@@ -10,8 +11,8 @@ import Link from "next/link"
 import { GolemIcon } from "./svg/GolemIcon"
 
 const VmNvidiaRuntimeView = ({ provider }) => {
-    const IconComponent = provider.runtimes.vm?.properties["golem.inf.cpu.vendor"] === "GenuineIntel" ? IntelIcon : AMDIcon
-    const additionalClasses = provider.runtimes.vm?.properties["golem.inf.cpu.vendor"] === "AuthenticAMD" ? "fill-red-500" : ""
+    const IconComponent = provider.runtimes.vm?.properties?.["golem.inf.cpu.vendor"] === "GenuineIntel" ? IntelIcon : AMDIcon
+    const additionalClasses = provider.runtimes.vm?.properties?.["golem.inf.cpu.vendor"] === "AuthenticAMD" ? "fill-red-500" : ""
     return (
         <Link
             href={{
@@ -81,7 +82,10 @@ const VmNvidiaRuntimeView = ({ provider }) => {
                         data-tooltip-id={`price-hourly${provider.node_id}`}
                         className="text-sm font-medium dark:text-dark-tremor-content-metric"
                     >
-                        ${RoundingFunction(provider.runtimes["vm-nvidia"].hourly_price_usd, 6)} / Hour
+                        {formatOrUnknown(
+                            provider.runtimes["vm-nvidia"].hourly_price_usd,
+                            (price) => `$${RoundingFunction(price, 6)} / Hour`
+                        )}
                     </p>
                 </div>
             </div>

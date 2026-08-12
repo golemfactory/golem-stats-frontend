@@ -16,11 +16,11 @@ function HardwareFilterModal({ data, filters, setFilters, runtime }) {
         let hardwareMap = new Map()
 
         data.forEach((provider) => {
-            if (runtime !== "vm-nvidia" && provider.runtimes?.vm?.properties["golem.inf.cpu.brand"]) {
+            if (runtime !== "vm-nvidia" && provider.runtimes?.vm?.properties?.["golem.inf.cpu.brand"]) {
                 const model = provider.runtimes.vm.properties["golem.inf.cpu.brand"]
                 hardwareMap.set(model, (hardwareMap.get(model) || 0) + 1)
             }
-            if (runtime !== "vm" && provider.runtimes?.["vm-nvidia"]?.properties["golem.!exp.gap-35.v1.inf.gpu.model"]) {
+            if (runtime !== "vm" && provider.runtimes?.["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"]) {
                 const model = provider.runtimes["vm-nvidia"].properties["golem.!exp.gap-35.v1.inf.gpu.model"]
                 hardwareMap.set(model, (hardwareMap.get(model) || 0) + 1)
             }
@@ -96,12 +96,12 @@ function HardwareFilterModal({ data, filters, setFilters, runtime }) {
                     {selectedHardware.map((hardware) => {
                         const matchingProvider = data.find(
                             (provider) =>
-                                provider.runtimes?.vm?.properties["golem.inf.cpu.brand"] === hardware ||
-                                provider.runtimes?.["vm-nvidia"]?.properties["golem.!exp.gap-35.v1.inf.gpu.model"] === hardware
+                                provider.runtimes?.vm?.properties?.["golem.inf.cpu.brand"] === hardware ||
+                                provider.runtimes?.["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"] === hardware
                         )
                         const isGPU =
-                            matchingProvider.runtimes?.["vm-nvidia"]?.properties["golem.!exp.gap-35.v1.inf.gpu.model"] === hardware
-                        const cpuVendor = isGPU ? "Nvidia" : matchingProvider.runtimes?.vm?.properties["golem.inf.cpu.vendor"]
+                            matchingProvider.runtimes?.["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"] === hardware
+                        const cpuVendor = isGPU ? "Nvidia" : matchingProvider.runtimes?.vm?.properties?.["golem.inf.cpu.vendor"]
                         return (
                             <HardwareBadge
                                 key={hardware}
@@ -148,12 +148,12 @@ function HardwareFilterModal({ data, filters, setFilters, runtime }) {
                             filteredAndFormattedData.map((item) => {
                                 const matchingProvider = data.find(
                                     (provider) =>
-                                        provider.runtimes?.vm?.properties["golem.inf.cpu.brand"] === item.name ||
-                                        provider.runtimes?.["vm-nvidia"]?.properties["golem.!exp.gap-35.v1.inf.gpu.model"] === item.name
+                                        provider.runtimes?.vm?.properties?.["golem.inf.cpu.brand"] === item.name ||
+                                        provider.runtimes?.["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"] === item.name
                                 )
                                 const isGPU =
-                                    matchingProvider.runtimes?.["vm-nvidia"]?.properties["golem.!exp.gap-35.v1.inf.gpu.model"] === item.name
-                                const cpuVendor = isGPU ? "Nvidia" : matchingProvider.runtimes?.vm?.properties["golem.inf.cpu.vendor"]
+                                    matchingProvider.runtimes?.["vm-nvidia"]?.properties?.["golem.!exp.gap-35.v1.inf.gpu.model"] === item.name
+                                const cpuVendor = isGPU ? "Nvidia" : matchingProvider.runtimes?.vm?.properties?.["golem.inf.cpu.vendor"]
 
                                 return (
                                     <div

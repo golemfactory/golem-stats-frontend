@@ -1,7 +1,9 @@
 import { RoundingFunction } from "@/lib/RoundingFunction"
+import { formatOrUnknown, UNKNOWN_LABEL } from "@/lib/Unknown"
 const priceHashMapOrDefault = (provider, usage) => {
     const runtime = provider.runtimes.vm || provider.runtimes.wasmtime
-    return PriceHashmap(runtime.properties, usage)
+    if (!runtime?.properties) return UNKNOWN_LABEL
+    return formatOrUnknown(PriceHashmap(runtime.properties, usage), (price) => price)
 }
 
 import { PriceHashmap } from "@/lib/PriceHashmap"
@@ -82,21 +84,23 @@ const VmRuntimeView = ({ provider }) => {
                         data-tooltip-id={`price-hourly${provider.node_id}`}
                         className="text-sm font-medium dark:text-dark-tremor-content-metric"
                     >
-                        ${RoundingFunction(provider.runtimes.vm?.hourly_price_usd, 6)} /Hour
+                        {formatOrUnknown(provider.runtimes.vm?.hourly_price_usd, (price) => `$${RoundingFunction(price, 6)} /Hour`)}
                         <ReactTooltip
                             id={`price-hourly${provider.node_id}`}
                             place="bottom"
-                            content={`Calculated using the formula: Assuming 100% usage on ${
-                                provider.runtimes.vm?.properties?.["golem.inf.cpu.threads"]
-                            } CPU threads at a rate of ${priceHashMapOrDefault(
+                            content={`Calculated using the formula: Assuming 100% usage on ${formatOrUnknown(
+                                provider.runtimes.vm?.properties?.["golem.inf.cpu.threads"],
+                                (threads) => threads
+                            )} CPU threads at a rate of ${priceHashMapOrDefault(
                                 provider,
                                 "golem.usage.cpu_sec"
                             )} GLM per thread, plus an environment rate of ${priceHashMapOrDefault(
                                 provider,
                                 "golem.usage.duration_sec"
-                            )} GLM per hour, and a start price of ${
-                                provider.runtimes.vm?.properties?.["golem.com.pricing.model.linear.coeffs"]?.slice(-1)[0]
-                            } GLM. These costs are then converted to USD based on the current GLM price.`}
+                            )} GLM per hour, and a start price of ${formatOrUnknown(
+                                provider.runtimes.vm?.properties?.["golem.com.pricing.model.linear.coeffs"]?.slice(-1)[0],
+                                (startPrice) => startPrice
+                            )} GLM. These costs are then converted to USD based on the current GLM price.`}
                             className="break-words max-w-64 z-50"
                         />
                     </p>
