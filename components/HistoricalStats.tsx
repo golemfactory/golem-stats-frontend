@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react"
 import { AreaChart, Card } from "@tremor/react"
-import Select from "react-select"
-import { hotjar } from 'react-hotjar' // Add this import
 import { useTimeFrame } from "@/components/TimeFrameContext"
 import { TimeFrameTabs } from "@/components/TimeFrameTabs"
 
@@ -129,17 +127,8 @@ const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, sel
 }
 
 const NetworkStats = ({ metricData }) => {
-    const [selectedRuntime, setSelectedRuntime] = useState(Object.keys(metricData).includes("vm") ? "vm" : Object.keys(metricData)[0])
+    const selectedRuntime = "vm"
     const { timeFrame: selectedTimeFrame } = useTimeFrame()
-
-    const runtimeOptions = Object.keys(metricData)
-        .sort((a, b) => getProviderType(a).localeCompare(getProviderType(b)))
-        .map((runtime) => ({ value: runtime, label: getProviderType(runtime) }))
-
-    const handleRuntimeChange = (selectedOption) => {
-        setSelectedRuntime(selectedOption.value)
-        hotjar.event('Selected Runtime - ' + selectedOption.label)
-    }
 
     const [tabs, setTabs] = useState([
         {
@@ -204,17 +193,6 @@ const NetworkStats = ({ metricData }) => {
 
     return (
         <div>
-            <div className="z-50 bottom-5 right-5 fixed w-40">
-                <Select
-                    value={runtimeOptions.find((option) => option.value === selectedRuntime)}
-                    onChange={handleRuntimeChange}
-                    options={runtimeOptions}
-                    instanceId="runtime-select"
-                    menuPlacement="top"
-                    isSearchable={false}
-                    placeholder="Select Runtime" // Placeholder text
-                />
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
                 {tabs.map((tab) => (
                     <NetworkStatChart
