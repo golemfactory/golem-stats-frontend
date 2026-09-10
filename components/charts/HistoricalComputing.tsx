@@ -1,39 +1,66 @@
 import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
-import { Card, AreaChart } from "@tremor/react"
+import { Card, AreaChart, Tab, TabGroup, TabList } from "@tremor/react"
 import { useTimeFrame } from "@/components/TimeFrameContext"
-import { TimeFrameTabs } from "@/components/TimeFrameTabs"
+
+interface ComputingSample {
+    truncated_date: string
+    total: number
+}
+
+const timeFrames = ["24h", "7d", "30d"] as const
 
 export const HistoricalComputingChart: React.FC = () => {
-    const { timeFrame: selectedTimeFrame } = useTimeFrame()
-    const { data, error } = useSWR("v2/network/historical/computing/combined", fetcher, {
+    const { timeFrame, setTimeFrame } = useTimeFrame()
+    const [showMonthlyHistory, setShowMonthlyHistory] = useState(false)
+    const selectedTimeFrame = showMonthlyHistory ? "30d" : timeFrame
+    useEffect(() => setShowMonthlyHistory(false), [timeFrame])
+    const { data, error } = useSWR<Record<string, ComputingSample[]>>("v2/network/historical/computing/combined", fetcher, {
         refreshInterval: 60000,
     })
-    const [formattedData, setFormattedData] = useState([])
+    const { data: monthlyData, error: monthlyError } = useSWR<Record<string, ComputingSample[]>>(
+        showMonthlyHistory ? "v2/network/historical/computing" : null,
+        fetcher,
+        {
+            refreshInterval: 60000,
+        }
+    )
 
     const formatLabel = (isoDate: string, timeFrame: string) => {
         const date = new Date(isoDate)
-        if (timeFrame === "24h") {
-            return date.toLocaleTimeString(navigator.language, { hour: "2-digit", minute: "2-digit" })
+        if (timeFrame === "30d") {
+            return date.toLocaleDateString(navigator.language, {
+                month: "short",
+                day: "numeric",
+                timeZone: "UTC",
+            })
         }
-        return date.toLocaleString(navigator.language, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+        if (timeFrame === "24h") {
+            return date.toLocaleTimeString(navigator.language, {
+                hour: "2-digit",
+                minute: "2-digit",
+            })
+        }
+        return date.toLocaleString(navigator.language, {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        })
     }
 
-    useEffect(() => {
-        if (data && selectedTimeFrame in data) {
-            const newFormattedData = data[selectedTimeFrame].map(({ truncated_date, total }) => ({
-                date: formatLabel(truncated_date, selectedTimeFrame),
-                "Providers computing": total,
-            }))
-            setFormattedData(newFormattedData)
-        }
-    }, [data, selectedTimeFrame])
+    const samples = showMonthlyHistory ? monthlyData?.["1m"] : data?.[selectedTimeFrame]
+    const seriesLabel = showMonthlyHistory ? "Daily peak providers computing" : "Providers computing"
+    const formattedData = (samples ?? []).map(({ truncated_date, total }) => ({
+        date: formatLabel(truncated_date, selectedTimeFrame),
+        [seriesLabel]: total,
+    }))
 
     const rightNow = data?.["24h"]?.length ? data["24h"][data["24h"].length - 1].total : 0
     const weeklyPeak = data?.["7d"]?.length ? Math.max(...data["7d"].map((item) => item.total)) : 0
 
-    if (error) return <div>Failed to load data...</div>
+    if (error && !showMonthlyHistory) return <div>Failed to load data...</div>
 
     return (
         <Card className="h-full px-6">
@@ -41,7 +68,7 @@ export const HistoricalComputingChart: React.FC = () => {
                 <h1 className="text-2xl mb-2 font-medium dark:text-gray-300">Computing on the Network</h1>
                 <p className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
                     The number of providers simultaneously computing tasks for requestors on the Golem Network — the last 24 hours at
-                    5-minute resolution and the last 7 days at hourly resolution.
+                    5-minute resolution, the last 7 days at hourly resolution, and the last 30 days as daily peaks (UTC).
                 </p>
             </div>
             <div className="border-t border-tremor-border p-6 dark:border-dark-tremor-border">
@@ -64,9 +91,7 @@ export const HistoricalComputingChart: React.FC = () => {
                         </li>
                         <li className="flex items-center">
                             <div>
-                                <h3 className="text-tremor-default font-medium text-red-500 dark:text-dark-tremor-content">
-                                    7-day peak
-                                </h3>
+                                <h3 className="text-tremor-default font-medium text-red-500 dark:text-dark-tremor-content">7-day peak</h3>
                                 <div className="flex items-baseline space-x-2">
                                     <span className="text-tremor-metric font-semibold font-inter dark:text-dark-tremor-content-metric">
                                         {weeklyPeak}{" "}
@@ -80,24 +105,39 @@ export const HistoricalComputingChart: React.FC = () => {
                     </ul>
 
                     <div className="order-1 md:order-2">
-                        <TimeFrameTabs />
+                        <TabGroup
+                            index={timeFrames.indexOf(selectedTimeFrame)}
+                            onIndexChange={(index) => {
+                                const frame = timeFrames[index]
+                                setShowMonthlyHistory(frame === "30d")
+                                if (frame !== "30d") setTimeFrame(frame)
+                            }}
+                        >
+                            <TabList variant="solid" className="flex flex-wrap justify-center md:justify-start w-full md:w-fit">
+                                {timeFrames.map((frame) => (
+                                    <Tab key={frame}>{frame}</Tab>
+                                ))}
+                            </TabList>
+                        </TabGroup>
                     </div>
                 </div>
             </div>
             <div className="flex justify-between">
-                {formattedData.length > 0 ? (
+                {showMonthlyHistory && monthlyError ? (
+                    <span>Failed to load 30-day history.</span>
+                ) : formattedData.length > 0 ? (
                     <AreaChart
                         className="h-72"
                         data={formattedData}
                         index="date"
                         autoMinValue={true}
-                        categories={["Providers computing"]}
+                        categories={[seriesLabel]}
                         colors={["blue"]}
                         yAxisWidth={30}
                         showAnimation={true}
                     />
                 ) : (
-                    <span>Loading...</span>
+                    <span>{samples ? "No data available for this period." : "Loading..."}</span>
                 )}
             </div>
         </Card>
