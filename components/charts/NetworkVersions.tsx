@@ -11,7 +11,7 @@ import { TimeFrameTabs } from "@/components/TimeFrameTabs"
 const SERIES_COLORS = ["blue", "emerald", "violet", "amber", "cyan", "rose", "gray"]
 
 export const NetworkVersionAdoption: React.FC = () => {
-    const { timeFrame, setTimeFrame } = useTimeFrame()
+    const { timeFrame } = useTimeFrame()
     const { data } = useSWR("v2/network/versions/combined", fetcher, {
         refreshInterval: 60000,
     })

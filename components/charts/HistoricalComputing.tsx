@@ -1,21 +1,17 @@
-import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { fetcher } from "@/fetcher"
-import { Card, AreaChart, Tab, TabGroup, TabList } from "@tremor/react"
+import { Card, AreaChart } from "@tremor/react"
 import { useTimeFrame } from "@/components/TimeFrameContext"
+import { TimeFrameTabs } from "@/components/TimeFrameTabs"
 
 interface ComputingSample {
     truncated_date: string
     total: number
 }
 
-const timeFrames = ["24h", "7d", "30d"] as const
-
 export const HistoricalComputingChart: React.FC = () => {
-    const { timeFrame, setTimeFrame } = useTimeFrame()
-    const [showMonthlyHistory, setShowMonthlyHistory] = useState(false)
-    const selectedTimeFrame = showMonthlyHistory ? "30d" : timeFrame
-    useEffect(() => setShowMonthlyHistory(false), [timeFrame])
+    const { timeFrame: selectedTimeFrame } = useTimeFrame()
+    const showMonthlyHistory = selectedTimeFrame === "30d"
     const { data, error } = useSWR<Record<string, ComputingSample[]>>("v2/network/historical/computing/combined", fetcher, {
         refreshInterval: 60000,
     })
@@ -105,20 +101,7 @@ export const HistoricalComputingChart: React.FC = () => {
                     </ul>
 
                     <div className="order-1 md:order-2">
-                        <TabGroup
-                            index={timeFrames.indexOf(selectedTimeFrame)}
-                            onIndexChange={(index) => {
-                                const frame = timeFrames[index]
-                                setShowMonthlyHistory(frame === "30d")
-                                if (frame !== "30d") setTimeFrame(frame)
-                            }}
-                        >
-                            <TabList variant="solid" className="flex flex-wrap justify-center md:justify-start w-full md:w-fit">
-                                {timeFrames.map((frame) => (
-                                    <Tab key={frame}>{frame}</Tab>
-                                ))}
-                            </TabList>
-                        </TabGroup>
+                        <TimeFrameTabs />
                     </div>
                 </div>
             </div>

@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, ReactNode } from "react"
 
-// One shared 24h/7d selection for every normalized time-series chart:
+// One shared 24h/7d/30d selection for every normalized time-series chart:
 // switching the timeframe on any chart switches all of them.
-export const TIME_FRAMES = ["24h", "7d"] as const
+export const TIME_FRAMES = ["24h", "7d", "30d"] as const
 export type TimeFrame = (typeof TIME_FRAMES)[number]
 
 const TimeFrameContext = createContext<{

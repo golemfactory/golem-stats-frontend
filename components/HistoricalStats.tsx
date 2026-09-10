@@ -54,6 +54,7 @@ const formatDate = (dateString, timeFrame) => {
     const options =
         {
             "24h": { hour: "2-digit", minute: "2-digit" },
+            "30d": { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" },
             "7d": { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" },
         }[timeFrame] || {}
     return date.toLocaleString(navigator.language, options)
@@ -110,7 +111,7 @@ const NetworkStatChart = ({ name, metricData, metric, unit, selectedRuntime, sel
 
             <div className="chart-container">
                 <AreaChart
-                    data={metricData[selectedRuntime][selectedTimeFrame].map((item) => ({
+                    data={(metricData[selectedRuntime]?.[selectedTimeFrame] ?? []).map((item) => ({
                         ...item,
                         date: formatDate(item.date, selectedTimeFrame),
                     }))}
@@ -160,7 +161,7 @@ const NetworkStats = ({ metricData }) => {
     useEffect(() => {
         // Aggregate check across all timeframes for any non-zero GPU count
         if (!metricData[selectedRuntime]) return
-        const hasGPUData = ["24h", "7d"].some((timeframe) =>
+        const hasGPUData = ["24h", "7d", "30d"].some((timeframe) =>
             metricData[selectedRuntime][timeframe]?.some((entry) => entry.gpus > 0)
         )
 
